@@ -120,7 +120,9 @@ const client = await connect();
 
 // Get or create named page (viewport only applies to new pages)
 const page = await client.page("name");
-const pageWithSize = await client.page("name", { viewport: { width: 1920, height: 1080 } });
+const pageWithSize = await client.page("name", {
+  viewport: { width: 1920, height: 1080 },
+});
 
 const pages = await client.list(); // List all page names
 await client.close("name"); // Close a page

@@ -184,10 +184,10 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
 ```typescript
 // Pick specific props from another component
-type IconProps = Pick<ButtonProps, 'size' | 'color'>;
+type IconProps = Pick<ButtonProps, "size" | "color">;
 
 // Omit specific props
-type ButtonWithoutClick = Omit<ButtonProps, 'onClick'>;
+type ButtonWithoutClick = Omit<ButtonProps, "onClick">;
 
 // Make all props optional
 type PartialButtonProps = Partial<ButtonProps>;

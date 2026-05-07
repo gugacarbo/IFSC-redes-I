@@ -27,6 +27,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/intro.md`
 - `docusaurus/docs/definicoes.md`
 
@@ -46,6 +47,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/filial.md`
 - `docusaurus/docs/protocol/udp.md`
 - `docusaurus/docs/firmware/filial/overview.md`
@@ -65,6 +67,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/protocol/udp.md`
 - `docusaurus/docs/infrastructure/network.md`
 
@@ -83,6 +86,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/infrastructure/wifi.md`
 
 **Acceptance Criteria:**
@@ -100,6 +104,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/requisitos.md`
 - `docusaurus/docs/protocol/udp.md`
 - `docusaurus/docs/firmware/filial/overview.md`
@@ -118,6 +123,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/firmware/matriz/overview.md`
 - `docusaurus/docs/matriz.md`
 
@@ -135,6 +141,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/firmware/matriz/overview.md`
 - `docusaurus/docs/firmware/filial/overview.md`
 - `docusaurus/docs/architecture/matriz.md`
@@ -155,6 +162,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Group:** A
 
 **Arquivos afetados:**
+
 - `docusaurus/docs/protocol/websocket.md`
 
 **Acceptance Criteria:**
@@ -174,6 +182,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/architecture/overview.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/definicoes.md` — §2.2 (flowchart completo) → substituir por link
 - `docusaurus/docs/fluxos.md` — §2.2 (flowchart idêntico) → substituir por link
 - `docusaurus/docs/intro.md` — descrição de componentes (manter resumo breve, adicionar link)
@@ -195,6 +204,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/protocol/udp.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/requisitos.md` — §5 (Protocolo UDP completo) → substituir por link
 
 **Acceptance Criteria:**
@@ -213,6 +223,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/protocol/websocket.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/matriz-gui.md` — §3 (mensagens WebSocket) → substituir por link
 
 **Acceptance Criteria:**
@@ -231,6 +242,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/infrastructure/config.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/config-build.md` — seção WiFi → substituir por link
 - `docusaurus/docs/firmware/matriz/overview.md` — seção config_wifi → substituir por link
 - `docusaurus/docs/firmware/filial/overview.md` — seção config_wifi → substituir por link
@@ -253,6 +265,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/infrastructure/config.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/matriz.md` — seção configuração → substituir por link
 - `docusaurus/docs/firmware/matriz/overview.md` — seção config_matriz → substituir por link
 
@@ -272,6 +285,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/infrastructure/config.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/filial.md` — seção configuração → substituir por link
 - `docusaurus/docs/firmware/filial/overview.md` — seção config_filial → substituir por link
 
@@ -291,6 +305,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/firmware/matriz/rest-api.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/matriz-gui.md` — §4 (integração REST) → substituir por link
 
 **Acceptance Criteria:**
@@ -309,6 +324,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/firmware/matriz/overview.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/matriz.md` — seção tasks FreeRTOS → substituir por link
 - `docusaurus/docs/architecture/matriz.md` — seção tasks → substituir por link
 
@@ -328,6 +344,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/firmware/filial/overview.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/filial.md` — seção tasks FreeRTOS → substituir por link
 - `docusaurus/docs/architecture/filial.md` — seção tasks → substituir por link
 
@@ -347,6 +364,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/infrastructure/config.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/config-build.md` — seção GPIO → substituir por link
 - `docusaurus/docs/firmware/filial/overview.md` — seção mapeamento GPIO → substituir por link
 
@@ -368,6 +386,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico (sensores vs atuadores):** `docusaurus/docs/definicoes.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/definicoes.md` — formato de ID → substituir por link para `requisitos.md` §4.1
 - `docusaurus/docs/infrastructure/config.md` — formato de ID → substituir por link
 - `docusaurus/docs/firmware/filial/overview.md` — formato de ID + conceito sensores/atuadores → substituir por links
@@ -393,6 +412,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico (timeout):** `docusaurus/docs/protocol/udp.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/matriz.md` — seção polling → substituir por link
 - `docusaurus/docs/matriz-gui.md` — seção "Robustez" + timeout 800ms → substituir por links
 - `docusaurus/docs/architecture/overview.md` — menção a polling/offline/timeout → substituir por links
@@ -417,6 +437,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/devops/build-deploy.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/config-build.md` — seção build GUI → substituir por link
 
 **Acceptance Criteria:**
@@ -435,6 +456,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/infrastructure/network.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/infrastructure/wifi.md` — menção a mDNS → substituir por link
 - `docusaurus/docs/matriz-gui.md` — seção descoberta mDNS → manter resumo, adicionar link
 
@@ -454,6 +476,7 @@ Este PRD descreve a refatoração completa para eliminar duplicações, corrigir
 **Arquivo canônico:** `docusaurus/docs/infrastructure/network.md`
 
 **Arquivos a refatorar:**
+
 - `docusaurus/docs/config-build.md` — seção endereços/portas → substituir por link
 - `docusaurus/docs/matriz.md` — menção a endereços/portas → substituir por link
 

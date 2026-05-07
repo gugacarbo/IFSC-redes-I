@@ -10,6 +10,7 @@ description: Build UI components with dark theme, shadcn/ui, animations, and res
 **HARD LIMIT: 300 lines per file maximum. NO EXCEPTIONS.**
 
 Before writing any component:
+
 1. If file would exceed 300 lines → decompose FIRST
 2. If component has 3+ useState → extract to hook
 3. If component has tabs/sections → split into separate files
@@ -40,6 +41,7 @@ See **code-structure** skill for detailed decomposition patterns.
 ## When to Use This Skill
 
 Load this skill when:
+
 - Creating new React components
 - Styling existing components
 - Adding animations or transitions
@@ -93,28 +95,28 @@ Common components: `button`, `card`, `dialog`, `dropdown-menu`, `input`, `label`
 
 All colors use HSL CSS variables defined in `frontend/app/globals.css`:
 
-| Variable | Usage | Example Class |
-|----------|-------|---------------|
-| `--background` | Page background | `bg-background` |
-| `--foreground` | Primary text | `text-foreground` |
-| `--card` | Card backgrounds | `bg-card` |
-| `--primary` | Primary actions | `bg-primary text-primary-foreground` |
-| `--secondary` | Secondary elements | `bg-secondary` |
-| `--muted` | Muted text/backgrounds | `text-muted-foreground bg-muted` |
-| `--accent` | Hover states | `hover:bg-accent` |
-| `--destructive` | Error/danger | `bg-destructive text-destructive-foreground` |
-| `--border` | Borders | `border-border` |
+| Variable        | Usage                  | Example Class                                |
+| --------------- | ---------------------- | -------------------------------------------- |
+| `--background`  | Page background        | `bg-background`                              |
+| `--foreground`  | Primary text           | `text-foreground`                            |
+| `--card`        | Card backgrounds       | `bg-card`                                    |
+| `--primary`     | Primary actions        | `bg-primary text-primary-foreground`         |
+| `--secondary`   | Secondary elements     | `bg-secondary`                               |
+| `--muted`       | Muted text/backgrounds | `text-muted-foreground bg-muted`             |
+| `--accent`      | Hover states           | `hover:bg-accent`                            |
+| `--destructive` | Error/danger           | `bg-destructive text-destructive-foreground` |
+| `--border`      | Borders                | `border-border`                              |
 
 ## Responsive Breakpoints
 
-| Breakpoint | Min Width | Usage |
-|------------|-----------|-------|
-| (default) | 0px | Mobile phones |
-| `sm:` | 640px | Large phones |
-| `md:` | 768px | Tablets |
-| `lg:` | 1024px | Laptops |
-| `xl:` | 1280px | Desktops |
-| `2xl:` | 1536px | Large screens |
+| Breakpoint | Min Width | Usage         |
+| ---------- | --------- | ------------- |
+| (default)  | 0px       | Mobile phones |
+| `sm:`      | 640px     | Large phones  |
+| `md:`      | 768px     | Tablets       |
+| `lg:`      | 1024px    | Laptops       |
+| `xl:`      | 1280px    | Desktops      |
+| `2xl:`     | 1536px    | Large screens |
 
 ## Anti-Patterns (NEVER DO)
 
@@ -202,11 +204,11 @@ function SwapForm() {
 
 ## Quick Reference
 
-| Task | Solution |
-|------|----------|
-| Add component | `cd frontend && npx shadcn@latest add <name>` |
-| Custom color | Add to globals.css + tailwind.config.ts |
-| Icon | `import { IconName } from 'lucide-react'` |
-| Icon sizes | `h-4 w-4` (sm), `h-5 w-5` (md), `h-6 w-6` (lg) |
-| Hover effect | `transition-all duration-300 hover:...` |
-| Focus ring | `focus:ring-2 focus:ring-primary focus:ring-offset-2` |
+| Task          | Solution                                              |
+| ------------- | ----------------------------------------------------- |
+| Add component | `cd frontend && npx shadcn@latest add <name>`         |
+| Custom color  | Add to globals.css + tailwind.config.ts               |
+| Icon          | `import { IconName } from 'lucide-react'`             |
+| Icon sizes    | `h-4 w-4` (sm), `h-5 w-5` (md), `h-6 w-6` (lg)        |
+| Hover effect  | `transition-all duration-300 hover:...`               |
+| Focus ring    | `focus:ring-2 focus:ring-primary focus:ring-offset-2` |

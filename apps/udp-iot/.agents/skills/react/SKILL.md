@@ -10,6 +10,7 @@ description: Core React 19 patterns including hooks, Suspense, lazy loading, com
 Essential React 19 patterns for building modern applications with hooks, Suspense, lazy loading, and TypeScript.
 
 **Note**: React 19 (released December 2024) breaking changes:
+
 - `forwardRef` no longer needed - pass `ref` as a prop directly
 - `propTypes` removed (silently ignored)
 - New JSX transform required
@@ -92,8 +93,8 @@ const [user, setUser] = useState<User | null>(null);
 const [items, setItems] = useState<Item[]>([]);
 
 // Functional updates when depending on previous state
-setCount(prev => prev + 1);
-setItems(prev => [...prev, newItem]);
+setCount((prev) => prev + 1);
+setItems((prev) => [...prev, newItem]);
 ```
 
 ### useCallback
@@ -101,13 +102,16 @@ setItems(prev => [...prev, newItem]);
 ```typescript
 // Wrap functions passed to child components
 const handleClick = useCallback((id: string) => {
-  console.log('Clicked:', id);
+  console.log("Clicked:", id);
 }, []); // Empty deps if no dependencies
 
 // With dependencies
-const handleUpdate = useCallback((data: FormData) => {
-  apiCall(userId, data);
-}, [userId]); // Re-create when userId changes
+const handleUpdate = useCallback(
+  (data: FormData) => {
+    apiCall(userId, data);
+  },
+  [userId],
+); // Re-create when userId changes
 ```
 
 ### useMemo
@@ -470,6 +474,7 @@ const handleAdd = () => {
 ## Additional Resources
 
 For more detailed patterns, see:
+
 - [component-patterns.md](resources/component-patterns.md) - Advanced component patterns
 - [performance.md](resources/performance.md) - Performance optimization techniques
 - [typescript-patterns.md](resources/typescript-patterns.md) - TypeScript best practices

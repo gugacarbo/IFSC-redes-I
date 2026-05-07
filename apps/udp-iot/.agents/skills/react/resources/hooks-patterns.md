@@ -3,10 +3,12 @@
 ## useToggle
 
 ```typescript
-function useToggle(initialValue = false): [boolean, () => void, (value: boolean) => void] {
+function useToggle(
+  initialValue = false,
+): [boolean, () => void, (value: boolean) => void] {
   const [value, setValue] = useState(initialValue);
 
-  const toggle = useCallback(() => setValue(v => !v), []);
+  const toggle = useCallback(() => setValue((v) => !v), []);
   const set = useCallback((newValue: boolean) => setValue(newValue), []);
 
   return [value, toggle, set];
@@ -52,7 +54,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 // Usage
-const [searchTerm, setSearchTerm] = useState('');
+const [searchTerm, setSearchTerm] = useState("");
 const debouncedSearch = useDebounce(searchTerm, 500);
 
 useEffect(() => {
@@ -68,7 +70,7 @@ useEffect(() => {
 function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
   handler: (event: WindowEventMap[K]) => void,
-  element: Window | HTMLElement = window
+  element: Window | HTMLElement = window,
 ) {
   const savedHandler = useRef(handler);
 
@@ -77,7 +79,8 @@ function useEventListener<K extends keyof WindowEventMap>(
   }, [handler]);
 
   useEffect(() => {
-    const eventListener = (event: Event) => savedHandler.current(event as WindowEventMap[K]);
+    const eventListener = (event: Event) =>
+      savedHandler.current(event as WindowEventMap[K]);
     element.addEventListener(eventName, eventListener);
 
     return () => element.removeEventListener(eventName, eventListener);
@@ -85,30 +88,36 @@ function useEventListener<K extends keyof WindowEventMap>(
 }
 
 // Usage
-useEventListener('resize', () => console.log('Window resized'));
-useEventListener('click', (e) => console.log('Clicked', e.target), buttonRef.current);
+useEventListener("resize", () => console.log("Window resized"));
+useEventListener(
+  "click",
+  (e) => console.log("Clicked", e.target),
+  buttonRef.current,
+);
 ```
 
 ## useMediaQuery
 
 ```typescript
 function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(query);
     const handler = (event: MediaQueryListEvent) => setMatches(event.matches);
 
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
   }, [query]);
 
   return matches;
 }
 
 // Usage
-const isMobile = useMediaQuery('(max-width: 768px)');
-const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
+const isMobile = useMediaQuery("(max-width: 768px)");
+const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
 ```
 
 ## useIntersectionObserver
@@ -116,7 +125,7 @@ const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
 ```typescript
 function useIntersectionObserver(
   elementRef: RefObject<Element>,
-  options?: IntersectionObserverInit
+  options?: IntersectionObserverInit,
 ): IntersectionObserverEntry | null {
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
 
@@ -126,7 +135,7 @@ function useIntersectionObserver(
 
     const observer = new IntersectionObserver(
       ([entry]) => setEntry(entry),
-      options
+      options,
     );
 
     observer.observe(element);
@@ -158,30 +167,27 @@ interface AsyncState<T> {
 
 function useAsync<T>(
   asyncFunction: () => Promise<T>,
-  dependencies: DependencyList = []
+  dependencies: DependencyList = [],
 ): AsyncState<T> {
   const [state, setState] = useState<AsyncState<T>>({
     loading: true,
     error: null,
-    data: null
+    data: null,
   });
 
   useEffect(() => {
     setState({ loading: true, error: null, data: null });
 
     asyncFunction()
-      .then(data => setState({ loading: false, error: null, data }))
-      .catch(error => setState({ loading: false, error, data: null }));
+      .then((data) => setState({ loading: false, error: null, data }))
+      .catch((error) => setState({ loading: false, error, data: null }));
   }, dependencies);
 
   return state;
 }
 
 // Usage
-const { loading, error, data } = useAsync(
-  () => fetchUser(userId),
-  [userId]
-);
+const { loading, error, data } = useAsync(() => fetchUser(userId), [userId]);
 ```
 
 ## useInterval
@@ -206,10 +212,7 @@ function useInterval(callback: () => void, delay: number | null) {
 const [count, setCount] = useState(0);
 const [isRunning, setIsRunning] = useState(true);
 
-useInterval(
-  () => setCount(count + 1),
-  isRunning ? 1000 : null
-);
+useInterval(() => setCount(count + 1), isRunning ? 1000 : null);
 ```
 
 ## useClickOutside
@@ -217,7 +220,7 @@ useInterval(
 ```typescript
 function useClickOutside<T extends HTMLElement>(
   ref: RefObject<T>,
-  handler: (event: MouseEvent | TouchEvent) => void
+  handler: (event: MouseEvent | TouchEvent) => void,
 ) {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
@@ -228,12 +231,12 @@ function useClickOutside<T extends HTMLElement>(
       handler(event);
     };
 
-    document.addEventListener('mousedown', listener);
-    document.addEventListener('touchstart', listener);
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
 
     return () => {
-      document.removeEventListener('mousedown', listener);
-      document.removeEventListener('touchstart', listener);
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
     };
   }, [ref, handler]);
 }
@@ -314,19 +317,19 @@ interface WindowSize {
 function useWindowSize(): WindowSize {
   const [size, setSize] = useState<WindowSize>({
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   });
 
   useEffect(() => {
     const handleResize = () => {
       setSize({
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       });
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return size;
@@ -400,13 +403,13 @@ function useFetch<T>(url: string, options?: RequestInit) {
     setLoading(true);
 
     fetch(url, { ...options, signal: abortController.signal })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setData(data);
         setError(null);
       })
-      .catch(err => {
-        if (err.name !== 'AbortError') {
+      .catch((err) => {
+        if (err.name !== "AbortError") {
           setError(err);
         }
       })
@@ -419,7 +422,7 @@ function useFetch<T>(url: string, options?: RequestInit) {
 }
 
 // Usage
-const { data, loading, error } = useFetch<User>('/api/user/123');
+const { data, loading, error } = useFetch<User>("/api/user/123");
 ```
 
 ## Hook Composition
@@ -431,8 +434,8 @@ function useAuthenticatedFetch<T>(url: string) {
   const { token } = useAuth();
   const { data, loading, error } = useFetch<T>(url, {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
 
   return { data, loading, error };
@@ -445,11 +448,11 @@ function useForm(initialValues: Record<string, any>) {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const handleChange = useCallback((field: string, value: any) => {
-    setValues(prev => ({ ...prev, [field]: value }));
+    setValues((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   const handleBlur = useCallback((field: string) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
+    setTouched((prev) => ({ ...prev, [field]: true }));
   }, []);
 
   const reset = useCallback(() => {
@@ -464,7 +467,7 @@ function useForm(initialValues: Record<string, any>) {
     touched,
     handleChange,
     handleBlur,
-    reset
+    reset,
   };
 }
 ```

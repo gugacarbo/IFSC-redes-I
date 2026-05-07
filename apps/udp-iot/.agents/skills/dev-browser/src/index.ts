@@ -1,7 +1,7 @@
+import { mkdirSync } from "node:fs";
+import type { Socket } from "node:net";
+import { join } from "node:path";
 import express, { type Express, type Request, type Response } from "express";
-import { mkdirSync } from "fs";
-import type { Socket } from "net";
-import { join } from "path";
 import { type BrowserContext, chromium, type Page } from "playwright";
 import type {
 	GetPageRequest,

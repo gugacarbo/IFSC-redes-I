@@ -3,14 +3,17 @@ import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.io.IOException;
 
+/**
+ * Main application window for the UDP Multicast Chat.
+ * <p>
+ * Composed of a {@link ConnectionPanel} (top), a scrollable message
+ * area (center), and a send bar (bottom).
+ */
 @SuppressWarnings("serial")
 public class ChatGUI extends JFrame {
 
-    private final JTextField txtUsername = new JTextField(12);
-    private final JTextField txtGroup    = new JTextField("230.0.0.0", 12);
-    private final JTextField txtPort     = new JTextField("4446", 6);
-    private final JButton    btnJoin     = new JButton("Entrar");
-    private final JButton    btnLeave    = new JButton("Sair");
+    private final ConnectionPanel connPanel = new ConnectionPanel();
+
     private final JTextArea  txtMessages = new JTextArea();
     private final JTextField txtMessage  = new JTextField();
     private final JButton    btnSend     = new JButton("Enviar");
@@ -28,7 +31,7 @@ public class ChatGUI extends JFrame {
         super("UDP Chat — Multicast");
         buildUI();
         registerListeners();
-        updateUIState(false);
+        connPanel.setConnected(false);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(560, 420);
@@ -43,17 +46,7 @@ public class ChatGUI extends JFrame {
         setLayout(new BorderLayout(6, 6));
 
         // ---- top: connection panel ----
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 4));
-        top.add(new JLabel("Usuário:"));
-        top.add(txtUsername);
-        top.add(Box.createHorizontalStrut(8));
-        top.add(new JLabel("Grupo:"));
-        top.add(txtGroup);
-        top.add(Box.createHorizontalStrut(8));
-        top.add(new JLabel("Porta:"));
-        top.add(txtPort);
-        top.add(btnJoin);
-        top.add(btnLeave);
+        add(connPanel, BorderLayout.NORTH);
 
         // ---- center: message area ----
         txtMessages.setEditable(false);
@@ -62,18 +55,16 @@ public class ChatGUI extends JFrame {
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane scroll = new JScrollPane(txtMessages);
 
-        // ---- bottom: send panel ----
+        // ---- bottom: send bar ----
         JPanel bottom = new JPanel(new BorderLayout(6, 6));
         bottom.add(txtMessage, BorderLayout.CENTER);
         bottom.add(btnSend, BorderLayout.EAST);
 
-        // assemble
-        add(top,    BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
 
         ((JComponent) getContentPane()).setBorder(
-            BorderFactory.createEmptyBorder(6, 6, 6, 6));
+                BorderFactory.createEmptyBorder(6, 6, 6, 6));
     }
 
     // ------------------------------------------------------------------
@@ -81,8 +72,7 @@ public class ChatGUI extends JFrame {
     // ------------------------------------------------------------------
 
     private void registerListeners() {
-        btnJoin.addActionListener(e -> doJoin());
-        btnLeave.addActionListener(e -> doLeave());
+        connPanel.onToggle(this::doToggle);
         btnSend.addActionListener(e -> doSend());
         txtMessage.addActionListener(e -> doSend());
     }
@@ -91,14 +81,23 @@ public class ChatGUI extends JFrame {
     //  Actions
     // ------------------------------------------------------------------
 
+    private void doToggle() {
+        if (connPanel.isConnected()) {
+            doDisconnect();
+        } else {
+            doJoin();
+        }
+    }
+
     private void doJoin() {
-        String username = txtUsername.getText().trim();
+        String username = connPanel.getUsername();
         if (username.isEmpty()) {
             showError("Informe um nome de usuário.");
+            connPanel.requestUsernameFocus();
             return;
         }
 
-        String group = txtGroup.getText().trim();
+        String group = connPanel.getGroup();
         if (group.isEmpty()) {
             showError("Informe um endereço de grupo multicast.");
             return;
@@ -106,7 +105,7 @@ public class ChatGUI extends JFrame {
 
         int port;
         try {
-            port = Integer.parseInt(txtPort.getText().trim());
+            port = Integer.parseInt(connPanel.getPortText());
             if (port < 1 || port > 65535) throw new NumberFormatException();
         } catch (NumberFormatException e) {
             showError("Porta inválida (1-65535).");
@@ -116,8 +115,9 @@ public class ChatGUI extends JFrame {
         try {
             chatManager.joinGroup(group, port, username);
             currentGroup = group;
-            currentPort  = port;
-            updateUIState(true);
+            currentPort = port;
+            connPanel.setConnected(true);
+            updateSendEnabled(true);
             appendMessage(">>> Entrou no grupo " + group + ":" + port
                           + " como " + username);
         } catch (IOException e) {
@@ -125,10 +125,11 @@ public class ChatGUI extends JFrame {
         }
     }
 
-    private void doLeave() {
+    private void doDisconnect() {
         chatManager.leaveGroup();
-        updateUIState(false);
-        appendMessage(">>> Saiu do grupo " + currentGroup + ":" + currentPort);
+        connPanel.setConnected(false);
+        updateSendEnabled(false);
+        appendMessage(">>> Desconectou do grupo " + currentGroup + ":" + currentPort);
     }
 
     private void doSend() {
@@ -144,7 +145,7 @@ public class ChatGUI extends JFrame {
     }
 
     // ------------------------------------------------------------------
-    //  GUI helpers  (called from any thread — uses invokeLater)
+    //  GUI helpers (called from any thread — uses invokeLater)
     // ------------------------------------------------------------------
 
     public void appendMessage(String text) {
@@ -153,32 +154,13 @@ public class ChatGUI extends JFrame {
 
     private void showError(String msg) {
         SwingUtilities.invokeLater(() ->
-            JOptionPane.showMessageDialog(this, msg, "Erro",
-                                          JOptionPane.ERROR_MESSAGE));
+                JOptionPane.showMessageDialog(this, msg, "Erro",
+                                              JOptionPane.ERROR_MESSAGE));
     }
 
-    private void updateUIState(boolean connected) {
-        txtUsername.setEnabled(!connected);
-        txtGroup.setEnabled(!connected);
-        txtPort.setEnabled(!connected);
-        btnJoin.setEnabled(!connected);
-        btnLeave.setEnabled(connected);
-        txtMessage.setEnabled(connected);
-        btnSend.setEnabled(connected);
-        if (!connected) txtMessage.setText("");
-    }
-
-    // ------------------------------------------------------------------
-    //  Entry point
-    // ------------------------------------------------------------------
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception ignored) { }
-            new ChatGUI().setVisible(true);
-        });
+    private void updateSendEnabled(boolean enabled) {
+        txtMessage.setEnabled(enabled);
+        btnSend.setEnabled(enabled);
+        if (!enabled) txtMessage.setText("");
     }
 }

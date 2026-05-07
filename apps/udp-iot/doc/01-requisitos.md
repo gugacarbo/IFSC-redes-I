@@ -7,7 +7,7 @@
 Imagine que você trabalha em uma empresa de desenvolvimento de software e que em uma reunião com um dos clientes da empresa, este relata o seguinte problema:
 
 > “...Temos diversas filiais e estamos tendo um gasto excessivo de energia elétrica por conta de luzes e aparelhos de ar-condicionado que se mantém ligados em horários os quais não há nenhum funcionário na empresa.
->  Gostaria de uma solução que nos permitisse monitorá-los, ligá-los e desligá-los remotamente...”
+> Gostaria de uma solução que nos permitisse monitorá-los, ligá-los e desligá-los remotamente...”
 
 Diante deste relato, a sua gerente de PD&I solicita que você desenvolva uma solução que resolva o problema do cliente.
 
@@ -46,7 +46,6 @@ flowchart TD
     C -->|10.0.0.2:51000| E[Filial B]
     C -->|10.0.0.3:51000| F[Filial C]
 ```
-
 
 ## 3. Protocolo de Comunicação
 
@@ -87,6 +86,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ### 5.1 `list_req` — Listar dispositivos
 
 **Requisição:**
+
 ```json
 {
   "cmd": "list_req",
@@ -96,6 +96,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ```
 
 **Resposta:**
+
 ```json
 {
   "cmd": "list_resp",
@@ -106,6 +107,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ### 5.2 `get_status` — Estado atual
 
 **Requisição:**
+
 ```json
 {
   "cmd": "get_status",
@@ -115,6 +117,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ```
 
 **Resposta:**
+
 ```json
 {
   "cmd": "get_resp",
@@ -127,6 +130,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ### 5.3 `set_req` — Alterar estado
 
 **Luz (boolean):**
+
 ```json
 {
   "cmd": "set_req",
@@ -138,6 +142,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ```
 
 **Ar-condicionado (0–1023):**
+
 ```json
 {
   "cmd": "set_req",
@@ -149,6 +154,7 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
 ```
 
 **Resposta:**
+
 ```json
 {
   "cmd": "set_resp",
@@ -156,7 +162,6 @@ Todos os comandos incluem `user` e `pass` em toda requisição.
   "value": true
 }
 ```
-
 
 ## 6. Fluxo de Comunicação
 
@@ -183,10 +188,12 @@ sequenceDiagram
 ## 7. Requisitos Funcionais
 
 ### 7.1 Monitoramento
+
 - Visualizar estado atual dos dispositivos por filial
 - Obter lista de dispositivos da filial
 
 ### 7.2 Controle
+
 - Ligar/desligar luzes
 - Ajustar intensidade do ar-condicionado (0–1023)
 - Feedback visual após alteração
@@ -230,7 +237,7 @@ sequenceDiagram
   "pass": "admin",
   "filiais": [
     { "name": "Filial Centro", "ip": "192.168.1.100", "port": 51000 },
-    { "name": "Filial Norte",  "ip": "192.168.1.101", "port": 51000 }
+    { "name": "Filial Norte", "ip": "192.168.1.101", "port": 51000 }
   ]
 }
 ```

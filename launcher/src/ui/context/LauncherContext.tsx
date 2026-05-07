@@ -8,12 +8,14 @@ import {
 	useState,
 } from "react";
 import { getScriptOptions } from "../../data/apps.js";
+import { LANGUAGE_TEMPLATES } from "../../services/appCreator/languages.js";
+import type { LanguageTemplate } from "../../services/appCreator/types.js";
 import type { BackgroundRunHandle } from "../../services/runner.js";
 import type { AppInfo, ScriptOption } from "../../types.js";
 import { renderMarkdownLine } from "../markdown/renderMarkdownLine.js";
 import { useLauncherActions } from "./useLauncherActions.js";
 
-export type Screen = "apps" | "scripts" | "docs" | "run";
+export type Screen = "apps" | "scripts" | "docs" | "run" | "create";
 
 export interface RunViewState {
 	id: string;
@@ -48,7 +50,13 @@ export interface LauncherContextValue {
 	isExitConfirmOpen: boolean;
 	setIsExitConfirmOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	apps: AppInfo[];
+	setApps: React.Dispatch<React.SetStateAction<AppInfo[]>>;
 	runningHandlesRef: React.MutableRefObject<Map<string, BackgroundRunHandle>>;
+	createAppName: string;
+	setCreateAppName: React.Dispatch<React.SetStateAction<string>>;
+	selectedLanguageIndex: number;
+	setSelectedLanguageIndex: React.Dispatch<React.SetStateAction<number>>;
+	languageTemplates: LanguageTemplate[];
 
 	selectedApp: AppInfo | undefined;
 	scriptOptions: ScriptOption[];
@@ -66,6 +74,7 @@ export interface LauncherContextValue {
 	clearFinishedRuns: () => void;
 	requestExitConfirmation: () => void;
 	confirmExit: () => void;
+	createNewApp: () => void;
 }
 
 const LauncherContext = createContext<LauncherContextValue | null>(null);
@@ -76,6 +85,7 @@ interface LauncherProviderProps {
 }
 
 export function LauncherProvider({ apps, children }: LauncherProviderProps) {
+	const [appsState, setApps] = useState<AppInfo[]>(apps);
 	const [screen, setScreen] = useState<Screen>("apps");
 	const [previousScreen, setPreviousScreen] = useState<Screen>("apps");
 	const [runReturnScreen, setRunReturnScreen] = useState<Screen>("scripts");
@@ -87,9 +97,12 @@ export function LauncherProvider({ apps, children }: LauncherProviderProps) {
 	const [runViews, setRunViews] = useState<RunViewState[]>([]);
 	const [selectedRunIndex, setSelectedRunIndex] = useState<number>(0);
 	const [isExitConfirmOpen, setIsExitConfirmOpen] = useState<boolean>(false);
+	const [createAppName, setCreateAppName] = useState<string>("");
+	const [selectedLanguageIndex, setSelectedLanguageIndex] = useState<number>(0);
 	const runningHandlesRef = useRef<Map<string, BackgroundRunHandle>>(new Map());
+	const languageTemplates = LANGUAGE_TEMPLATES;
 
-	const selectedApp = apps[selectedAppIndex];
+	const selectedApp = appsState[selectedAppIndex];
 	const scriptOptions = getScriptOptions(selectedApp);
 
 	const { stdout } = useStdout();
@@ -120,6 +133,8 @@ export function LauncherProvider({ apps, children }: LauncherProviderProps) {
 	}, [docsLines, docsScrollOffset, docsViewportHeight]);
 
 	const actions = useLauncherActions({
+		apps: appsState,
+		setApps,
 		selectedApp,
 		setPreviousScreen,
 		setDocsContent,
@@ -132,6 +147,12 @@ export function LauncherProvider({ apps, children }: LauncherProviderProps) {
 		runningHandlesRef,
 		runViews,
 		selectedRunIndex,
+		createAppName,
+		setCreateAppName,
+		selectedLanguageIndex,
+		setSelectedLanguageIndex,
+		languageTemplates,
+		setSelectedAppIndex,
 	});
 
 	const requestExitConfirmation = useCallback(() => {
@@ -162,8 +183,14 @@ export function LauncherProvider({ apps, children }: LauncherProviderProps) {
 			setSelectedRunIndex,
 			isExitConfirmOpen,
 			setIsExitConfirmOpen,
-			apps,
+			apps: appsState,
+			setApps,
 			runningHandlesRef,
+			createAppName,
+			setCreateAppName,
+			selectedLanguageIndex,
+			setSelectedLanguageIndex,
+			languageTemplates,
 			selectedApp,
 			scriptOptions,
 			docsLines,
@@ -187,7 +214,9 @@ export function LauncherProvider({ apps, children }: LauncherProviderProps) {
 			runViews,
 			selectedRunIndex,
 			isExitConfirmOpen,
-			apps,
+			appsState,
+			createAppName,
+			selectedLanguageIndex,
 			selectedApp,
 			scriptOptions,
 			docsLines,

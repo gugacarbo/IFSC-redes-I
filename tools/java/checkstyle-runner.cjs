@@ -22,7 +22,8 @@ function expandArg(arg) {
 	const normalized = arg.replaceAll("\\", "/");
 	const slashIndex = normalized.lastIndexOf("/");
 	const dirPart = slashIndex === -1 ? "." : normalized.slice(0, slashIndex);
-	const basePart = slashIndex === -1 ? normalized : normalized.slice(slashIndex + 1);
+	const basePart =
+		slashIndex === -1 ? normalized : normalized.slice(slashIndex + 1);
 	const dirPath = path.resolve(process.cwd(), dirPart);
 
 	if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {

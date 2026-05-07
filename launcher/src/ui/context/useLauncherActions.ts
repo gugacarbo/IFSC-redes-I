@@ -1,4 +1,7 @@
 import { useCallback } from "react";
+import { getApps, getRepoRoot } from "../../data/apps.js";
+import { createApp } from "../../services/appCreator/createApp.js";
+import type { LanguageTemplate } from "../../services/appCreator/types.js";
 import { executeScriptOptionInBackground } from "../../services/runner.js";
 import type { AppInfo, ScriptOption } from "../../types.js";
 import { readAppDocs } from "../docs/readAppDocs.js";
@@ -7,6 +10,8 @@ import type { LauncherContextValue, Screen } from "./LauncherContext.js";
 export function useLauncherActions(
 	context: Pick<
 		LauncherContextValue,
+		| "apps"
+		| "setApps"
 		| "selectedApp"
 		| "setPreviousScreen"
 		| "setDocsContent"
@@ -19,9 +24,17 @@ export function useLauncherActions(
 		| "runningHandlesRef"
 		| "runViews"
 		| "selectedRunIndex"
+		| "createAppName"
+		| "setCreateAppName"
+		| "selectedLanguageIndex"
+		| "setSelectedLanguageIndex"
+		| "languageTemplates"
+		| "setSelectedAppIndex"
 	>,
 ) {
 	const {
+		apps,
+		setApps,
 		selectedApp,
 		setPreviousScreen,
 		setDocsContent,
@@ -34,6 +47,12 @@ export function useLauncherActions(
 		runningHandlesRef,
 		runViews,
 		selectedRunIndex,
+		createAppName,
+		setCreateAppName,
+		selectedLanguageIndex,
+		setSelectedLanguageIndex,
+		languageTemplates,
+		setSelectedAppIndex,
 	} = context;
 
 	const openDocs = useCallback(
@@ -175,6 +194,53 @@ export function useLauncherActions(
 		}
 	}, [runningHandlesRef]);
 
+	const createNewApp = useCallback((): void => {
+		const template: LanguageTemplate | undefined =
+			languageTemplates[selectedLanguageIndex];
+		if (!template) {
+			setStatusMessage("Selecione uma linguagem valida.");
+			return;
+		}
+
+		try {
+			const repoRoot = getRepoRoot();
+			const createdAppName = createApp({
+				repoRoot,
+				appName: createAppName,
+				template,
+			});
+			const refreshedApps = getApps(repoRoot);
+			setApps(refreshedApps);
+			const nextIndex = refreshedApps.findIndex(
+				(app) => app.name === createdAppName,
+			);
+			setSelectedAppIndex(
+				nextIndex >= 0 ? nextIndex : Math.max(apps.length - 1, 0),
+			);
+			setCreateAppName("");
+			setSelectedLanguageIndex(0);
+			setScreen("apps");
+			setStatusMessage(
+				`App "${createdAppName}" criado com sucesso em apps/${createdAppName}.`,
+			);
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : "Falha ao criar o app.";
+			setStatusMessage(message);
+		}
+	}, [
+		languageTemplates,
+		selectedLanguageIndex,
+		createAppName,
+		setApps,
+		setSelectedAppIndex,
+		apps.length,
+		setCreateAppName,
+		setSelectedLanguageIndex,
+		setScreen,
+		setStatusMessage,
+	]);
+
 	return {
 		openDocs,
 		startExternalTerminal,
@@ -183,5 +249,6 @@ export function useLauncherActions(
 		clearFinishedRuns,
 		requestExitConfirmation,
 		confirmExit,
+		createNewApp,
 	};
 }

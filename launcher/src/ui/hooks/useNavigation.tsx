@@ -19,6 +19,11 @@ export function useNavigation() {
 		setSelectedScriptIndex,
 		runViews,
 		setSelectedRunIndex,
+		createAppName,
+		setCreateAppName,
+		selectedLanguageIndex,
+		setSelectedLanguageIndex,
+		languageTemplates,
 		isExitConfirmOpen,
 		requestExitConfirmation,
 		openDocs,
@@ -26,6 +31,7 @@ export function useNavigation() {
 		stopSelectedRun,
 		stopAllRunningRuns,
 		clearFinishedRuns,
+		createNewApp,
 	} = useLauncherContext();
 
 	const isRawModeSupported = true;
@@ -48,6 +54,10 @@ export function useNavigation() {
 			}
 
 			if (screen === "docs") {
+				if (input === "n") {
+					setScreen("create");
+					return;
+				}
 				if (key.escape || input === "d" || input === "b") {
 					setScreen(previousScreen);
 					return;
@@ -75,6 +85,10 @@ export function useNavigation() {
 			}
 
 			if (screen === "run") {
+				if (input === "n") {
+					setScreen("create");
+					return;
+				}
 				if (key.upArrow) {
 					setSelectedRunIndex((prev) =>
 						clamp(prev - 1, 0, runViews.length - 1),
@@ -105,6 +119,42 @@ export function useNavigation() {
 				return;
 			}
 
+			if (screen === "create") {
+				if (key.escape) {
+					setCreateAppName("");
+					setSelectedLanguageIndex(0);
+					setScreen("apps");
+					return;
+				}
+				if (key.upArrow) {
+					setSelectedLanguageIndex((prev) =>
+						clamp(prev - 1, 0, languageTemplates.length - 1),
+					);
+					return;
+				}
+				if (key.downArrow) {
+					setSelectedLanguageIndex((prev) =>
+						clamp(prev + 1, 0, languageTemplates.length - 1),
+					);
+					return;
+				}
+				if (key.backspace || key.delete) {
+					setCreateAppName((prev) => prev.slice(0, -1));
+					return;
+				}
+				if (key.return) {
+					createNewApp();
+					return;
+				}
+				if (!key.ctrl && !key.meta && input.length === 1) {
+					const isAllowed = /[a-zA-Z0-9-_ ]/.test(input);
+					if (isAllowed) {
+						setCreateAppName((prev) => `${prev}${input}`);
+					}
+				}
+				return;
+			}
+
 			if (screen === "apps") {
 				if (key.escape) {
 					requestExitConfirmation();
@@ -112,6 +162,12 @@ export function useNavigation() {
 				}
 				if (input === "t") {
 					setScreen("run");
+					return;
+				}
+				if (input === "n") {
+					setCreateAppName(createAppName);
+					setSelectedLanguageIndex(selectedLanguageIndex);
+					setScreen("create");
 					return;
 				}
 				if (input === "d") {
@@ -134,6 +190,10 @@ export function useNavigation() {
 			}
 
 			if (screen === "scripts") {
+				if (input === "n") {
+					setScreen("create");
+					return;
+				}
 				if (input === "t") {
 					setScreen("run");
 					return;

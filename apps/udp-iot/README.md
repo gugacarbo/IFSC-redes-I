@@ -55,7 +55,6 @@ flowchart LR
 
 ## 📚 Índice da Documentação
 
-
 ### 🏗️ Arquitetura
 
 | Documento                                                          | Descrição                                                                    |
@@ -155,10 +154,10 @@ flowchart TD
     style STEP4 fill:#0ea5e9,color:#fff,stroke:#0284c7
     style STEP5 fill:#0ea5e9,color:#fff,stroke:#0284c7
 ```
+
 ### 📋 Projeto e Requisitos
 
 ---
-
 
 | Documento                                                | Descrição                                         |
 | -------------------------------------------------------- | ------------------------------------------------- |
@@ -168,7 +167,6 @@ flowchart TD
 | [Fluxos](docusaurus/docs/fluxos.md)                      | Fluxos de dados e comunicação do sistema          |
 
 ---
-
 
 ## 🚀 Como Começar
 
@@ -185,5 +183,3 @@ flowchart TD
    [Filial](docusaurus/docs/firmware/filial/overview.md)
 5. **Deploy** —
    [Build e Deploy](docusaurus/docs/devops/build-deploy.md)
-
-

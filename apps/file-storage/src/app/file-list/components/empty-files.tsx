@@ -1,3 +1,4 @@
+import { FileIcon } from "lucide-react";
 import {
 	Empty,
 	EmptyDescription,
@@ -5,7 +6,6 @@ import {
 	EmptyMedia,
 	EmptyTitle,
 } from "#/app/components/ui/empty";
-import { FileIcon } from "lucide-react";
 
 function EmptyFiles() {
 	return (
@@ -20,4 +20,5 @@ function EmptyFiles() {
 		</Empty>
 	);
 }
+
 export { EmptyFiles };

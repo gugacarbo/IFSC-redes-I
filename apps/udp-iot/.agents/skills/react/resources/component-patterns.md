@@ -111,26 +111,31 @@ function useLocalStorage<T>(key: string, initialValue: T) {
     }
   });
 
-  const setValue = useCallback((value: T | ((val: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
-    }
-  }, [key, storedValue]);
+  const setValue = useCallback(
+    (value: T | ((val: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+      }
+    },
+    [key, storedValue],
+  );
 
   return [storedValue, setValue] as const;
 }
 
 // Usage
-const [theme, setTheme] = useLocalStorage('theme', 'light');
+const [theme, setTheme] = useLocalStorage("theme", "light");
 ```
 
 ## Controlled vs Uncontrolled Components
 
 ### Controlled
+
 ```typescript
 function ControlledInput() {
   const [value, setValue] = useState('');
@@ -145,6 +150,7 @@ function ControlledInput() {
 ```
 
 ### Uncontrolled
+
 ```typescript
 function UncontrolledInput() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -158,6 +164,7 @@ function UncontrolledInput() {
 ```
 
 **When to use:**
+
 - Controlled: Form validation, conditional rendering, dynamic behavior
 - Uncontrolled: Simple forms, file inputs, integrating with non-React code
 

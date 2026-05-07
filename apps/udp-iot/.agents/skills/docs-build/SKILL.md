@@ -41,6 +41,7 @@ make lint
 ```
 
 Common lint errors:
+
 - Unclosed JSX tags
 - Invalid MDX syntax
 - Missing imports for components
@@ -49,6 +50,7 @@ Common lint errors:
 ## Rendering Library Documentation
 
 **Warning:** These scripts are slow (10+ minutes). They pull from hundreds of upstream repos. Only run when:
+
 1. Library docs don't exist locally
 2. Explicitly requested to update library content
 
@@ -105,13 +107,13 @@ docs-collator/
 
 Located in `plugins/staticRedirects/redirects/`:
 
-| File | Purpose |
-|------|---------|
-| `docs.json` | General documentation moves |
-| `refarch.json` | Reference architecture paths |
-| `deprecated.json` | Deprecated content |
-| `legacy_setup_docs.json` | Legacy setup docs |
-| `components-migration.json` | Component path changes |
+| File                        | Purpose                      |
+| --------------------------- | ---------------------------- |
+| `docs.json`                 | General documentation moves  |
+| `refarch.json`              | Reference architecture paths |
+| `deprecated.json`           | Deprecated content           |
+| `legacy_setup_docs.json`    | Legacy setup docs            |
+| `components-migration.json` | Component path changes       |
 
 ### Adding Redirects
 
@@ -171,6 +173,7 @@ sidebar_class_name: hidden
 - Mermaid diagram settings
 
 Key plugins:
+
 - `@docusaurus/plugin-client-redirects` - Static redirects
 - `docusaurus-plugin-image-zoom` - Image lightbox
 - `docusaurus-plugin-llms` - LLM-friendly exports
@@ -179,6 +182,7 @@ Key plugins:
 ## Deployment
 
 Production deployments happen via GitHub Actions. The build:
+
 1. Runs `npm install`
 2. Renders library docs (components, modules, actions)
 3. Runs `npm run build`

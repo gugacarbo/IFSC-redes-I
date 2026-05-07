@@ -1,4 +1,4 @@
-export type Paginated<T = {}> = T & {
+export type Paginated<T extends object> = T & {
 	total: number;
 	offset: number;
 	limit: number;

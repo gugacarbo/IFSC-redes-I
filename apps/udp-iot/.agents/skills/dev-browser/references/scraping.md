@@ -40,7 +40,10 @@ page.on("request", (request) => {
       headers: request.headers(),
       method: request.method(),
     };
-    fs.writeFileSync("tmp/request-details.json", JSON.stringify(capturedRequest, null, 2));
+    fs.writeFileSync(
+      "tmp/request-details.json",
+      JSON.stringify(capturedRequest, null, 2),
+    );
     console.log("Captured request:", url.substring(0, 80) + "...");
   }
 });
@@ -85,7 +88,9 @@ const client = await connect();
 const page = await client.page("site");
 
 const results = new Map(); // Use Map for deduplication
-const headers = JSON.parse(fs.readFileSync("tmp/request-details.json", "utf8")).headers;
+const headers = JSON.parse(
+  fs.readFileSync("tmp/request-details.json", "utf8"),
+).headers;
 const baseUrl = "https://example.com/api/data";
 
 let cursor = null;
@@ -103,7 +108,7 @@ while (hasMore) {
       const res = await fetch(url, { headers });
       return res.json();
     },
-    { url, headers }
+    { url, headers },
   );
 
   // Extract data and cursor (adjust paths for your API)

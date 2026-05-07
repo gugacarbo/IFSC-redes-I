@@ -35,21 +35,26 @@ Obtenção da lista de pontos de monitoramento/controle na filial:
 - Cliente envia:
 
 ```json
-{ "cmd":"list_req" }
+{ "cmd": "list_req" }
 ```
 
 - Servidor responde:
 
 ```json
 {
- "cmd":"list_resp",
- "id":["sensor_light_sala", "actuator_light_sala", "sensor_ac_escritorio", "actuator_ac_escritorio"]
+  "cmd": "list_resp",
+  "id": [
+    "sensor_light_sala",
+    "actuator_light_sala",
+    "sensor_ac_escritorio",
+    "actuator_ac_escritorio"
+  ]
 }
 ```
 
-sensor_actuator_vector – é uma lista com as chaves de sensores e atuadores contendo o seguinte layout:
-`<type>_<device>_<place>` onde `<type>` é o tipo (sensor/actuator), `<device>` é o dispositivo (light/ac)
-e `<place>` é o local (ex.: luz da sala de reuniões – actuator_light_meetroom).
+sensor*actuator_vector – é uma lista com as chaves de sensores e atuadores contendo o seguinte layout:
+`<type>*<device>\_<place>`onde`<type>`é o tipo (sensor/actuator),`<device>`é o dispositivo (light/ac)
+e`<place>` é o local (ex.: luz da sala de reuniões – actuator_light_meetroom).
 
 ## Estado Atual
 
@@ -58,7 +63,7 @@ Obtenção do estado atual dos sensores e atuadores da filial:
 - Cliente envia:
 
 ```json
-{ "cmd":"get_status" }
+{ "cmd": "get_status" }
 ```
 
 - Servidor responde:
@@ -110,22 +115,22 @@ Os seguintes requisitos técnicos devem ser contemplados:
 
 - serão desenvolvidas duas aplicações independentes (um servidor e um cliente);
 - o para o ambiente de teste você deve assumir que existam ao menos 2 filiais (onde as aplicações
-servidor irão ser executadas) e a matriz (onde a aplicação cliente será executada).
+  servidor irão ser executadas) e a matriz (onde a aplicação cliente será executada).
 - a aplicação do cliente deve ter interface gráfica (GUI – Graphical User Interface);
 - a comunicação entre o cliente e o servidor deve ser realizada obrigatoriamente via protocolo
-UDP;
+  UDP;
 - a servidor deve autenticar o cliente através de uma tupla `<usuário|senha>`;
 - os IDs do tipo actuator são somente escrita e os IDs do tipo sensor são de somente leitura;
 - o cliente deve ser capaz de ser configurado para enviar solicitações periódicas (período
-configurável pelo usuário) de valores para todos os IDs listados em uma filial;
+  configurável pelo usuário) de valores para todos os IDs listados em uma filial;
 - a interface gráfica do cliente deve:
-permitir a definição do endereço IP e porta do servidor de cada filial;
-o ter operação de conexão aos servidores listados;
-o alterar o período de obtenção periódica de dados;
-o apresentar o estado dos IDs obtidos identificando a filial ao qual este pertence;
-o alterar o estado de IDs do tipo actuator;
+  permitir a definição do endereço IP e porta do servidor de cada filial;
+  o ter operação de conexão aos servidores listados;
+  o alterar o período de obtenção periódica de dados;
+  o apresentar o estado dos IDs obtidos identificando a filial ao qual este pertence;
+  o alterar o estado de IDs do tipo actuator;
 - o payload (carga útil) da mensagem deve estar no formato JSON (codificação UTF-8) e seguir
-rigorosamente o layout definido anteriormente;
+  rigorosamente o layout definido anteriormente;
 
 ## Configuração do Servidor
 
@@ -135,9 +140,9 @@ ambientes na filial, conforme o exemplo abaixo:
 
 ```json
 {
- "port":51000,
- "admin_user":"test",
- "admin_pass":"test",
- "id":"[sensor_actuator_vector]",
+  "port": 51000,
+  "admin_user": "test",
+  "admin_pass": "test",
+  "id": "[sensor_actuator_vector]"
 }
 ```

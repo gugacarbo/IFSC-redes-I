@@ -18,4 +18,5 @@ function DragHere({ isDragActive }: { isDragActive: boolean }) {
 		</div>
 	);
 }
+
 export { DragHere };

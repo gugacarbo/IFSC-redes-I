@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Home } from "#/app/home";
 import z from "zod";
+import { Home } from "#/app/home";
 
 const fileSearchParamsSchema = z.object({
 	limit: z.number().optional(),

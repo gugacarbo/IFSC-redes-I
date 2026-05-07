@@ -34,4 +34,5 @@ function Stats() {
 		</div>
 	);
 }
+
 export { Stats };

@@ -1,8 +1,0 @@
-{
-  "label": "GUI",
-  "position": 8,
-  "link": {
-    "type": "generated-index",
-    "description": "Interface gráfica React — componentes e dashboard."
-  }
-}

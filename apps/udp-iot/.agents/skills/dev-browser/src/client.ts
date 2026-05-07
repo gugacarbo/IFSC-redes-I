@@ -130,9 +130,12 @@ async function getPageLoadState(page: Page): Promise<PageLoadState> {
 	const result = await page.evaluate(() => {
 		// Access browser globals via globalThis for TypeScript compatibility
 		/* eslint-disable @typescript-eslint/no-explicit-any */
+		// biome-ignore lint/suspicious/noExplicitAny: browser context has unknown globals
 		const g = globalThis as { document?: any; performance?: any };
 		/* eslint-enable @typescript-eslint/no-explicit-any */
+		// biome-ignore lint/style/noNonNullAssertion: checked via evaluate, guaranteed at this point
 		const perf = g.performance!;
+		// biome-ignore lint/style/noNonNullAssertion: checked via evaluate, guaranteed at this point
 		const doc = g.document!;
 
 		const now = perf.now();
@@ -268,7 +271,7 @@ export async function connect(
 
 	async function ensureConnected(): Promise<Browser> {
 		// Return existing connection if still active
-		if (browser && browser.isConnected()) {
+		if (browser?.isConnected()) {
 			return browser;
 		}
 
@@ -373,6 +376,7 @@ export async function connect(
 			}
 
 			if (allPages.length === 1) {
+				// biome-ignore lint/style/noNonNullAssertion: checked via length === 1
 				return allPages[0]!;
 			}
 
@@ -440,6 +444,7 @@ export async function connect(
 				// Inject script if not already present
 				// Note: page.evaluate runs in browser context where window exists
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// biome-ignore lint/suspicious/noExplicitAny: browser context has unknown globals
 				const w = globalThis as any;
 				if (!w.__devBrowser_getAISnapshot) {
 					// eslint-disable-next-line no-eval
@@ -463,6 +468,7 @@ export async function connect(
 			const elementHandle = await page.evaluateHandle((refId: string) => {
 				// Note: page.evaluateHandle runs in browser context where globalThis is the window
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				// biome-ignore lint/suspicious/noExplicitAny: browser context has unknown globals
 				const w = globalThis as any;
 				const refs = w.__devBrowserRefs;
 				if (!refs) {

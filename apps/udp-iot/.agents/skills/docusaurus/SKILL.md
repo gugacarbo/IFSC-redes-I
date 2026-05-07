@@ -8,16 +8,18 @@ description: Docusaurus 3 syntax, frontmatter templates, MDX components, and sid
 ## Frontmatter Templates
 
 ### Regular content page
+
 ```yaml
 ---
 id: my-page-name
-title: My Page Title          # under 60 chars, include target keywords
-sidebar_label: Sidebar Label  # short nav label
+title: My Page Title # under 60 chars, include target keywords
+sidebar_label: Sidebar Label # short nav label
 description: One or two sentences describing this page for search engines.
 ---
 ```
 
 ### Index / hub page (custom URL)
+
 ```yaml
 ---
 slug: /section/subsection
@@ -36,46 +38,54 @@ tags:
 ## Standard Imports
 
 ```jsx
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import useBaseUrl from "@docusaurus/useBaseUrl";
 ```
 
 For hub/card pages:
+
 ```jsx
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import DocCardList from '@theme/DocCardList';
-import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import DocCardList from "@theme/DocCardList";
+import { useCurrentSidebarCategory } from "@docusaurus/theme-common";
 ```
 
 For embedded videos:
+
 ```jsx
-import Iframe from 'react-iframe';
+import Iframe from "react-iframe";
 ```
 
 ## Hub/Index Page Layouts
 
 ### Card grid (sumologic-documentation custom layout)
+
 ```jsx
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 <div className="box-wrapper">
   <div className="box smallbox card">
     <div className="container">
-      <a href={useBaseUrl('docs/section/page')}>
-        <img src={useBaseUrl('img/icons/icon.png')} alt="icon description" width="40"/>
+      <a href={useBaseUrl("docs/section/page")}>
+        <img
+          src={useBaseUrl("img/icons/icon.png")}
+          alt="icon description"
+          width="40"
+        />
         <h4>Card Title</h4>
       </a>
       <p>Brief description of this section.</p>
     </div>
   </div>
-</div>
+</div>;
 ```
 
 ### DocCardList (auto-generated from sidebar)
-```jsx
-import DocCardList from '@theme/DocCardList';
-import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
-<DocCardList items={useCurrentSidebarCategory().items}/>
+```jsx
+import DocCardList from "@theme/DocCardList";
+import { useCurrentSidebarCategory } from "@docusaurus/theme-common";
+
+<DocCardList items={useCurrentSidebarCategory().items} />;
 ```
 
 ## Admonitions
@@ -115,6 +125,7 @@ Admonitions support code blocks, links, bullets, and images inside them.
 ## Code Blocks
 
 With language and title:
+
 ````markdown
 ```json title="config.json"
 { "key": "value" }
@@ -122,6 +133,7 @@ With language and title:
 ````
 
 With line highlighting:
+
 ````markdown
 ```python {3-5}
 line1
@@ -136,16 +148,24 @@ line6
 ## Images
 
 Add this import under frontmatter:
+
 ```jsx
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import useBaseUrl from "@docusaurus/useBaseUrl";
 ```
 
 Image syntax:
+
 ```jsx
-<img src={useBaseUrl('img/folder/image.png')} alt="Descriptive alt text" style={{border: '1px solid gray'}} width="400" />
+<img
+  src={useBaseUrl("img/folder/image.png")}
+  alt="Descriptive alt text"
+  style={{ border: "1px solid gray" }}
+  width="400"
+/>
 ```
 
 Guidelines:
+
 - Save images to `/static/img/`
 - PNG format preferred; max 2MB; max display width 800px
 - Always include descriptive `alt` text
@@ -155,38 +175,29 @@ Guidelines:
 
 ```html
 <details>
-<summary>Toggle label here</summary>
+  <summary>Toggle label here</summary>
 
-Content goes here. Supports markdown, code blocks, and images.
-
+  Content goes here. Supports markdown, code blocks, and images.
 </details>
 ```
 
 ## Tabs
 
 ```jsx
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 <Tabs
   className="unique-tabs"
   defaultValue="tab1"
   values={[
-    {label: 'Tab 1', value: 'tab1'},
-    {label: 'Tab 2', value: 'tab2'},
-  ]}>
-
-<TabItem value="tab1">
-
-Content for tab 1.
-
-</TabItem>
-<TabItem value="tab2">
-
-Content for tab 2.
-
-</TabItem>
-</Tabs>
+    { label: "Tab 1", value: "tab1" },
+    { label: "Tab 2", value: "tab2" },
+  ]}
+>
+  <TabItem value="tab1">Content for tab 1.</TabItem>
+  <TabItem value="tab2">Content for tab 2.</TabItem>
+</Tabs>;
 ```
 
 ## Reusable Partials (Snippets)
@@ -202,7 +213,9 @@ import MySnippet from '../reuse/my-snippet.md';
 ## Downloadable Files
 
 ```jsx
-<a href={useBaseUrl('files/your-file.yaml')} target="_blank">your-file.yaml</a>
+<a href={useBaseUrl("files/your-file.yaml")} target="_blank">
+  your-file.yaml
+</a>
 ```
 
 Store downloadable files in `/static/files/`.
@@ -210,9 +223,10 @@ Store downloadable files in `/static/files/`.
 ## Embedded Video (Iframe)
 
 ```jsx
-import Iframe from 'react-iframe';
+import Iframe from "react-iframe";
 
-<Iframe url="https://www.youtube.com/embed/VIDEO_ID"
+<Iframe
+  url="https://www.youtube.com/embed/VIDEO_ID"
   width="854px"
   height="480px"
   id="myId"
@@ -221,18 +235,20 @@ import Iframe from 'react-iframe';
   position="relative"
   allow="accelerometer; autoplay=1; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen
-/>
+/>;
 ```
 
 ## sidebars.ts Patterns
 
 ### Add a simple doc
+
 ```javascript
 // In the appropriate sidebar array:
 'section/my-doc-id',   // matches frontmatter id: my-doc-id in docs/section/my-doc.md
 ```
 
 ### Add a category with an index page
+
 ```javascript
 {
   type: 'category',
@@ -255,6 +271,7 @@ import Iframe from 'react-iframe';
 ```
 
 ### Sidebar ID to file path mapping
+
 - Sidebar entry `'section/my-page'` maps to file `docs/section/my-page.md` with frontmatter `id: my-page`
 - For `index.md` files with `slug:`, use the path `'section/index'`
 
@@ -266,14 +283,14 @@ import Iframe from 'react-iframe';
 
 ## Special Folders
 
-| Folder | Purpose |
-|--------|---------|
-| `docs/reuse/` | Shared markdown snippets, not rendered publicly |
-| `docs/beta/` | Beta feature docs (closed/open beta) |
-| `docs/contributing/` | Contribution guides and templates |
-| `static/img/` | All images |
-| `static/files/` | Downloadable files (YAML, JSON, etc.) |
-| `blog-service/`, `blog-cse/`, etc. | Release notes (blog-based) |
+| Folder                             | Purpose                                         |
+| ---------------------------------- | ----------------------------------------------- |
+| `docs/reuse/`                      | Shared markdown snippets, not rendered publicly |
+| `docs/beta/`                       | Beta feature docs (closed/open beta)            |
+| `docs/contributing/`               | Contribution guides and templates               |
+| `static/img/`                      | All images                                      |
+| `static/files/`                    | Downloadable files (YAML, JSON, etc.)           |
+| `blog-service/`, `blog-cse/`, etc. | Release notes (blog-based)                      |
 
 ## Key Docusaurus Plugins Available
 

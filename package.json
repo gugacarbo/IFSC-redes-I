@@ -22,10 +22,9 @@
 		"format:packages": "turbo run format",
 		"format": "biome check --write",
 		"format:md": "prettier --write \"**/*.md\"",
-		"format:java": "node ./tools/java/checkstyle-runner.cjs",
 		"lint-staged": "lint-staged",
 		"download-checkstyle": "powershell -ExecutionPolicy Bypass -File tools/java/download-checkstyle.ps1",
-		"prepare": "husky; npm run download-checkstyle",
+		"prepare": "husky",
 		"postinstall": "npm run download-checkstyle",
 		"knip": "knip"
 	},

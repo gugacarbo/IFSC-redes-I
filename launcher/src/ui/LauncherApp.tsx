@@ -20,8 +20,11 @@ function LauncherAppContent() {
 		runViews,
 		selectedRunIndex,
 		isExitConfirmOpen,
+		createAppName,
+		selectedLanguageIndex,
 		selectedApp,
 		scriptOptions,
+		languageTemplates,
 		visibleDocsNodes,
 		docsViewportHeight,
 		runningCount,
@@ -47,8 +50,8 @@ function LauncherAppContent() {
 			{screen === "apps" ? (
 				<>
 					<Text dimColor>
-						Selecione um app (Enter), d para docs, t para terminais,
-						q/Esc/Ctrl+C para sair.
+						Selecione um app (Enter), n para novo app, d para docs, t para
+						terminais, q/Esc/Ctrl+C para sair.
 					</Text>
 					<Box marginTop={1} flexDirection="column">
 						{apps.map((app, index) => (
@@ -68,7 +71,7 @@ function LauncherAppContent() {
 				<>
 					<Text dimColor>
 						{selectedApp?.name}: selecione um script (Enter), d para docs, Esc
-						para voltar, t para terminais.
+						para voltar, t para terminais, n para novo app.
 					</Text>
 					<Box marginTop={1} flexDirection="column">
 						{scriptOptions.map((option, index) => (
@@ -86,7 +89,7 @@ function LauncherAppContent() {
 				<>
 					<Text dimColor>
 						Terminais externos (Setas: selecionar | k: fecha selecionado | x:
-						fecha todos | c: limpa | Esc/b: voltar)
+						fecha todos | c: limpa | n: novo app | Esc/b: voltar)
 					</Text>
 					<Text dimColor>
 						Executando: {runningCount} | Finalizados: {finishedCount} | Total:{" "}
@@ -109,11 +112,32 @@ function LauncherAppContent() {
 						</Box>
 					)}
 				</>
+			) : screen === "create" ? (
+				<>
+					<Text dimColor>
+						Criar app: digite o nome, use setas para linguagem e Enter para
+						criar. Esc cancela.
+					</Text>
+					<Text color="green">Nome: {createAppName || "_"}</Text>
+					<Text dimColor>Linguagem:</Text>
+					<Box marginTop={1} flexDirection="column">
+						{languageTemplates.map((template, index) => (
+							<Text
+								key={template.id}
+								color={index === selectedLanguageIndex ? "green" : undefined}
+							>
+								{index === selectedLanguageIndex ? "> " : "  "}
+								{template.label} - {template.description}
+							</Text>
+						))}
+					</Box>
+				</>
 			) : (
 				<>
 					<Text dimColor>Documentacao: {selectedApp?.name}</Text>
 					<Text dimColor>
-						Use setas, j/k ou PgUp/PgDn para rolar. Esc, d ou b para voltar.
+						Use setas, j/k ou PgUp/PgDn para rolar. n: novo app. Esc, d ou b
+						para voltar.
 					</Text>
 					<Text color="green">[b] Voltar</Text>
 					<Box marginTop={1} flexDirection="column">

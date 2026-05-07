@@ -115,4 +115,5 @@ function OffsetPagination({
 		</div>
 	);
 }
+
 export { OffsetPagination };

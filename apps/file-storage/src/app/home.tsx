@@ -13,4 +13,5 @@ function Home() {
 		</div>
 	);
 }
+
 export { Home };

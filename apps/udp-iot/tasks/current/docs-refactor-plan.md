@@ -8,11 +8,11 @@
 
 ## 📊 Resumo do Audit
 
-| Problema | Quantidade |
-|---|---|
-| Grupos de **duplicação** | 19+ |
-| **Inconsistências** de terminologia | 8 |
-| Áreas **fragmentadas** | 5+ |
+| Problema                            | Quantidade |
+| ----------------------------------- | ---------- |
+| Grupos de **duplicação**            | 19+        |
+| **Inconsistências** de terminologia | 8          |
+| Áreas **fragmentadas**              | 5+         |
 
 **Causa raiz:** O conteúdo foi escrito em paralelo sem referências cruzadas — vários arquivos repetem as mesmas tabelas, definições e fluxos.
 
@@ -22,47 +22,47 @@
 
 Consolidar cada tema em **um único arquivo** e converter repetições em links.
 
-| Tema | 📄 Arquivo Canônico | 🔄 Arquivos a Refatorar |
-|---|---|---|
-| **Arquitetura geral** | `architecture/overview.md` | `definicoes.md`, `fluxos.md` |
-| **Protocolo UDP** (comandos, payloads) | `protocol/udp.md` | `requisitos.md` |
-| **Protocolo WebSocket** | `protocol/websocket.md` | `matriz-gui.md` |
-| **Config. WiFi** (`config_wifi.json`) | `infrastructure/config.md` | `config-build.md`, `firmware/matriz/overview.md`, `firmware/filial/overview.md` |
-| **Config. Matriz** (`config_matriz.json`) | `infrastructure/config.md` | `matriz.md`, `firmware/matriz/overview.md` |
-| **Config. Filial** (`config_filial.json`) | `infrastructure/config.md` | `filial.md`, `firmware/filial/overview.md` |
-| **Formato de ID** (`<tipo>_<dispositivo>_<local>`) | `requisitos.md` §4.1 | `definicoes.md`, `infrastructure/config.md`, `firmware/filial/overview.md` |
-| **REST API Matriz** | `firmware/matriz/rest-api.md` | `matriz-gui.md` |
-| **REST API Filial** | `firmware/filial/rest-api.md` | — (falta referência) |
-| **Tasks FreeRTOS Matriz** | `firmware/matriz/overview.md` | `matriz.md`, `architecture/matriz.md` |
-| **Tasks FreeRTOS Filial** | `firmware/filial/overview.md` | `filial.md`, `architecture/filial.md` |
-| **Polling / Detecção Offline** | `firmware/matriz/overview.md` | `matriz-gui.md`, `architecture/overview.md` |
-| **GPIO Mapping** | `infrastructure/config.md` | `firmware/filial/overview.md`, `config-build.md` |
-| **Build & Deploy** | `devops/build-deploy.md` | `config-build.md` |
-| **Endereços IP / Portas** | `infrastructure/network.md` | `config-build.md`, `matriz.md` |
-| **mDNS Hostname** | `infrastructure/network.md` | `infrastructure/wifi.md`, `matriz-gui.md` |
+| Tema                                               | 📄 Arquivo Canônico           | 🔄 Arquivos a Refatorar                                                         |
+| -------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------- |
+| **Arquitetura geral**                              | `architecture/overview.md`    | `definicoes.md`, `fluxos.md`                                                    |
+| **Protocolo UDP** (comandos, payloads)             | `protocol/udp.md`             | `requisitos.md`                                                                 |
+| **Protocolo WebSocket**                            | `protocol/websocket.md`       | `matriz-gui.md`                                                                 |
+| **Config. WiFi** (`config_wifi.json`)              | `infrastructure/config.md`    | `config-build.md`, `firmware/matriz/overview.md`, `firmware/filial/overview.md` |
+| **Config. Matriz** (`config_matriz.json`)          | `infrastructure/config.md`    | `matriz.md`, `firmware/matriz/overview.md`                                      |
+| **Config. Filial** (`config_filial.json`)          | `infrastructure/config.md`    | `filial.md`, `firmware/filial/overview.md`                                      |
+| **Formato de ID** (`<tipo>_<dispositivo>_<local>`) | `requisitos.md` §4.1          | `definicoes.md`, `infrastructure/config.md`, `firmware/filial/overview.md`      |
+| **REST API Matriz**                                | `firmware/matriz/rest-api.md` | `matriz-gui.md`                                                                 |
+| **REST API Filial**                                | `firmware/filial/rest-api.md` | — (falta referência)                                                            |
+| **Tasks FreeRTOS Matriz**                          | `firmware/matriz/overview.md` | `matriz.md`, `architecture/matriz.md`                                           |
+| **Tasks FreeRTOS Filial**                          | `firmware/filial/overview.md` | `filial.md`, `architecture/filial.md`                                           |
+| **Polling / Detecção Offline**                     | `firmware/matriz/overview.md` | `matriz-gui.md`, `architecture/overview.md`                                     |
+| **GPIO Mapping**                                   | `infrastructure/config.md`    | `firmware/filial/overview.md`, `config-build.md`                                |
+| **Build & Deploy**                                 | `devops/build-deploy.md`      | `config-build.md`                                                               |
+| **Endereços IP / Portas**                          | `infrastructure/network.md`   | `config-build.md`, `matriz.md`                                                  |
+| **mDNS Hostname**                                  | `infrastructure/network.md`   | `infrastructure/wifi.md`, `matriz-gui.md`                                       |
 
 ---
 
 ## 🔧 Fase 2 — Corrigir Inconsistências
 
-| # | Inconsistência | Correção |
-|---|---|---|
-| 1 | **Nome das GUIs** — `definicoes.md` chama de "Interface local", `intro.md` foca só na GUI Matriz | Padronizar: **"GUI da Matriz"** (React app) e **"Portal Local da Filial"** (servido pelo ESP32) |
-| 2 | **Autenticação UDP** — um arquivo diz "ignorado silenciosamente", outro "por segurança" | Unificar: sempre incluir a justificativa "(por segurança)" |
-| 3 | **Porta UDP** — não fica claro se Matriz e Filial podem ter portas diferentes | Esclarecer: **ambas devem usar a mesma porta** (padrão 51000) |
-| 4 | **Captive Portal SSID** — Matriz usa `Matriz-Setup`, Filial usa `ESP32-<ip>-Setup` | Documentar a diferença explicitamente em `infrastructure/wifi.md` |
-| 5 | **Valores AC (0–1023)** — "PWM duty cycle" vs "intensidade de refrigeração" | Padronizar: **"duty cycle PWM (0–1023)"** |
-| 6 | **Polling** — "em paralelo" vs "sequencial" | Esclarecer: **sequencial por filial, via task dedicada** |
-| 7 | **Prioridades FreeRTOS** — com e sem números | Padronizar: sempre com valores numéricos (Alta=2, Média=1) |
-| 8 | **Limite WebSocket** — `MAX_WS_CLIENTS = 4` só mencionado na GUI | Adicionar em `protocol/websocket.md` |
+| #   | Inconsistência                                                                                   | Correção                                                                                        |
+| --- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| 1   | **Nome das GUIs** — `definicoes.md` chama de "Interface local", `intro.md` foca só na GUI Matriz | Padronizar: **"GUI da Matriz"** (React app) e **"Portal Local da Filial"** (servido pelo ESP32) |
+| 2   | **Autenticação UDP** — um arquivo diz "ignorado silenciosamente", outro "por segurança"          | Unificar: sempre incluir a justificativa "(por segurança)"                                      |
+| 3   | **Porta UDP** — não fica claro se Matriz e Filial podem ter portas diferentes                    | Esclarecer: **ambas devem usar a mesma porta** (padrão 51000)                                   |
+| 4   | **Captive Portal SSID** — Matriz usa `Matriz-Setup`, Filial usa `ESP32-<ip>-Setup`               | Documentar a diferença explicitamente em `infrastructure/wifi.md`                               |
+| 5   | **Valores AC (0–1023)** — "PWM duty cycle" vs "intensidade de refrigeração"                      | Padronizar: **"duty cycle PWM (0–1023)"**                                                       |
+| 6   | **Polling** — "em paralelo" vs "sequencial"                                                      | Esclarecer: **sequencial por filial, via task dedicada**                                        |
+| 7   | **Prioridades FreeRTOS** — com e sem números                                                     | Padronizar: sempre com valores numéricos (Alta=2, Média=1)                                      |
+| 8   | **Limite WebSocket** — `MAX_WS_CLIENTS = 4` só mencionado na GUI                                 | Adicionar em `protocol/websocket.md`                                                            |
 
 ---
 
 ## 📝 Fase 3 — Criar Conteúdo Faltante
 
-| Novo Arquivo | Conteúdo |
-|---|---|
-| `gui/filial-portal.md` | Documentação do Portal Local da Filial (endpoints, componentes, funcionalidades) |
+| Novo Arquivo                 | Conteúdo                                                                                     |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| `gui/filial-portal.md`       | Documentação do Portal Local da Filial (endpoints, componentes, funcionalidades)             |
 | `protocol/authentication.md` | Especificação completa de autenticação (user/pass, injeção pela Matriz, fallback silencioso) |
 
 ---
@@ -111,13 +111,13 @@ Exemplo em `protocol/udp.md`:
 
 ## ✅ Ordem de Execução Sugerida
 
-| Ordem | Fase | Impacto | Risco |
-|---|---|---|---|
-| 1 | **Fase 2** — Corrigir inconsistências | Imediato | Baixo |
-| 2 | **Fase 1** — Designar canônicos e remover duplicatas | Principal | Médio |
-| 3 | **Fase 3** — Criar conteúdo faltante | Preencher lacunas | Baixo |
-| 4 | **Fase 4** — Refatorar top-level | Limpeza final | Médio |
-| 5 | **Fase 5** — Referências cruzadas | Navegação | Baixo |
+| Ordem | Fase                                                 | Impacto           | Risco |
+| ----- | ---------------------------------------------------- | ----------------- | ----- |
+| 1     | **Fase 2** — Corrigir inconsistências                | Imediato          | Baixo |
+| 2     | **Fase 1** — Designar canônicos e remover duplicatas | Principal         | Médio |
+| 3     | **Fase 3** — Criar conteúdo faltante                 | Preencher lacunas | Baixo |
+| 4     | **Fase 4** — Refatorar top-level                     | Limpeza final     | Médio |
+| 5     | **Fase 5** — Referências cruzadas                    | Navegação         | Baixo |
 
 ---
 

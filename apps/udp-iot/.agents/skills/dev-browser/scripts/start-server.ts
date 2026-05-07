@@ -1,7 +1,7 @@
-import { execSync } from "child_process";
-import { existsSync, mkdirSync, readdirSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { execSync } from "node:child_process";
+import { existsSync, mkdirSync, readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { serve } from "@/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

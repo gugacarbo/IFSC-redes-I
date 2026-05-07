@@ -1,5 +1,5 @@
-import { Input } from "#/app/components/ui/input";
 import { Search } from "lucide-react";
+import { Input } from "#/app/components/ui/input";
 
 function SearchFile({
 	value,
@@ -23,4 +23,5 @@ function SearchFile({
 		</div>
 	);
 }
+
 export { SearchFile };

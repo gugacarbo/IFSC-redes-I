@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/files/")({
 				try {
 					const body = (await request.json()) as LIST_REQ | PUT_REQ | GET_REQ;
 
-					if (!body || !body.cmd) {
+					if (!body?.cmd) {
 						return new Response(
 							JSON.stringify({ error: "Missing cmd in body" }),
 							{ status: 400, headers: { "Content-Type": "application/json" } },

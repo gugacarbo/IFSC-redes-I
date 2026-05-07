@@ -41,6 +41,7 @@ async function getSnapshot(): Promise<string> {
 	const script = getSnapshotScript();
 	return await page.evaluate((s: string) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// biome-ignore lint/suspicious/noExplicitAny: browser context has unknown globals
 		const w = globalThis as any;
 		if (!w.__devBrowser_getAISnapshot) {
 			// eslint-disable-next-line no-eval
@@ -136,8 +137,8 @@ describe("ARIA Snapshot", () => {
 		// Extract a ref from the snapshot
 		const refMatch = snapshot.match(/\[ref=(e\d+)\]/);
 		expect(refMatch).toBeTruthy();
-		expect(refMatch![1]).toBeDefined();
-		const ref = refMatch![1] as string;
+		expect(refMatch?.[1]).toBeDefined();
+		const ref = refMatch?.[1] as string;
 
 		// Select the element by ref
 		const result = (await selectRef(ref)) as {
