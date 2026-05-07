@@ -76,7 +76,7 @@ function OffsetPagination({
 					</PaginationItem>
 
 					{getPageNumbers().map((page, index) => (
-						<PaginationItem key={index}>
+						<PaginationItem key={`${page}-${index}`}>
 							{page === "..." ? (
 								<PaginationEllipsis />
 							) : (

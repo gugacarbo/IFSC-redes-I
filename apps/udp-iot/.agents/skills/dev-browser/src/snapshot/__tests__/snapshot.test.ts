@@ -55,6 +55,7 @@ async function getSnapshot(): Promise<string> {
 async function selectRef(ref: string): Promise<unknown> {
 	return await page.evaluate((refId: string) => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// biome-ignore lint/suspicious/noExplicitAny: browser context has unknown globals
 		const w = globalThis as any;
 		const element = w.__devBrowser_selectSnapshotRef(refId);
 		return {
@@ -113,6 +114,7 @@ describe("ARIA Snapshot", () => {
 		// Check that refs are stored
 		const hasRefs = await page.evaluate(() => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			// biome-ignore lint/suspicious/noExplicitAny: browser context has unknown globals
 			const w = globalThis as any;
 			return (
 				typeof w.__devBrowserRefs === "object" &&
