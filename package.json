@@ -1,12 +1,13 @@
 {
-	"name": "ifsc-estrutura-de-dados",
+	"name": "ifsc-redes-i",
 	"private": true,
 	"license": "MIT",
 	"type": "module",
 	"packageManager": "^npm@10.9.2",
 	"workspaces": [
 		"launcher",
-		"apps/*"
+		"apps/*",
+		"apps/udp-iot/*"
 	],
 	"author": {
 		"name": "Gustavo Carbonera",
