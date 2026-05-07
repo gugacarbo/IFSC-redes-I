@@ -1,0 +1,15 @@
+{
+	"name": "chat-udp",
+	"description": "Chat UDP Multicast com interface Swing",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "javac src/*.java",
+		"dev": "java -cp src ChatGUI",
+		"test": "echo 'Testes: pendentes'",
+		"lint": "javac -Xlint src/*.java",
+		"typecheck": "javac -Xlint src/*.java",
+		"format": "node ../../tools/java/checkstyle-runner.cjs src/*.java",
+		"clean": "del /s /q *.class 2>nul"
+	}
+}
