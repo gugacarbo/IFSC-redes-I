@@ -4,17 +4,9 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 const config = defineConfig({
-	plugins: [
-		nitro(),
-		devtools(),
-		tsconfigPaths({ projects: ["./tsconfig.json"] }),
-		tailwindcss(),
-		tanstackStart(),
-		viteReact(),
-	],
+	plugins: [nitro(), devtools(), tailwindcss(), tanstackStart(), viteReact()],
 	nitro: {
 		serverDir: "./",
 	},
