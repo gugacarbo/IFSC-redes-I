@@ -14,7 +14,7 @@
 		"url": "https://github.com/gugacarbo"
 	},
 	"scripts": {
-		"start": "npm run start --workspace=launcher",
+		"start": "node launcher/prepare-and-start.js",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
 		"build": "turbo run build",

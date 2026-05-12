@@ -76,7 +76,12 @@ function OffsetPagination({
 					</PaginationItem>
 
 					{getPageNumbers().map((page, index) => (
-						<PaginationItem key={`${page}-${index}`}>
+						<PaginationItem
+							key={`${page}-${
+								// biome-ignore lint/suspicious/noArrayIndexKey: index never changes
+								index
+							}`}
+						>
 							{page === "..." ? (
 								<PaginationEllipsis />
 							) : (
