@@ -12,7 +12,7 @@ import {
 
 interface FileListItemProps {
 	file: FileType;
-	onDelete?: (id: number) => void;
+	onDelete?: (id: number, fileName: string) => void;
 }
 
 export function FileListItem({ file, onDelete }: FileListItemProps) {
@@ -54,7 +54,12 @@ export function FileListItem({ file, onDelete }: FileListItemProps) {
 						</>
 					)}
 				</Button>
-				<Button variant="ghost" size="sm" onClick={() => onDelete?.(file.id)}>
+				<Button
+					variant="ghost"
+					size="sm"
+					className="text-destructive"
+					onClick={() => onDelete?.(file.id, file.fileName)}
+				>
 					<Trash2Icon className="h-4 w-4 mr-1" />
 					Excluir
 				</Button>

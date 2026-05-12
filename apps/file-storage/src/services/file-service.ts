@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { count, eq, like, sql, sum } from "drizzle-orm";
+import { count, eq, inArray, like, or, sql, sum } from "drizzle-orm";
 import type { PUT_REQ } from "#/@types/command";
 import { db } from "#/db";
 import { type FileType, files } from "#/db/schema";
@@ -41,7 +41,7 @@ export async function listFiles({
 	columns?: Partial<Record<keyof FileType, boolean>>;
 }) {
 	const filesList = await db.query.files.findMany({
-		orderBy: (fields, { desc }) => desc(fields.createdAt),
+		orderBy: (fields, { desc }) => [desc(fields.createdAt), desc(fields.id)],
 		where: buildSearchClause(search),
 		offset,
 		limit,
@@ -80,17 +80,31 @@ export async function putFile({
 	fileName,
 	hash,
 	content,
+	overwrite,
 }: {
 	fileName: string;
 	hash: string;
 	content: Buffer<ArrayBuffer>;
+	overwrite?: boolean;
 }) {
-	const hasRecord = await db.query.files.findFirst({
+	const existingRecord = await db.query.files.findFirst({
 		where: eq(files.fileName, fileName),
 	});
 
-	if (hasRecord) {
-		throw new Error("Arquivo já existe!");
+	if (existingRecord) {
+		if (!overwrite) {
+			throw new Error("Arquivo já existe!");
+		}
+
+		// Remove old file from disk (ignore error if file doesn't exist)
+		try {
+			await unlink(existingRecord.path);
+		} catch {
+			// file may already be missing
+		}
+
+		// Delete old database record
+		await db.delete(files).where(eq(files.id, existingRecord.id));
 	}
 
 	const randomId = randomBytes(4).toString("hex");
@@ -112,6 +126,66 @@ export async function putFile({
 			hash: hash,
 		})
 		.returning();
+}
+
+export async function deleteFileById(id: number): Promise<boolean> {
+	const fileRecord = await db.query.files.findFirst({
+		where: eq(files.id, id),
+	});
+
+	if (!fileRecord) {
+		return false;
+	}
+
+	try {
+		await unlink(fileRecord.path);
+	} catch (error) {
+		console.error("Error deleting file from disk:\n", error);
+	}
+
+	await db.delete(files).where(eq(files.id, id));
+
+	return true;
+}
+
+export async function getExistingFileNames(
+	fileNames: string[],
+): Promise<string[]> {
+	const result = await db
+		.select({ fileName: files.fileName })
+		.from(files)
+		.where(inArray(files.fileName, fileNames));
+
+	return result.map((r) => r.fileName);
+}
+
+/**
+ * For each filename, find all existing variants on the server:
+ * - Exact match (e.g. "file.txt")
+ * - Renamed variants (e.g. "file (1).txt", "file (2).txt", …)
+ */
+export async function getExistingFileVariants(
+	fileNames: string[],
+): Promise<string[]> {
+	if (fileNames.length === 0) return [];
+
+	const conditions = fileNames.map((name) => {
+		const dotIndex = name.lastIndexOf(".");
+		const baseName = dotIndex > 0 ? name.slice(0, dotIndex) : name;
+		const extension = dotIndex > 0 ? name.slice(dotIndex) : "";
+
+		return or(
+			eq(files.fileName, name),
+			like(files.fileName, `${baseName} (%)${extension}`),
+		);
+	});
+
+	const result = await db
+		.select({ fileName: files.fileName })
+		.from(files)
+		.where(or(...conditions));
+
+	return result.map((r) => r.fileName);
 }
 
 export async function countFiles(search = "") {

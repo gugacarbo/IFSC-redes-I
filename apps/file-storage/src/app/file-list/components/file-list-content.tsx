@@ -4,7 +4,7 @@ import { FileListItem } from "./file-list-item";
 
 interface FileListContentProps {
 	files: FileType[];
-	onDelete?: (id: number) => void;
+	onDelete?: (id: number, fileName: string) => void;
 }
 
 export function FileListContent({ files, onDelete }: FileListContentProps) {

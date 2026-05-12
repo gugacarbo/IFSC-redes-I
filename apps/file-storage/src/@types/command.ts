@@ -25,6 +25,7 @@ export const putReqSchema = z.object({
 	file: z.string().min(1),
 	hash: z.string().min(1).max(256),
 	value: z.string().min(1),
+	overwrite: z.boolean().optional().default(false),
 });
 
 type PutReqType = z.infer<typeof putReqSchema>;

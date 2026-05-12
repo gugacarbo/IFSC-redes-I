@@ -16,7 +16,10 @@ export const createFile = createServerFn({
 		try {
 			const validatedInput = await validateFileInput(data);
 
-			await putFile(validatedInput);
+			await putFile({
+				...validatedInput,
+				overwrite: data.overwrite,
+			});
 
 			return {
 				fileName: validatedInput.fileName,
