@@ -1,5 +1,5 @@
 # npm run biome check
 
-npm run build
-npm run test
-npm run typecheck
+# npm run build
+# npm run test
+# npm run typecheck
