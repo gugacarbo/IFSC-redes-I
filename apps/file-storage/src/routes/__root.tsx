@@ -8,6 +8,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ThemeProvider } from "#/app/components/theme/theme-provider";
 import { Toaster } from "#/app/components/ui/sonner";
+import { NotFound } from "#/app/not-found";
 import TanStackQueryDevtools from "#/integrations/tanstack-query/devtools";
 import TanStackQueryProvider from "#/integrations/tanstack-query/root-provider";
 import appCss from "#/styles.css?url";
@@ -17,6 +18,7 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+	notFoundComponent: NotFound,
 	head: () => ({
 		meta: [
 			{
