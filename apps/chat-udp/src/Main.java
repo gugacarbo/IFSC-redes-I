@@ -6,7 +6,9 @@ public class Main {
             try {
                 UIManager.setLookAndFeel(
                         UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception ignored) { }
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException
+                    | UnsupportedLookAndFeelException ignored) {
+            }
             new ChatGUI().setVisible(true);
         });
     }

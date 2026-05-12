@@ -1,21 +1,8 @@
 # IFSC Redes I
 
-- [TR1 - Playlist](apps/tr1-playlist/README.md)
-- [TR2 - Tabela Hash](apps/tr2-hash-table/README.md)
-- [Launcher TUI](launcher/)
-
-## Pré-requisitos
-
-- Node.js (v18 ou superior) — para uso do npm e Turbo
-- Java JDK (v8 ou superior) — para compilar e executar os trabalhos
-
-Verifique se as ferramentas estão instaladas:
-
-```bash
-node --version
-java --version
-javac --version
-```
+- [Chat UDP](apps/chat-udp/README.md)
+- [File Storage](apps/file-storage/README.md)
+- [UDP IOT](apps/udp-iot/README.md)
 
 ## Configuração Inicial
 
@@ -32,30 +19,25 @@ cd IFSC-redes-I
 npm install
 ```
 
-## Como Executar os Apps
-
-Use o Turbo com a flag `--filter` para rodar um TR específico:
-
-```bash
-# TR1 - Playlist
-npx turbo run dev --filter=tr1-playlist
-
-# TR2 - Tabela de Dispersão
-npx turbo run dev --filter=tr2-hash-table
-```
-
-Para compilar e executar todos os trabalhos de uma vez:
-
-```bash
-npx turbo run dev
-```
-
-## Launcher
+3. Launcher
 
 O launcher TUI do monorepo está em `launcher/`.
 
 ```bash
 npm run start
+```
+
+## Pré-requisitos
+
+- Node.js (v18 ou superior) — para uso do npm e Turbo
+- Java JDK (v8 ou superior) — para compilar e executar os trabalhos
+
+Verifique se as ferramentas estão instaladas:
+
+```bash
+node --version
+java --version
+javac --version
 ```
 
 ## Documentação

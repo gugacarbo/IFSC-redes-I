@@ -1,7 +1,7 @@
-import javax.swing.*;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.io.IOException;
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 /**
  * Main application window for the UDP Multicast Chat.
@@ -14,18 +14,18 @@ public class ChatGUI extends JFrame {
 
     private final ConnectionPanel connPanel = new ConnectionPanel();
 
-    private final JTextArea  txtMessages = new JTextArea();
-    private final JTextField txtMessage  = new JTextField();
-    private final JButton    btnSend     = new JButton("Enviar");
+    private final JTextArea txtMessages = new JTextArea();
+    private final JTextField txtMessage = new JTextField();
+    private final JButton btnSend = new JButton("Enviar");
 
     private final MulticastChatManager chatManager = new MulticastChatManager(this);
 
     private String currentGroup;
-    private int    currentPort;
+    private int currentPort;
 
-    // ------------------------------------------------------------------
-    //  Constructor
-    // ------------------------------------------------------------------
+    // | ------------------------------------------------------------------
+    // | Constructor
+    // | ------------------------------------------------------------------
 
     public ChatGUI() {
         super("UDP Chat — Multicast");
@@ -38,9 +38,9 @@ public class ChatGUI extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    // ------------------------------------------------------------------
-    //  Layout
-    // ------------------------------------------------------------------
+    // | ------------------------------------------------------------------
+    // | Layout
+    // | ------------------------------------------------------------------
 
     private void buildUI() {
         setLayout(new BorderLayout(6, 6));
@@ -67,9 +67,9 @@ public class ChatGUI extends JFrame {
                 BorderFactory.createEmptyBorder(6, 6, 6, 6));
     }
 
-    // ------------------------------------------------------------------
-    //  Listeners
-    // ------------------------------------------------------------------
+    // | ------------------------------------------------------------------
+    // | Listeners
+    // | ------------------------------------------------------------------
 
     private void registerListeners() {
         connPanel.onToggle(this::doToggle);
@@ -77,9 +77,9 @@ public class ChatGUI extends JFrame {
         txtMessage.addActionListener(e -> doSend());
     }
 
-    // ------------------------------------------------------------------
-    //  Actions
-    // ------------------------------------------------------------------
+    // | ------------------------------------------------------------------
+    // | Actions
+    // | ------------------------------------------------------------------
 
     private void doToggle() {
         if (connPanel.isConnected()) {
@@ -106,7 +106,8 @@ public class ChatGUI extends JFrame {
         int port;
         try {
             port = Integer.parseInt(connPanel.getPortText());
-            if (port < 1 || port > 65535) throw new NumberFormatException();
+            if (port < 1 || port > 65535)
+                throw new NumberFormatException();
         } catch (NumberFormatException e) {
             showError("Porta inválida (1-65535).");
             return;
@@ -119,7 +120,7 @@ public class ChatGUI extends JFrame {
             connPanel.setConnected(true);
             updateSendEnabled(true);
             appendMessage(">>> Entrou no grupo " + group + ":" + port
-                          + " como " + username);
+                    + " como " + username);
         } catch (IOException e) {
             showError("Erro ao entrar no grupo: " + e.getMessage());
         }
@@ -134,7 +135,8 @@ public class ChatGUI extends JFrame {
 
     private void doSend() {
         String msg = txtMessage.getText().trim();
-        if (msg.isEmpty()) return;
+        if (msg.isEmpty())
+            return;
 
         try {
             chatManager.sendMessage(msg);
@@ -144,23 +146,23 @@ public class ChatGUI extends JFrame {
         }
     }
 
-    // ------------------------------------------------------------------
-    //  GUI helpers (called from any thread — uses invokeLater)
-    // ------------------------------------------------------------------
+    // | ------------------------------------------------------------------
+    // | GUI helpers (called from any thread — uses invokeLater)
+    // | ------------------------------------------------------------------
 
     public void appendMessage(String text) {
         SwingUtilities.invokeLater(() -> txtMessages.append(text + "\n"));
     }
 
     private void showError(String msg) {
-        SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(this, msg, "Erro",
-                                              JOptionPane.ERROR_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, msg, "Erro",
+                JOptionPane.ERROR_MESSAGE));
     }
 
     private void updateSendEnabled(boolean enabled) {
         txtMessage.setEnabled(enabled);
         btnSend.setEnabled(enabled);
-        if (!enabled) txtMessage.setText("");
+        if (!enabled)
+            txtMessage.setText("");
     }
 }

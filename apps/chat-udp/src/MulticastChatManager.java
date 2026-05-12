@@ -26,10 +26,6 @@ public class MulticastChatManager {
         this.gui = gui;
     }
 
-    // ------------------------------------------------------------------
-    //  Public API
-    // ------------------------------------------------------------------
-
     /** Join a multicast group. Leaves any previous group first. */
     public synchronized void joinGroup(String groupIp, int port, String username)
             throws IOException {
@@ -60,11 +56,11 @@ public class MulticastChatManager {
             try {
                 if (groupAddress != null) {
                     NetworkInterface netIf = findMulticastInterface();
-                    InetSocketAddress groupSockAddr =
-                            new InetSocketAddress(groupAddress, port);
+                    InetSocketAddress groupSockAddr = new InetSocketAddress(groupAddress, port);
                     socket.leaveGroup(groupSockAddr, netIf);
                 }
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
             socket.close();
             socket = null;
         }
@@ -99,7 +95,7 @@ public class MulticastChatManager {
     }
 
     // ------------------------------------------------------------------
-    //  Internal
+    // Internal
     // ------------------------------------------------------------------
 
     private void receiveLoop() {
@@ -111,8 +107,7 @@ public class MulticastChatManager {
                 socket.receive(packet);
 
                 String json = new String(
-                        packet.getData(), 0, packet.getLength(), StandardCharsets.UTF_8
-                );
+                        packet.getData(), 0, packet.getLength(), StandardCharsets.UTF_8);
 
                 String sender = JsonHelper.extractValue(json, "username");
                 // skip messages sent by ourselves
@@ -123,7 +118,8 @@ public class MulticastChatManager {
                 gui.appendMessage(jsonToDisplay(json));
 
             } catch (SocketException e) {
-                if (!running) break; // socket closed on purpose
+                if (!running)
+                    break; // socket closed on purpose
                 gui.appendMessage("*** Erro de rede: " + e.getMessage());
             } catch (IOException e) {
                 if (running) {
