@@ -28,7 +28,7 @@ export const listFilesFn = createServerFn({
 		try {
 			const [filesList, total] = await Promise.all([
 				listFiles({ offset, limit, search }),
-				countFiles(),
+				countFiles(search),
 			]);
 
 			return {
