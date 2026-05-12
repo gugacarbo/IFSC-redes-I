@@ -2,13 +2,14 @@
 #include <WiFi.h>
 #include "ConfigManager.h"
 #include "DeviceManager.h"
+#include "UdpServer.h"
 
-// Hardcode for testing environment
-const char* WIFI_SSID = "WOKWI-GUEST"; // Typical test/simulator SSID
+const char* WIFI_SSID = "WOKWI-GUEST";
 const char* WIFI_PASS = "";
 
 FilialConfig globalConfig;
 DeviceManager deviceManager;
+UdpServerWrapper udpServer;
 
 void connectWiFi() {
   Serial.printf("Connecting to %s ", WIFI_SSID);
@@ -28,11 +29,16 @@ void setup() {
   if (ConfigManager::begin()) {
       if (ConfigManager::loadConfig(globalConfig)) {
           deviceManager.init(globalConfig.devices);
-          Serial.println("Devices initialized.");
       }
   }
   
   connectWiFi();
+  
+  // Start UDP after WiFi
+  udpServer.begin(&globalConfig, &deviceManager);
 }
 
-void loop() {}
+void loop() {
+    // AsyncUDP handles everything in background via interrupts/callbacks
+    delay(1000);
+}
