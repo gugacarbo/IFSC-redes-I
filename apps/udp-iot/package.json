@@ -1,21 +1,19 @@
 {
-	"name": "udp-iot",
-	"private": true,
-	"version": "1.0.0",
-	"workspaces": [
-		"applications/*",
-		"packages/*"
-	],
-	"packageManager": "npm@10.9.2",
-	"scripts": {
-		"biome:fix": "biome check --write",
-		"build": "turbo run build",
-		"dev": "turbo run dev --ui=tui",
-		"dev:matriz": "turbo run dev --filter=@udp-iot/matriz-*",
-		"dev:filial": "turbo run dev --filter=@udp-iot/filial-*",
-		"typecheck": "turbo run typecheck",
-		"lint": "turbo run lint",
-		"clean": "turbo run clean",
-		"postinstall": "bash scripts/init-config.sh"
-	}
+  "name": "udp-iot",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "applications/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@10.9.2",
+  "scripts": {
+    "biome:fix": "biome check --write",
+    "build": "turbo run build",
+    "dev": "turbo run dev --ui=tui",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "clean": "echo 'Run clean inside udp-iot workspace'",
+    "postinstall": "bash scripts/init-config.sh"
+  }
 }
