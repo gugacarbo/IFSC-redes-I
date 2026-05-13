@@ -5,6 +5,7 @@
 #include "UdpServer.h"
 #include "DeviceBridge.h"
 #include "ApiServer.h"
+#include "LogCapture.h"
 
 const char* WIFI_SSID = "WOKWI-GUEST";
 const char* WIFI_PASS = "";
@@ -22,13 +23,15 @@ void connectWiFi() {
     delay(500);
     Serial.print(".");
   }
-  Serial.println(" CONNECTED");
+  LogCapture::println("WiFi connected");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 }
 
 void setup() {
   Serial.begin(115200);
+  LogCapture::begin(500);
+  LogCapture::println("Filial IoT (ESP32) starting...");
   
   if (ConfigManager::begin()) {
       if (ConfigManager::loadConfig(globalConfig)) {
@@ -45,12 +48,12 @@ void setup() {
   uint16_t httpPort = globalConfig.http_port > 0 ? globalConfig.http_port : 80;
   apiServer = new ApiServer(httpPort);
   deviceBridge.begin(apiServer->getServer(), &deviceManager);
+  LogCapture::setBroadcastCallback([](const char* json) {
+      deviceBridge.broadcast(json);
+  });
   apiServer->begin(&deviceManager);
 
-  Serial.print("Filial ready. UDP port: ");
-  Serial.print(globalConfig.port);
-  Serial.print(", HTTP/WS port: ");
-  Serial.println(httpPort);
+  LogCapture::printf("Filial ready. UDP port: %d, HTTP/WS port: %d", globalConfig.port, httpPort);
 }
 
 void loop() {

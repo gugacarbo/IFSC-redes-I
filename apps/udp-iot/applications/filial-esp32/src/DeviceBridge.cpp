@@ -59,6 +59,10 @@ void DeviceBridge::handleWsMessage(void* arg, uint8_t* data, size_t len) {
     }
 }
 
+void DeviceBridge::broadcast(const char* json) {
+    ws.textAll(json);
+}
+
 void DeviceBridge::broadcastDevicesUpdated() {
     String json = "{\"type\":\"devices_updated\",\"devices\":";
     json += devMgr->getAllJson();

@@ -1,4 +1,5 @@
 #include "ApiServer.h"
+#include "LogCapture.h"
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
@@ -60,25 +61,22 @@ void ApiServer::setupRoutes() {
     );
 
     // ── DELETE /api/devices/<id> ──
-    server.on([](const String& uri) { return uri.startsWith("/api/devices/") && uri != "/api/devices"; },
-        HTTP_DELETE,
-        [this](AsyncWebServerRequest *request) {
-            String id = request->url().substring(strlen("/api/devices/"));
-            bool removed = devMgr->removeDevice(id);
+    server.on("/api/devices/{id}", HTTP_DELETE, [this](AsyncWebServerRequest *request) {
+        String id = request->pathArg(0);
+        bool removed = devMgr->removeDevice(id);
 
-            if (!removed) {
-                AsyncWebServerResponse *resp = request->beginResponse(404, "application/json", "{\"error\":\"Device not found\"}");
-                resp->addHeader("Access-Control-Allow-Origin", "*");
-                request->send(resp);
-                return;
-            }
-
-            String json = "{\"id\":\"" + id + "\",\"removed\":true}";
-            AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", json);
+        if (!removed) {
+            AsyncWebServerResponse *resp = request->beginResponse(404, "application/json", "{\"error\":\"Device not found\"}");
             resp->addHeader("Access-Control-Allow-Origin", "*");
             request->send(resp);
+            return;
         }
-    );
+
+        String json = "{\"id\":\"" + id + "\",\"removed\":true}";
+        AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", json);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(resp);
+    });
 
     // ── GET /api/config ──
     server.on("/api/config", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -95,11 +93,25 @@ void ApiServer::setupRoutes() {
         resp->addHeader("Access-Control-Allow-Origin", "*");
         request->send(resp);
     });
+
+    // ── GET /api/logs ──
+    server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request) {
+        int limit = 200;
+        if (request->hasParam("limit")) {
+            limit = request->getParam("limit")->value().toInt();
+        }
+        String json = LogCapture::getEntries(limit);
+        AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", json);
+        resp->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(resp);
+    });
+
+    server.on("/api/logs", HTTP_OPTIONS, cors);
 }
 
 void ApiServer::begin(DeviceManager* mgr) {
     devMgr = mgr;
     setupRoutes();
     server.begin();
-    Serial.println("ApiServer: HTTP + WebSocket started on port " + String(server.port()));
+    Serial.println("ApiServer: HTTP + WebSocket started on port " + String(httpPort));
 }

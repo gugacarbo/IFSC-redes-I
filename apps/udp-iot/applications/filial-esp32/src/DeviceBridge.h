@@ -14,6 +14,7 @@ public:
     DeviceBridge() : ws("/ws") {}
     void begin(AsyncWebServer& server, DeviceManager* mgr);
     void broadcastDevicesUpdated();
+    void broadcast(const char* json);
 };
 
 #endif
