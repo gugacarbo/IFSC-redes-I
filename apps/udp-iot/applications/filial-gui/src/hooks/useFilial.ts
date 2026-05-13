@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DeviceInfo, ServerConfig } from "../types";
+import type { DeviceInfo, ServerConfig, LogEntry } from "../types";
 
 const FILIAL_GUI_PORT = import.meta.env.VITE_FILIAL_GUI_PORT || "8082";
 const API_BASE =
@@ -11,6 +11,7 @@ export function useFilial() {
 	const [devices, setDevices] = useState<DeviceInfo[]>([]);
 	const [connected, setConnected] = useState(false);
 	const [config, setConfig] = useState<ServerConfig | null>(null);
+	const [logs, setLogs] = useState<LogEntry[]>([]);
 	const wsRef = useRef<WebSocket | null>(null);
 	const reconnectTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
 		undefined,
@@ -42,7 +43,13 @@ export function useFilial() {
 	useEffect(() => {
 		function connect() {
 			const ws = new WebSocket(WS_URL);
-			ws.onopen = () => setConnected(true);
+			ws.onopen = () => {
+				setConnected(true);
+				fetch(`${API_BASE}/api/logs`)
+					.then((r) => r.json())
+					.then((data: LogEntry[]) => setLogs(data.reverse()))
+					.catch(() => {});
+			};
 			ws.onclose = () => {
 				setConnected(false);
 				reconnectTimer.current = setTimeout(connect, 3000);
@@ -52,6 +59,11 @@ export function useFilial() {
 					const msg = JSON.parse(event.data);
 					if (msg.type === "devices_updated") {
 						setDevices(msg.devices);
+					} else if (msg.type === "log") {
+						setLogs((prev) => {
+							const next = [...prev, { level: msg.level, message: msg.message, ts: msg.ts }];
+							return next.length > 500 ? next.slice(next.length - 500) : next;
+						});
 					}
 				} catch {
 					// ignore malformed messages
@@ -109,6 +121,8 @@ export function useFilial() {
 		devices,
 		connected,
 		config,
+		logs,
+		clearLogs: () => setLogs([]),
 		setDevice,
 		addDevice,
 		removeDevice,

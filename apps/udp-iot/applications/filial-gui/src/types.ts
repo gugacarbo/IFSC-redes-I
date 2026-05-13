@@ -11,3 +11,9 @@ export interface ServerConfig {
   adminUser: string;
   adminPass: string;
 }
+
+export interface LogEntry {
+  level: "info" | "error";
+  message: string;
+  ts: number;
+}
