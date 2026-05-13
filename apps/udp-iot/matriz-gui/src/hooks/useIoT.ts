@@ -17,8 +17,11 @@ export function useIoT() {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    // Porta do WebSocket: VITE_WS_PORT do .env, ou 80 (padrao navegador)
+    const wsPort = import.meta.env.VITE_WS_PORT || '';
     const host = window.location.hostname === 'localhost' ? '192.168.1.100' : window.location.hostname;
-    const ws = new WebSocket(`ws://${host}/ws`);
+    const wsUrl = wsPort ? `ws://${host}:${wsPort}/ws` : `ws://${host}/ws`;
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => setConnected(true);

@@ -1,0 +1,17 @@
+{
+	"name": "udp-iot-java",
+	"description": "Monitoramento IoT UDP - Implementação Java (substitui ESP32)",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "javac -d dist src/shared/*.java src/filial/*.java src/matriz/*.java",
+		"dev:matriz": "java -cp dist matriz.MatrizMain",
+		"dev:filial": "java -cp dist filial.FilialMain",
+		"dev": "java -cp dist matriz.MatrizMain",
+		"clean": "rm -rf dist",
+		"lint": "javac -Xlint -d dist src/shared/*.java src/filial/*.java src/matriz/*.java",
+		"typecheck": "javac -Xlint -d dist src/shared/*.java src/filial/*.java src/matriz/*.java",
+		"init-config": "bash scripts/init-config.sh",
+		"postinstall": "npm run init-config"
+	}
+}

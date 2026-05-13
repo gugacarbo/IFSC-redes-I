@@ -23,7 +23,7 @@
 		"format": "biome check --write",
 		"format:md": "prettier --write \"**/*.md\"",
 		"lint-staged": "lint-staged",
-		"download-checkstyle": "powershell -ExecutionPolicy Bypass -File tools/java/download-checkstyle.ps1",
+		"download-checkstyle": "bash tools/java/download-checkstyle.sh",
 		"prepare": "husky",
 		"postinstall": "npm run download-checkstyle",
 		"knip": "knip"
