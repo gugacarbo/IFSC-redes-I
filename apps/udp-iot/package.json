@@ -10,7 +10,7 @@
 	"scripts": {
 		"biome:fix": "biome check --write",
 		"build": "turbo run build",
-		"dev": "turbo run dev",
+		"dev": "turbo run dev --ui=tui",
 		"dev:matriz": "turbo run dev --filter=@udp-iot/matriz-*",
 		"dev:filial": "turbo run dev --filter=@udp-iot/filial-*",
 		"typecheck": "turbo run typecheck",
