@@ -24,7 +24,7 @@ public class ApiHandler {
 
     private final DeviceManager deviceManager;
     private final DeviceBridge deviceBridge;
-    private int lastStatusCode = 200;
+    private final ThreadLocal<Integer> lastStatusCode = ThreadLocal.withInitial(() -> 200);
 
     public ApiHandler(DeviceManager deviceManager, DeviceBridge deviceBridge) {
         this.deviceManager = deviceManager;
@@ -63,7 +63,7 @@ public class ApiHandler {
             }
             if (path.equals("/health") || path.equals("/api/health")) {
                 if ("GET".equals(method) || "OPTIONS".equals(method)) {
-                    lastStatusCode = 200;
+                    lastStatusCode.set(200);
                     return "{\"status\":\"ok\",\"devices\":" + deviceManager.count() + "}";
                 }
                 return jsonError(405, "Method not allowed");
@@ -77,13 +77,13 @@ public class ApiHandler {
     }
 
     public int lastStatusCode() {
-        return lastStatusCode;
+        return lastStatusCode.get();
     }
 
     // ---- Device handlers ----
 
     private String handleGetDevices() {
-        lastStatusCode = 200;
+        lastStatusCode.set(200);
         JsonArray arr = new JsonArray();
         for (Map.Entry<String, DeviceState> entry : deviceManager.getAll().entrySet()) {
             String id = entry.getKey();
@@ -101,22 +101,22 @@ public class ApiHandler {
 
     private String handlePostDevice(String body) {
         if (body == null || body.isBlank()) {
-            lastStatusCode = 400;
+            lastStatusCode.set(400);
             return jsonError(400, "Empty body");
         }
         try {
             JsonObject obj = Json.parseObject(body);
             String id = obj.getString("id", "");
             if (id.isEmpty()) {
-                lastStatusCode = 400;
+                lastStatusCode.set(400);
                 return jsonError(400, "Missing id");
             }
             deviceManager.addDevice(id);
             deviceBridge.broadcastDevicesUpdated();
-            lastStatusCode = 201;
+            lastStatusCode.set(201);
             return "{\"id\":" + Json.escape(id) + "}";
         } catch (Exception e) {
-            lastStatusCode = 400;
+            lastStatusCode.set(400);
             return jsonError(400, "Invalid JSON");
         }
     }
@@ -124,36 +124,36 @@ public class ApiHandler {
     private String handleDeleteDevice(String deviceId) {
         boolean removed = deviceManager.removeDevice(deviceId);
         if (!removed) {
-            lastStatusCode = 404;
+            lastStatusCode.set(404);
             return jsonError(404, "Device not found");
         }
         deviceBridge.broadcastDevicesUpdated();
-        lastStatusCode = 200;
+        lastStatusCode.set(200);
         return "{\"id\":" + Json.escape(deviceId) + ",\"removed\":true}";
     }
 
     private String handlePutDevice(String oldId, String body) {
         if (body == null || body.isBlank()) {
-            lastStatusCode = 400;
+            lastStatusCode.set(400);
             return jsonError(400, "Empty body");
         }
         try {
             JsonObject obj = Json.parseObject(body);
             String newId = obj.getString("newId", "");
             if (newId.isEmpty()) {
-                lastStatusCode = 400;
+                lastStatusCode.set(400);
                 return jsonError(400, "Missing newId");
             }
             boolean updated = deviceManager.updateDevice(oldId, newId);
             if (!updated) {
-                lastStatusCode = 404;
+                lastStatusCode.set(404);
                 return jsonError(404, "Device not found");
             }
             deviceBridge.broadcastDevicesUpdated();
-            lastStatusCode = 200;
+            lastStatusCode.set(200);
             return "{\"oldId\":" + Json.escape(oldId) + ",\"newId\":" + Json.escape(newId) + "}";
         } catch (Exception e) {
-            lastStatusCode = 400;
+            lastStatusCode.set(400);
             return jsonError(400, "Invalid JSON");
         }
     }
@@ -161,7 +161,7 @@ public class ApiHandler {
     // ---- Config handlers ----
 
     private String handleGetConfig() {
-        lastStatusCode = 200;
+        lastStatusCode.set(200);
         JsonObject cfg = new JsonObject();
         cfg.put("port", 0);
         cfg.put("adminUser", "admin");
@@ -171,14 +171,14 @@ public class ApiHandler {
     }
 
     private String handlePutConfig(String body) {
-        lastStatusCode = 200;
+        lastStatusCode.set(200);
         return "{\"status\":\"ok\"}";
     }
 
     // ---- Helpers ----
 
     private String handleOptions() {
-        lastStatusCode = 204;
+        lastStatusCode.set(204);
         return "";
     }
 
