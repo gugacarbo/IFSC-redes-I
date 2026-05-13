@@ -1,19 +1,33 @@
-// put function declarations here:
-int myFunction(int, int);
+#include <Arduino.h>
+#include <WiFi.h>
+#include "ConfigManager.h"
+#include "ApiServer.h"
+#include "BridgeManager.h"
 
-void setup()
-{
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+const char* WIFI_SSID = "WOKWI-GUEST";
+const char* WIFI_PASS = "";
+
+ApiServer apiServer;
+BridgeManager bridge;
+
+void connectWiFi() {
+	WiFi.begin(WIFI_SSID, WIFI_PASS);
+	while (WiFi.status() != WL_CONNECTED) {
+		delay(500);
+	}
+	Serial.print("Matriz IP: ");
+	Serial.println(WiFi.localIP());
 }
 
-void loop()
-{
-  // put your main code here, to run repeatedly:
+void setup() {
+	Serial.begin(115200);
+	if (ConfigManager::begin()) {
+		connectWiFi();
+		bridge.begin(apiServer.getServer());
+		apiServer.begin();
+	}
 }
 
-// put function definitions here:
-int myFunction(int x, int y)
-{
-  return x + y;
+void loop() {
+	bridge.loop();
 }
