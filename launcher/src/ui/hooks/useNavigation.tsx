@@ -1,6 +1,6 @@
 import { useInput } from "ink";
 import { useLauncherContext } from "../context/LauncherContext.js";
-import { clamp } from "../utils/clamp.js";
+import { clamp, wrap } from "../utils/clamp.js";
 
 export function useNavigation() {
 	const {
@@ -128,13 +128,13 @@ export function useNavigation() {
 				}
 				if (key.upArrow) {
 					setSelectedLanguageIndex((prev) =>
-						clamp(prev - 1, 0, languageTemplates.length - 1),
+						wrap(prev - 1, 0, languageTemplates.length - 1),
 					);
 					return;
 				}
 				if (key.downArrow) {
 					setSelectedLanguageIndex((prev) =>
-						clamp(prev + 1, 0, languageTemplates.length - 1),
+						wrap(prev + 1, 0, languageTemplates.length - 1),
 					);
 					return;
 				}
@@ -175,11 +175,11 @@ export function useNavigation() {
 					return;
 				}
 				if (key.upArrow) {
-					setSelectedAppIndex((prev) => clamp(prev - 1, 0, apps.length - 1));
+					setSelectedAppIndex((prev) => wrap(prev - 1, 0, apps.length - 1));
 					return;
 				}
 				if (key.downArrow) {
-					setSelectedAppIndex((prev) => clamp(prev + 1, 0, apps.length - 1));
+					setSelectedAppIndex((prev) => wrap(prev + 1, 0, apps.length - 1));
 					return;
 				}
 				if (key.return && apps[selectedAppIndex]) {
@@ -208,13 +208,13 @@ export function useNavigation() {
 				}
 				if (key.upArrow) {
 					setSelectedScriptIndex((prev) =>
-						clamp(prev - 1, 0, scriptOptions.length - 1),
+						wrap(prev - 1, 0, scriptOptions.length - 1),
 					);
 					return;
 				}
 				if (key.downArrow) {
 					setSelectedScriptIndex((prev) =>
-						clamp(prev + 1, 0, scriptOptions.length - 1),
+						wrap(prev + 1, 0, scriptOptions.length - 1),
 					);
 					return;
 				}

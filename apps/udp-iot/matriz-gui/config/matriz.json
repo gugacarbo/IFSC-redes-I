@@ -1,0 +1,8 @@
+{
+  "user": "admin",
+  "pass": "admin",
+  "pollingMs": 5000,
+  "filiais": [
+    { "name": "Filial Local", "ip": "127.0.0.1", "port": 51000 }
+  ]
+}

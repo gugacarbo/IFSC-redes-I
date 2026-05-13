@@ -1,0 +1,13 @@
+{
+	"port": 51000,
+	"adminUser": "admin",
+	"adminPass": "admin",
+	"devices": [
+		"actuator_light_sala",
+		"sensor_light_sala",
+		"actuator_ac_escritorio",
+		"sensor_ac_escritorio",
+		"actuator_light_cozinha",
+		"sensor_light_cozinha"
+	]
+}
