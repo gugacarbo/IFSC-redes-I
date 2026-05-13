@@ -48,12 +48,12 @@ public class LogCapture {
         this.broadcastListener = listener;
     }
 
-    /** Return most recent entries, oldest first, up to limit. */
+    /** Return most recent entries, newest first, up to limit. */
     public List<LogEntry> getEntries(int limit) {
         List<LogEntry> result = new ArrayList<>();
-        for (LogEntry e : entries) {
-            result.add(e);
-            if (result.size() >= limit) break;
+        java.util.Iterator<LogEntry> it = entries.descendingIterator();
+        while (it.hasNext() && result.size() < limit) {
+            result.add(it.next());
         }
         return result;
     }
