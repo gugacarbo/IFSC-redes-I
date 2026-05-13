@@ -81,10 +81,3 @@ public class FilialMain {
         }
     }
 }
-        String configPath;
-        if (args.length > 0) {
-            configPath = args[0];
-        } else {
-            // CLI env var > .env file > default
-            configPath = Env.get("FILIAL_CONFIG_PATH", DEFAULT_CONFIG);
-        }
