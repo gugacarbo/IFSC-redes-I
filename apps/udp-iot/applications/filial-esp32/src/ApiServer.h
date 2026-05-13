@@ -14,7 +14,6 @@ private:
 public:
     ApiServer(uint16_t port) : server(port), httpPort(port) {}
     void begin(DeviceManager* mgr);
-    static String getLogsJson();
     AsyncWebServer& getServer() { return server; }
 };
 

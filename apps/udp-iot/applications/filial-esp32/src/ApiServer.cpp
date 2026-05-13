@@ -99,6 +99,8 @@ void ApiServer::setupRoutes() {
         int limit = 200;
         if (request->hasParam("limit")) {
             limit = request->getParam("limit")->value().toInt();
+            if (limit < 1) limit = 1;
+            if (limit > 500) limit = 500;
         }
         String json = LogCapture::getEntries(limit);
         AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", json);
