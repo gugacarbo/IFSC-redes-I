@@ -132,7 +132,7 @@ public class AppServer {
             deviceBridge.onSessionOpened(session);
             deviceBridge.sessionReadLoop(session);
         } else {
-            sendHttpResponse(out, 400, "Bad Request", "{\"error\":\"WebSocket handshake failed\"}");
+            sendHttpResponse(out, 400, "Bad Request", "application/json", "{\"error\":\"WebSocket handshake failed\"}");
         }
     }
 
