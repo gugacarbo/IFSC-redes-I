@@ -3,16 +3,21 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".pio/**"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "cache": false
+    },
+    "lint": {
+      "cache": false
     },
     "clean": {
       "cache": false
-    },
-    "lint": {},
-    "typecheck": {}
+    }
   }
 }

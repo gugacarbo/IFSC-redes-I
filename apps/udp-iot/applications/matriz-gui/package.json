@@ -1,5 +1,5 @@
 {
-  "name": "matriz-gui-v2",
+  "name": "@udp-iot/matriz-gui",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -9,6 +9,9 @@
     "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
     "build": "tsc -b && vite build",
     "build:server": "tsc -p server/tsconfig.json",
+    "typecheck": "tsc -b",
+    "lint": "tsc -b",
+    "clean": "rm -rf dist .turbo",
     "preview": "vite preview"
   },
   "dependencies": {

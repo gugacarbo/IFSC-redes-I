@@ -6,6 +6,8 @@
   "scripts": {
     "build": "javac -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/filial/*.java",
     "dev": "java -cp dist:../../packages/udp-shared/src filial.FilialMain",
+    "typecheck": "javac -Xlint -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/filial/*.java",
+    "lint": "javac -Xlint -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/filial/*.java",
     "clean": "rm -rf dist"
   }
 }
