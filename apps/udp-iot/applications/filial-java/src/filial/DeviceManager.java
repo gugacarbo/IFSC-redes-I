@@ -85,7 +85,7 @@ public class DeviceManager {
     }
 
     /** Rename device from oldId to newId. Returns true if oldId existed. */
-    public boolean updateDevice(String oldId, String newId) {
+    public synchronized boolean updateDevice(String oldId, String newId) {
         DeviceState state = devices.remove(oldId);
         if (state == null) return false;
         DeviceState newState = new DeviceState(newId);
@@ -94,7 +94,12 @@ public class DeviceManager {
         } else {
             newState.setValue(state.intValue());
         }
-        devices.put(newId, newState);
+        DeviceState existing = devices.putIfAbsent(newId, newState);
+        if (existing != null) {
+            // newId already exists — restore old mapping and fail
+            devices.put(oldId, state);
+            return false;
+        }
         return true;
     }
 }
