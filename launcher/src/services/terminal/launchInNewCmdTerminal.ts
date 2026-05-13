@@ -3,14 +3,19 @@ import type { AppInfo, ScriptOption } from "../../types.js";
 import { buildCommandForOption } from "./buildCommandForOption.js";
 import { escapePowerShellSingleQuoted } from "./escapePowerShellSingleQuoted.js";
 import { sanitizeWindowTitle } from "./sanitizeWindowTitle.js";
+import { launchInNewCmdTerminalLinux } from "./launchInNewCmdTerminalLinux.js";
 
 export function launchInNewCmdTerminal(
 	app: AppInfo,
 	option: ScriptOption,
 ): number {
+	if (process.platform === "linux") {
+		return launchInNewCmdTerminalLinux(app, option);
+	}
+
 	if (process.platform !== "win32") {
 		throw new Error(
-			"Abertura de terminal externo implementada apenas para Windows.",
+			"Abertura de terminal externo implementada apenas para Windows e Linux.",
 		);
 	}
 
