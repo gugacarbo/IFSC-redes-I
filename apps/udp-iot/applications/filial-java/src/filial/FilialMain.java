@@ -1,6 +1,7 @@
 package filial;
 
 import shared.Env;
+import shared.LogCapture;
 
 /**
  * Entry point for the Filial (branch) application.
@@ -28,6 +29,10 @@ public class FilialMain {
         System.out.println("=== Filial IoT (Java) ===");
         System.out.println("Config: " + configPath);
 
+        // === Log stdout to GUI console ===
+        LogCapture logCapture = new LogCapture(500);
+        logCapture.install();
+
         // 1. Load config
         ConfigManager cfgMgr = new ConfigManager();
         if (!cfgMgr.load(configPath)) {
@@ -50,7 +55,8 @@ public class FilialMain {
 
         // 3. Create bridge and API handler
         DeviceBridge deviceBridge = new DeviceBridge(devMgr, cfgMgr);
-        ApiHandler apiHandler = new ApiHandler(devMgr, deviceBridge);
+        logCapture.setBroadcastListener(json -> deviceBridge.broadcast(json));
+        ApiHandler apiHandler = new ApiHandler(devMgr, deviceBridge, logCapture);
 
         // 4. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, deviceBridge, apiHandler);

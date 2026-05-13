@@ -3,6 +3,7 @@ package filial;
 import shared.Json;
 import shared.Json.JsonArray;
 import shared.Json.JsonObject;
+import shared.LogCapture;
 
 import java.util.Map;
 
@@ -24,11 +25,13 @@ public class ApiHandler {
 
     private final DeviceManager deviceManager;
     private final DeviceBridge deviceBridge;
+    private final LogCapture logCapture;
     private final ThreadLocal<Integer> lastStatusCode = ThreadLocal.withInitial(() -> 200);
 
-    public ApiHandler(DeviceManager deviceManager, DeviceBridge deviceBridge) {
+    public ApiHandler(DeviceManager deviceManager, DeviceBridge deviceBridge, LogCapture logCapture) {
         this.deviceManager = deviceManager;
         this.deviceBridge = deviceBridge;
+        this.logCapture = logCapture;
     }
 
     public String handle(String method, String path, String body) {
@@ -65,6 +68,13 @@ public class ApiHandler {
                 if ("GET".equals(method) || "OPTIONS".equals(method)) {
                     lastStatusCode.set(200);
                     return "{\"status\":\"ok\",\"devices\":" + deviceManager.count() + "}";
+                }
+                return jsonError(405, "Method not allowed");
+            }
+            if (path.equals("/api/logs")) {
+                if ("GET".equals(method) || "OPTIONS".equals(method)) {
+                    lastStatusCode.set(200);
+                    return logsToJson(logCapture.getEntries(200));
                 }
                 return jsonError(405, "Method not allowed");
             }
@@ -184,5 +194,19 @@ public class ApiHandler {
 
     private String jsonError(int code, String message) {
         return "{\"error\":\"" + message + "\"}";
+    }
+
+    private String logsToJson(java.util.List<LogCapture.LogEntry> logEntries) {
+        StringBuilder sb = new StringBuilder("[");
+        boolean first = true;
+        for (LogCapture.LogEntry e : logEntries) {
+            if (!first) sb.append(",");
+            first = false;
+            sb.append("{\"level\":\"").append(e.level)
+              .append("\",\"message\":").append(Json.escape(e.message))
+              .append(",\"ts\":").append(e.ts).append("}");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }
