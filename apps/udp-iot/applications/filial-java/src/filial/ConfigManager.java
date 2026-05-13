@@ -20,6 +20,7 @@ import java.util.List;
  * <pre>
  * {
  *   "port": 51000,
+ *   "http_port": 8082,
  *   "admin_user": "admin",
  *   "admin_pass": "admin",
  *   "id": ["actuator_light_sala", "sensor_light_sala", ...]
@@ -39,7 +40,7 @@ public class ConfigManager {
             int port = obj.getInt("port", Protocol.DEFAULT_PORT);
             String user = obj.getString("admin_user", Protocol.DEFAULT_USER);
             String pass = obj.getString("admin_pass", Protocol.DEFAULT_PASS);
-            int httpPort = obj.getInt("http_port", 8082);
+            int httpPort = obj.getInt("http_port", Protocol.DEFAULT_HTTP_PORT);
 
             List<String> deviceIds = new ArrayList<>();
             if (obj.has("id")) {

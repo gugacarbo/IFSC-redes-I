@@ -50,6 +50,7 @@ public final class Protocol {
     // ---- Defaults ----
 
     public static final int    DEFAULT_PORT = 51000;
+    public static final int    DEFAULT_HTTP_PORT = 8082;
     public static final String DEFAULT_USER = "admin";
     public static final String DEFAULT_PASS = "admin";
 
