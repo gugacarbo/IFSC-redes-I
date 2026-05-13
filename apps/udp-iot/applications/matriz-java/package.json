@@ -4,10 +4,10 @@
   "private": true,
   "description": "UDP-IoT Matriz - Java implementation",
   "scripts": {
-    "build": "javac -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/matriz/*.java",
-    "dev": "java -cp dist:../../packages/udp-shared/src matriz.MatrizMain",
-    "typecheck": "javac -Xlint -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/matriz/*.java",
-    "lint": "javac -Xlint -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/matriz/*.java",
+    "build": "javac -d dist -cp src src/matriz/*.java",
+    "dev": "java -cp dist matriz.MatrizMain",
+    "typecheck": "javac -Xlint -d dist -cp src src/matriz/*.java",
+    "lint": "javac -Xlint -d dist -cp src src/matriz/*.java",
     "clean": "rm -rf dist"
   }
 }

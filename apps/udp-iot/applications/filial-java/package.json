@@ -4,10 +4,10 @@
   "private": true,
   "description": "UDP-IoT Filial - Java implementation",
   "scripts": {
-    "build": "javac -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/filial/*.java",
-    "dev": "java -cp dist:../../packages/udp-shared/src filial.FilialMain",
-    "typecheck": "javac -Xlint -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/filial/*.java",
-    "lint": "javac -Xlint -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/filial/*.java",
+    "build": "javac -d dist -cp src src/filial/*.java",
+    "dev": "java -cp dist filial.FilialMain",
+    "typecheck": "javac -Xlint -d dist -cp src src/filial/*.java",
+    "lint": "javac -Xlint -d dist -cp src src/filial/*.java",
     "clean": "rm -rf dist"
   }
 }
