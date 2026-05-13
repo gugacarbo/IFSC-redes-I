@@ -3,7 +3,11 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
-export default defineConfig({
+import { loadEnv } from 'vite'
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") }
@@ -11,5 +15,9 @@ export default defineConfig({
   build: {
     outDir: '../matriz-esp32/data/www',
     emptyOutDir: true
+  }
+    server: {
+      port: parseInt(env.VITE_MATRIZ_PORT || '5173', 10),
+    }
   }
 })

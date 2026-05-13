@@ -15,6 +15,7 @@
 		"dev:filial": "turbo run dev --filter=@udp-iot/filial-*",
 		"typecheck": "turbo run typecheck",
 		"lint": "turbo run lint",
-		"clean": "turbo run clean"
+		"clean": "turbo run clean",
+		"postinstall": "bash scripts/init-config.sh"
 	}
 }

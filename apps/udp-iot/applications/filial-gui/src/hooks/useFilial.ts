@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { DeviceInfo, ServerConfig } from "../types";
 
-const API_BASE = "http://localhost:3002";
-const WS_URL = "ws://localhost:3002/ws";
+const FILIAL_GUI_PORT = import.meta.env.VITE_FILIAL_GUI_PORT || "3002";
+const API_BASE = import.meta.env.VITE_FILIAL_API_URL || `http://localhost:${FILIAL_GUI_PORT}`;
+const WS_URL = import.meta.env.VITE_FILIAL_WS_URL || `ws://localhost:${FILIAL_GUI_PORT}/ws`;
 
 export function useFilial() {
   const [devices, setDevices] = useState<DeviceInfo[]>([]);

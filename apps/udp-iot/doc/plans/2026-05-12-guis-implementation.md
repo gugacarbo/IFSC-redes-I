@@ -2,11 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Implement `matriz-gui` and `filial-gui` with direct UDP communication, working with both ESP32 and Java filial servers.
+**Goal:** Implement `matriz-gui` and `filial-gui` with direct UDP communication, working with ESP32 and Java filial servers.
 
-**Architecture:** Each GUI has a React (Vite) frontend communicating via local WebSocket to a Node.js backend that handles UDP sockets. The `filial-gui` backend IS a full UDP filial server with runtime device management.
+**Architecture:**
+- `matriz-gui`: Node.js bridge (WebSocket client ↔ UDP server) connecting to ESP32/Java filial servers
+- `filial-gui`: React app connecting directly to ESP32 or Java via WebSocket (no Node.js backend)
 
-**Tech Stack:** React 19 + Vite + TypeScript + Tailwind 4 (frontend), Node.js + Express + `ws` + `dgram` (backend), Java (existing filial server)
+**Tech Stack:** React 19 + Vite + TypeScript + Tailwind 4 (frontend), Node.js + Express + `ws` + `dgram` (matriz bridge only)
 
 ---
 
@@ -30,14 +32,10 @@ apps/udp-iot/
 │   │   └── main.tsx
 │   ├── package.json                 # MODIFY: add server scripts
 │   └── vite.config.ts
-├── filial-gui/
-│   ├── server/                      # CREATE: Node.js UDP server
-│   │   ├── index.ts                 #   UDP server + WS API
-│   │   ├── device-manager.ts        #   Device CRUD + state
-│   │   └── tsconfig.json
-│   ├── src/                         # REWRITE (was Vite boilerplate)
+├── filial-gui/                      # REWRITE: no server, direct WS
+│   ├── src/
 │   │   ├── hooks/
-│   │   │   └── useFilial.ts
+│   │   │   └── useFilial.ts         # CREATE: WS to ESP32/Java
 │   │   ├── components/
 │   │   │   ├── dashboard.tsx
 │   │   │   ├── device-editor.tsx
@@ -46,10 +44,11 @@ apps/udp-iot/
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   └── index.css
-│   ├── package.json                 # MODIFY: add deps + server scripts
 │   └── vite.config.ts
 └── java/                            # EXISTING (unmodified)
 ```
+
+---
 
 ## Protocol (UDP — compatível com ESP32 e Java)
 
@@ -62,6 +61,19 @@ Every command includes `user` + `pass`:
 | `set_req` | `{"cmd":"set_req","user":"x","pass":"y","id":"actuator_light_sala","value":true}` | `{"cmd":"set_resp","id":"actuator_light_sala","value":true}` |
 
 Error responses: `{"error":"Invalid JSON"}` / `"Unauthorized"` / `"Device not found"` / `"Read only"`
+
+---
+
+## Protocol (WebSocket — filial-gui ↔ ESP32/Java)
+
+The filial WebSocket server (ESP32 or Java) exposes the same UDP protocol over WS:
+
+| WS Message Type | Payload | Response |
+|-----------------|---------|----------|
+| `list_req` | `{"type":"list_req","user":"x","pass":"y"}` | `{"type":"list_resp","id":["actuator_light_sala",...]}` |
+| `get_status` | `{"type":"get_status","user":"x","pass":"y"}` | `{"type":"get_resp",...}` |
+| `set_req` | `{"type":"set_req","user":"x","pass":"y","id":"...","value":...}` | `{"type":"set_resp","id":"...","value":...}` |
+| `update` | (server → client) | `{"type":"update","devices":[{id,boolValue?,intValue?}]}` |
 
 ---
 
@@ -148,55 +160,10 @@ Error responses: `{"error":"Invalid JSON"}` / `"Unauthorized"` / `"Device not fo
 - [ ] **2.5 Update `App.tsx`** — pass connection status, handle loading states, show server connection status
 - [ ] **2.6 Commit** `matriz-gui: refactor frontend for local bridge`
 
-### Task 3: filial-gui server (Node.js UDP server)
+### Task 3: filial-gui frontend — Build from scratch (no server)
 
 **Files:**
-- Create: `apps/udp-iot/filial-gui/server/tsconfig.json`
-- Create: `apps/udp-iot/filial-gui/server/device-manager.ts`
-- Create: `apps/udp-iot/filial-gui/server/index.ts`
-
-**What it does:**
-- Full UDP server compatible with filial-esp32 protocol
-- Listens on configurable UDP port (default 51000)
-- DeviceManager: CRUD devices at runtime, state management
-- WebSocket for React GUI
-- REST API for device management + config
-
-**Steps:**
-- [ ] **3.1 Create `server/device-manager.ts`** — class `DeviceManager`:
-  - `Map<string, DeviceState>` where `DeviceState = { isLight, boolVal, intVal, isSensor }`
-  - `init(deviceIds: string[])` — create default states
-  - `get(id)` / `set(id, bool)` / `set(id, int)` / `list()` / `getAll()`
-  - `addDevice(id)` / `removeDevice(id)` / `updateDevice(oldId, newId)` — runtime management
-  - `getConfig()` / `setConfig(port, user, pass)` — server config
-  - Detect `isLight`: id contains `_light_`, `isSensor`: starts with `sensor_`
-- [ ] **3.2 Create `server/index.ts`** — full application:
-  - UDP socket listener (configurable port)
-  - On datagram: parse JSON, authenticate (user/pass), route command, send response
-  - Commands: `list_req` → `list_resp`, `get_status` → `get_resp`, `set_req` → `set_resp`
-  - Error handling: `Invalid JSON`, `Missing credentials`, `Unauthorized`, `Device not found`, `Read only`, `Unknown command`
-  - HTTP + WebSocket server on port 3002:
-    - WS: sends device state updates, receives device management commands
-    - REST: `GET /api/devices`, `POST /api/devices` (add), `DELETE /api/devices/:id`
-    - REST: `GET /api/config`, `PUT /api/config` (port, user, pass, autostart)
-  - Auto-save config to `config/servidor.json`
-- [ ] **3.3 Add dependencies** — `ws`, `express`, `cors`, `@types/*`, `tsx`, `typescript`, `concurrently`
-- [ ] **3.4 Update `filial-gui/package.json`**:
-  ```json
-  "scripts": {
-    "dev": "vite",
-    "dev:server": "tsx server/index.ts",
-    "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
-    "build": "tsc -b && vite build",
-    "build:server": "tsc -p server/tsconfig.json"
-  }
-  ```
-- [ ] **3.5 Commit** `filial-gui: add Node.js UDP server`
-
-### Task 4: filial-gui frontend — Build from scratch
-
-**Files:**
-- Create: `apps/udp-iot/filial-gui/src/types.ts`
+- Rewrite: `apps/udp-iot/filial-gui/src/types.ts`
 - Create: `apps/udp-iot/filial-gui/src/hooks/useFilial.ts`
 - Create: `apps/udp-iot/filial-gui/src/components/layout.tsx`
 - Create: `apps/udp-iot/filial-gui/src/components/dashboard.tsx`
@@ -206,40 +173,40 @@ Error responses: `{"error":"Invalid JSON"}` / `"Unauthorized"` / `"Device not fo
 - Modify: `apps/udp-iot/filial-gui/index.html` — title, lang
 
 **What it does:**
-- React app with Tailwind CSS
+- React app connects directly to ESP32 or Java WebSocket server
+- No Node.js backend — connects to `ws://<esp32-ip>:<port>/ws` or `ws://localhost:<port>/ws`
 - Dashboard showing all devices and their current states
-- Device editor: add, remove, rename devices at runtime
-- Server config: port, auth credentials
+- Device editor: add, remove, rename devices at runtime (via ESP32/Java API)
+- Server config: ESP32/Java server URL, auth credentials
 - Real-time updates via WebSocket
 
 **Steps:**
-- [ ] **4.1 Rewrite `index.html`** — title "Filial IoT", lang="pt-BR"
-- [ ] **4.2 Rewrite `src/index.css`** — Tailwind import (`@import "tailwindcss"`)
-- [ ] **4.3 Create `src/types.ts`** — shared types
-- [ ] **4.4 Create `hooks/useFilial.ts`** — WebSocket connection to local server, CRUD operations:
+- [ ] **3.1 Rewrite `index.html`** — title "Filial IoT", lang="pt-BR"
+- [ ] **3.2 Rewrite `src/index.css`** — Tailwind import (`@import "tailwindcss"`)
+- [ ] **3.3 Create `src/types.ts`** — shared types for filial devices
+- [ ] **3.4 Create `hooks/useFilial.ts`** — WebSocket connection to ESP32/Java server:
+  - `serverUrl` state (configurable by user)
   - `devices` state, `config` state
-  - `addDevice(id)`, `removeDevice(id)`, `updateDevice(oldId, newId)`
-  - `updateConfig(config)`
-- [ ] **4.5 Create `components/layout.tsx`** — header with nav tabs, server status indicator
-- [ ] **4.6 Create `components/dashboard.tsx`** — grid of device cards:
+  - Handles WS message types: `list_resp`, `get_resp`, `set_resp`, `update`
+  - Auto-reconnect on disconnect
+- [ ] **3.5 Create `components/layout.tsx`** — header with nav tabs, server status indicator, server URL input
+- [ ] **3.6 Create `components/dashboard.tsx`** — grid of device cards:
   - Each card: device ID, type icon (light/AC), current value
   - Light: boolean indicator (on/off), AC: numeric display
   - Sensor vs actuator marker
   - Read-only for sensors
-- [ ] **4.7 Create `components/device-editor.tsx`** — form to:
-  - Add new device: select type (light/ac), access (sensor/actuator), place name
-  - Auto-generate ID: `actuator_light_sala` format
-  - Remove existing device with confirmation
-  - Edit device ID
-- [ ] **4.8 Rewrite `App.tsx`** — tabs: Dashboard, Devices, Config
-- [ ] **4.9 Add Tailwind to deps** — `tailwindcss`, `@tailwindcss/vite`
-- [ ] **4.10 Update `vite.config.ts`** — add Tailwind plugin
-- [ ] **4.11 Commit** `filial-gui: build React frontend`
+- [ ] **3.7 Create `components/device-editor.tsx`** — form to:
+  - Note: device management depends on ESP32/Java REST API (if available)
+  - Display current devices
+- [ ] **3.8 Rewrite `App.tsx`** — tabs: Dashboard, Config
+- [ ] **3.9 Update `vite.config.ts`** — ensure Tailwind plugin
+- [ ] **3.10 Commit** `filial-gui: build React frontend (direct WS to ESP32/Java)`
 
-### Task 5: Integration & verification
+### Task 4: Integration & verification
 
-- [ ] **5.1 Install deps for both apps:** run `npm install` in matriz-gui and filial-gui
-- [ ] **5.2 Build matriz-gui:** `npm run build` in matriz-gui
-- [ ] **5.3 Build filial-gui:** `npm run build` in filial-gui
-- [ ] **5.4 Manual test:** Start filial-gui server → start matriz-gui server → verify list/get/set works
-- [ ] **5.5 Compatibility test:** Verify matriz-gui works with Java filial (`java -cp dist filial.FilialMain`)
+- [ ] **4.1 Install deps for matriz-gui:** run `npm install` in matriz-gui
+- [ ] **4.2 Install deps for filial-gui:** run `npm install` in filial-gui
+- [ ] **4.3 Build matriz-gui:** `npm run build` in matriz-gui
+- [ ] **4.4 Build filial-gui:** `npm run build` in filial-gui
+- [ ] **4.5 Manual test:** Start Java filial → start matriz-gui server → verify list/get/set works
+- [ ] **4.6 Compatibility test:** Verify filial-gui works with Java filial (`java -cp dist filial.FilialMain`)

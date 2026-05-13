@@ -99,3 +99,10 @@ public class MatrizMain {
         }
     }
 }
+        String configPath;
+        if (args.length > 0) {
+            configPath = args[0];
+        } else {
+            // CLI env var > .env file > default
+            configPath = Env.get("MATRIZ_CONFIG_PATH", DEFAULT_CONFIG);
+        }

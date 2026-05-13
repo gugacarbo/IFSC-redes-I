@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { AppConfig, FilialData } from "../types";
 
 const WS_URL =
-  import.meta.env.VITE_MATRIZ_WS_URL || "ws://localhost:3001/ws";
+  import.meta.env.VITE_MATRIZ_WS_URL || `ws://localhost:${import.meta.env.VITE_MATRIZ_PORT || 3001}/ws`;
 const API_URL =
-  import.meta.env.VITE_MATRIZ_API_URL || "http://localhost:3001";
+  import.meta.env.VITE_MATRIZ_API_URL || `http://localhost:${import.meta.env.VITE_MATRIZ_PORT || 3001}`;
 
 export function useIoT() {
   const [filiais, setFiliais] = useState<Record<string, FilialData>>({});
