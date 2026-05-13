@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AppConfig, FilialData } from "../types";
+import type { AppConfig, FilialData, LogEntry } from "../types";
 
 const WS_URL =
 	import.meta.env.VITE_MATRIZ_WS_URL ||
@@ -12,6 +12,7 @@ export function useIoT() {
 	const [filiais, setFiliais] = useState<Record<string, FilialData>>({});
 	const [connected, setConnected] = useState(false);
 	const [config, setConfig] = useState<AppConfig | null>(null);
+	const [logs, setLogs] = useState<LogEntry[]>([]);
 	const wsRef = useRef<WebSocket | null>(null);
 	const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const backoffRef = useRef(1000);
@@ -25,6 +26,11 @@ export function useIoT() {
 		ws.onopen = () => {
 			setConnected(true);
 			backoffRef.current = 1000;
+			// Fetch log backlog from server
+			fetch(`${API_URL}/api/logs`)
+				.then((r) => r.json())
+				.then((data: LogEntry[]) => setLogs(data.reverse()))
+				.catch(() => {});
 		};
 
 		ws.onclose = () => {
@@ -78,6 +84,11 @@ export function useIoT() {
 								lastSeen: Date.now(),
 							},
 						};
+					});
+				} else if (msg.type === "log") {
+					setLogs((prev) => {
+						const next = [...prev, { level: msg.level, message: msg.message, ts: msg.ts }];
+						return next.length > 500 ? next.slice(next.length - 500) : next;
 					});
 				}
 			} catch (err) {
@@ -153,5 +164,5 @@ export function useIoT() {
 		[],
 	);
 
-	return { filiais, connected, config, updateConfig, sendCommand };
+	return { filiais, connected, config, logs, updateConfig, sendCommand, clearLogs: () => setLogs([]) };
 }

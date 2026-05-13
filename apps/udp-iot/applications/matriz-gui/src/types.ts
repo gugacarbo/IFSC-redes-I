@@ -18,3 +18,9 @@ export interface FilialData {
   state: Record<string, boolean | number>;
   lastSeen: number;
 }
+
+export interface LogEntry {
+  level: "info" | "error";
+  message: string;
+  ts: number;
+}

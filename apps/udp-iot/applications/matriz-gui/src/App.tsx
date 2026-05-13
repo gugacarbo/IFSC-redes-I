@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Layout } from "./components/layout";
 import { Dashboard } from "./components/dashboard";
 import { ConfigView } from "./components/config";
+import { Console } from "./components/console";
 import { useIoT } from "./hooks/useIoT";
 import { Alert, AlertDescription } from "@udp-iot/ui/components/alert";
 
 function App() {
 	const [tab, setTab] = useState("dashboard");
-	const { filiais, connected, sendCommand } = useIoT();
+	const { filiais, connected, logs, sendCommand, clearLogs } = useIoT();
 
 	return (
 		<Layout currentTab={tab} setTab={setTab} connected={connected}>
@@ -17,10 +18,14 @@ function App() {
 				</Alert>
 			)}
 
-			{tab === "dashboard" ? (
+			{tab === "dashboard" && (
 				<Dashboard filiais={filiais} onCommand={sendCommand} />
-			) : (
+			)}
+			{tab === "config" && (
 				<ConfigView />
+			)}
+			{tab === "console" && (
+				<Console logs={logs} onClear={clearLogs} />
 			)}
 		</Layout>
 	);
