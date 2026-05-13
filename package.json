@@ -7,7 +7,8 @@
 	"workspaces": [
 		"launcher",
 		"apps/*",
-		"apps/udp-iot/*"
+		"apps/udp-iot/packages/*",
+		"apps/udp-iot/applications/*"
 	],
 	"author": {
 		"name": "Gustavo Carbonera",
