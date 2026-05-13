@@ -8,7 +8,10 @@ export default defineConfig(({ mode }) => {
 	return {
 		plugins: [react(), tailwindcss()],
 		resolve: {
-			alias: { "@": path.resolve(__dirname, "./src") },
+			alias: {
+				"@": path.resolve(__dirname, "./src"),
+				"@workspace/ui": path.resolve(__dirname, "../../packages/ui/src"),
+			},
 		},
 		build: {
 			outDir: "../matriz-esp32/data/www",

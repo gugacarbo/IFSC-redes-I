@@ -1,98 +1,84 @@
 import type { FilialData } from "../types";
+import { Card, CardHeader, CardTitle, CardContent } from "@udp-iot/ui/components/card";
+import { Badge } from "@udp-iot/ui/components/badge";
+import { Switch } from "@udp-iot/ui/components/switch";
+import { Slider } from "@udp-iot/ui/components/slider";
 
 export function Dashboard({
-  filiais,
-  onCommand,
+	filiais,
+	onCommand,
 }: {
-  filiais: Record<string, FilialData>;
-  onCommand: (ip: string, id: string, val: boolean | number) => void;
+	filiais: Record<string, FilialData>;
+	onCommand: (ip: string, id: string, val: boolean | number) => void;
 }) {
-  const entries = Object.values(filiais);
+	const entries = Object.values(filiais);
 
-  if (entries.length === 0) {
-    return (
-      <div className="text-center p-12 text-slate-500">
-        Aguardando dados das filiais...
-      </div>
-    );
-  }
+	if (entries.length === 0) {
+		return (
+			<div className="text-center p-12 text-muted-foreground">
+				Aguardando dados das filiais...
+			</div>
+		);
+	}
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {entries.map((filial) => {
-        const isOffline = Date.now() - filial.lastSeen > 15000;
+	return (
+		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{entries.map((filial) => {
+				const isOffline = Date.now() - filial.lastSeen > 15000;
 
-        return (
-          <div
-            key={filial.ip}
-            className={`bg-white rounded-lg shadow border p-5 ${isOffline ? "opacity-60 grayscale" : ""}`}
-          >
-            <div className="flex justify-between items-center mb-4 border-b pb-2">
-              <div>
-                <h2 className="font-bold text-lg text-slate-800">
-                  {filial.name}
-                </h2>
-                <span className="text-xs text-slate-500 font-mono">
-                  {filial.ip}
-                </span>
-              </div>
-              <span
-                className={`text-xs px-2 py-1 rounded-full font-medium ${isOffline ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}
-              >
-                {isOffline ? "Offline" : "Online"}
-              </span>
-            </div>
+				return (
+					<Card key={filial.ip} size="sm" className={isOffline ? "opacity-60" : ""}>
+						<CardHeader>
+							<div className="flex justify-between items-center">
+								<div>
+									<CardTitle>{filial.name}</CardTitle>
+									<span className="text-xs text-muted-foreground font-mono">{filial.ip}</span>
+								</div>
+								<Badge variant={isOffline ? "destructive" : "outline"}>
+									{isOffline ? "Offline" : "Online"}
+								</Badge>
+							</div>
+						</CardHeader>
+						<CardContent>
+							<div className="flex flex-col gap-3">
+								{filial.devices.map((dev) => {
+									const isLight = dev.includes("_light_");
+									const isSensor = dev.startsWith("sensor_");
+									const val = filial.state[dev];
 
-            <div className="space-y-3">
-              {filial.devices.map((dev) => {
-                const isLight = dev.includes("_light_");
-                const isSensor = dev.startsWith("sensor_");
-                const val = filial.state[dev];
+									return (
+										<div key={dev} className="flex justify-between items-center bg-muted p-2.5 rounded">
+											<span className="text-sm font-medium truncate pr-2">{dev}</span>
 
-                return (
-                  <div
-                    key={dev}
-                    className="flex justify-between items-center bg-slate-50 p-2.5 rounded"
-                  >
-                    <span className="text-sm text-slate-700 font-medium truncate pr-2">
-                      {dev}
-                    </span>
-
-                    {isLight ? (
-                      <button
-                        disabled={isSensor}
-                        onClick={() => onCommand(filial.ip, dev, !val)}
-                        className={`w-12 h-6 rounded-full relative transition-colors ${val ? "bg-emerald-500" : "bg-slate-300"} ${isSensor ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
-                      >
-                        <div
-                          className={`absolute w-5 h-5 bg-white rounded-full top-0.5 transition-transform ${val ? "left-6" : "left-0.5"}`}
-                        />
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="range"
-                          min="0"
-                          max="1023"
-                          disabled={isSensor}
-                          value={(val as number) || 0}
-                          onChange={(e) =>
-                            onCommand(filial.ip, dev, parseInt(e.target.value))
-                          }
-                          className={`w-24 ${isSensor ? "cursor-not-allowed opacity-70" : ""}`}
-                        />
-                        <span className="text-xs font-mono text-slate-500 w-10 text-right">
-                          {val ?? 0}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+											{isLight ? (
+												<Switch
+													checked={Boolean(val)}
+													onCheckedChange={(v) => onCommand(filial.ip, dev, v)}
+													disabled={isSensor}
+												/>
+											) : (
+												<div className="flex items-center gap-2">
+													<Slider
+														value={[(val as number) || 0]}
+														onValueChange={([v]) => onCommand(filial.ip, dev, v)}
+														min={0}
+														max={1023}
+														disabled={isSensor}
+														className="w-24"
+													/>
+													<span className="text-xs font-mono text-muted-foreground w-10 text-right">
+														{val ?? 0}
+													</span>
+												</div>
+											)}
+										</div>
+									);
+								})}
+							</div>
+						</CardContent>
+					</Card>
+				);
+			})}
+		</div>
+	);
 }

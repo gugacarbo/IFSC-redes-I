@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "react": "^19.0.0",
+    "@udp-iot/ui": "*",
     "react-dom": "^19.0.0",
     "lucide-react": "^0.468.0",
     "ws": "^8.18.0",

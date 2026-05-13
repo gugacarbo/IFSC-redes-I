@@ -1,5 +1,9 @@
 import { useState } from "react";
 import type { DeviceInfo } from "../types";
+import { Card, CardHeader, CardTitle, CardContent } from "@udp-iot/ui/components/card";
+import { Button } from "@udp-iot/ui/components/button";
+import { Input } from "@udp-iot/ui/components/input";
+import { Lightbulb, Snowflake, Pencil, Trash2 } from "lucide-react";
 
 interface DeviceEditorProps {
   devices: DeviceInfo[];
@@ -43,180 +47,141 @@ export function DeviceEditor({ devices, onAdd, onRemove, onRename }: DeviceEdito
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Add Device */}
-      <section className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
-        <h2 className="mb-4 text-lg font-semibold">Adicionar Dispositivo</h2>
-
-        <div className="mb-3">
-          <label className="mb-1 block text-sm text-zinc-400">Tipo</label>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setDeviceType("light")}
-              className={`flex-1 rounded px-3 py-2 text-sm font-medium transition-colors ${
-                deviceType === "light"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-              }`}
-            >
-              💡 Light
-            </button>
-            <button
-              type="button"
-              onClick={() => setDeviceType("ac")}
-              className={`flex-1 rounded px-3 py-2 text-sm font-medium transition-colors ${
-                deviceType === "ac"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-              }`}
-            >
-              ❄️ AC
-            </button>
+      <Card size="sm">
+        <CardHeader>
+          <CardTitle>Adicionar Dispositivo</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div>
+            <label className="mb-1 block text-sm text-muted-foreground">Tipo</label>
+            <div className="flex gap-2">
+              <Button
+                variant={deviceType === "light" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDeviceType("light")}
+                className="flex-1"
+              >
+                <Lightbulb className="size-4" />
+                Light
+              </Button>
+              <Button
+                variant={deviceType === "ac" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDeviceType("ac")}
+                className="flex-1"
+              >
+                <Snowflake className="size-4" />
+                AC
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div className="mb-3">
-          <label className="mb-1 block text-sm text-zinc-400">Acesso</label>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setAccessType("actuator")}
-              className={`flex-1 rounded px-3 py-2 text-sm font-medium transition-colors ${
-                accessType === "actuator"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-              }`}
-            >
-              Atuador
-            </button>
-            <button
-              type="button"
-              onClick={() => setAccessType("sensor")}
-              className={`flex-1 rounded px-3 py-2 text-sm font-medium transition-colors ${
-                accessType === "sensor"
-                  ? "bg-blue-600 text-white"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-              }`}
-            >
-              Sensor
-            </button>
+          <div>
+            <label className="mb-1 block text-sm text-muted-foreground">Acesso</label>
+            <div className="flex gap-2">
+              <Button
+                variant={accessType === "actuator" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAccessType("actuator")}
+                className="flex-1"
+              >
+                Atuador
+              </Button>
+              <Button
+                variant={accessType === "sensor" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAccessType("sensor")}
+                className="flex-1"
+              >
+                Sensor
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div className="mb-3">
-          <label className="mb-1 block text-sm text-zinc-400">
-            Local (ex: sala, escritorio)
-          </label>
-          <input
-            type="text"
-            value={place}
-            onChange={(e) => setPlace(e.target.value)}
-            placeholder="sala"
-            className="w-full rounded border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:border-blue-500 focus:outline-none"
-          />
-        </div>
+          <div>
+            <label className="mb-1 block text-sm text-muted-foreground">Local (ex: sala, escritorio)</label>
+            <Input
+              value={place}
+              onChange={(e) => setPlace(e.target.value)}
+              placeholder="sala"
+            />
+          </div>
 
-        <div className="mb-4 rounded bg-zinc-800 px-3 py-2 font-mono text-xs text-zinc-400">
-          ID: <span className="text-zinc-200">{generatedId}</span>
-        </div>
+          <div className="rounded bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
+            ID: <span className="text-foreground">{generatedId}</span>
+          </div>
 
-        <button
-          type="button"
-          disabled={!isValid}
-          onClick={handleAdd}
-          className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Adicionar
-        </button>
-      </section>
+          <Button disabled={!isValid} onClick={handleAdd} className="w-full">
+            Adicionar
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Device List */}
-      <section className="rounded-lg border border-zinc-800 bg-zinc-900 p-4">
-        <h2 className="mb-4 text-lg font-semibold">
-          Dispositivos ({devices.length})
-        </h2>
-
-        {devices.length === 0 ? (
-          <p className="text-sm text-zinc-500">Nenhum dispositivo.</p>
-        ) : (
-          <ul className="space-y-2">
-            {devices.map((device) => (
-              <li
-                key={device.id}
-                className="flex items-center justify-between rounded bg-zinc-800 px-3 py-2"
-              >
-                {renamingId === device.id ? (
-                  <div className="flex flex-1 items-center gap-2">
-                    <input
-                      type="text"
-                      value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      className="flex-1 rounded border border-zinc-600 bg-zinc-700 px-2 py-1 text-sm text-zinc-100 focus:border-blue-500 focus:outline-none"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") handleRename(device.id);
-                        if (e.key === "Escape") {
-                          setRenamingId(null);
-                          setNewName("");
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRename(device.id)}
-                      className="rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-500"
-                    >
-                      OK
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRenamingId(null);
-                        setNewName("");
-                      }}
-                      className="rounded bg-zinc-700 px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-600"
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <span>{device.isLight ? "💡" : "❄️"}</span>
-                      <span className="text-sm font-mono text-zinc-200">
-                        {device.id}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const parts = device.id.split("_");
-                          setRenamingId(device.id);
-                          setNewName(parts.slice(2).join("_"));
+      <Card size="sm">
+        <CardHeader>
+          <CardTitle>Dispositivos ({devices.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {devices.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nenhum dispositivo.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {devices.map((device) => (
+                <li key={device.id} className="flex items-center justify-between rounded bg-muted px-3 py-2">
+                  {renamingId === device.id ? (
+                    <div className="flex flex-1 items-center gap-2">
+                      <Input
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleRename(device.id);
+                          if (e.key === "Escape") { setRenamingId(null); setNewName(""); }
                         }}
-                        className="rounded px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
-                        title="Renomear"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRemove(device.id)}
-                        className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-900/40"
-                        title="Remover"
-                      >
-                        🗑️
-                      </button>
+                      />
+                      <Button size="sm" onClick={() => handleRename(device.id)}>OK</Button>
+                      <Button variant="outline" size="sm" onClick={() => { setRenamingId(null); setNewName(""); }}>Cancelar</Button>
                     </div>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        {device.isLight ? <Lightbulb className="size-4 text-muted-foreground" /> : <Snowflake className="size-4 text-muted-foreground" />}
+                        <span className="text-sm font-mono">{device.id}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => {
+                            const parts = device.id.split("_");
+                            setRenamingId(device.id);
+                            setNewName(parts.slice(2).join("_"));
+                          }}
+                          title="Renomear"
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleRemove(device.id)}
+                          title="Remover"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
