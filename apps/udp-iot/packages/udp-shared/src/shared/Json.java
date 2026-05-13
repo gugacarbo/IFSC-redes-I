@@ -437,7 +437,7 @@ public final class Json {
     //  String escaping
     // ================================================================
 
-    static String escape(String s) {
+    public static String escape(String s) {
         StringBuilder sb = new StringBuilder(s.length() + 2);
         sb.append('"');
         for (int i = 0; i < s.length(); i++) {
