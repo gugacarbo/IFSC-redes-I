@@ -73,4 +73,28 @@ public class DeviceManager {
     public int count() {
         return devices.size();
     }
+
+    /** Add a new device with default state. No-op if already exists. */
+    public void addDevice(String deviceId) {
+        devices.putIfAbsent(deviceId, new DeviceState(deviceId));
+    }
+
+    /** Remove a device. Returns true if it existed. */
+    public boolean removeDevice(String deviceId) {
+        return devices.remove(deviceId) != null;
+    }
+
+    /** Rename device from oldId to newId. Returns true if oldId existed. */
+    public boolean updateDevice(String oldId, String newId) {
+        DeviceState state = devices.remove(oldId);
+        if (state == null) return false;
+        DeviceState newState = new DeviceState(newId);
+        if (state.isLight()) {
+            newState.setValue(state.boolValue());
+        } else {
+            newState.setValue(state.intValue());
+        }
+        devices.put(newId, newState);
+        return true;
+    }
 }
