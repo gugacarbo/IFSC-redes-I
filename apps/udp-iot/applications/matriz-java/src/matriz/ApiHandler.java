@@ -1,5 +1,8 @@
 package matriz;
 
+import shared.LogCapture;
+import shared.Json;
+
 /**
  * Handles REST API calls without com.sun.net.httpserver dependency.
  *
@@ -18,11 +21,13 @@ public class ApiHandler {
 
     private final ConfigManager configManager;
     private final FilialStateTracker stateTracker;
+    private final LogCapture logCapture;
     private int lastStatusCode = 200;
 
-    public ApiHandler(ConfigManager configManager, FilialStateTracker stateTracker) {
+    public ApiHandler(ConfigManager configManager, FilialStateTracker stateTracker, LogCapture logCapture) {
         this.configManager = configManager;
         this.stateTracker = stateTracker;
+        this.logCapture = logCapture;
     }
 
     /**
@@ -43,6 +48,7 @@ public class ApiHandler {
                 case "/api/config" -> handleConfig(method, body);
                 case "/api/status" -> handleStatus(method);
                 case "/health"     -> handleHealth(method);
+                case "/api/logs"   -> handleLogs(method);
                 default -> jsonError(404, "Not found");
             };
         } catch (Exception e) {
@@ -111,9 +117,32 @@ public class ApiHandler {
         return jsonError(405, "Method not allowed");
     }
 
+    private String handleLogs(String method) {
+        if ("GET".equals(method) || "OPTIONS".equals(method)) {
+            lastStatusCode = 200;
+            return logsToJson(logCapture.getEntries(200));
+        }
+        lastStatusCode = 405;
+        return jsonError(405, "Method not allowed");
+    }
+
     // ---- Helpers ----
 
     private String jsonError(int code, String message) {
         return "{\"error\":\"" + message + "\"}";
+    }
+
+    private String logsToJson(java.util.List<LogCapture.LogEntry> logEntries) {
+        StringBuilder sb = new StringBuilder("[");
+        boolean first = true;
+        for (LogCapture.LogEntry e : logEntries) {
+            if (!first) sb.append(",");
+            first = false;
+            sb.append("{\"level\":\"").append(e.level)
+              .append("\",\"message\":").append(Json.escape(e.message))
+              .append(",\"ts\":").append(e.ts).append("}");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

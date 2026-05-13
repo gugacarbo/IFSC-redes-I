@@ -1,6 +1,7 @@
 package matriz;
 
 import shared.Env;
+import shared.LogCapture;
 
 /**
  * Entry point for the Matriz (headquarters) application.
@@ -41,6 +42,11 @@ public class MatrizMain {
 
         System.out.println("=== Matriz IoT (Java) ===");
         System.out.println("Config: " + configPath);
+
+        // === Log stdout to GUI console ===
+        LogCapture logCapture = new LogCapture(500);
+        logCapture.install();
+
         System.out.println("HTTP/WS port: " + httpPort + " (via .env)");
 
         // 1. Load configuration
@@ -58,12 +64,13 @@ public class MatrizMain {
 
         // 3. Create BridgeManager (WS ↔ UDP bridge)
         BridgeManager bridgeManager = new BridgeManager(configManager, udpClient);
+        logCapture.setBroadcastListener(json -> bridgeManager.broadcast(json));
 
         // 4. Create FilialStateTracker (internal state, independent of GUI)
         FilialStateTracker stateTracker = new FilialStateTracker();
 
         // 5. Create API handler
-        ApiHandler apiHandler = new ApiHandler(configManager, stateTracker);
+        ApiHandler apiHandler = new ApiHandler(configManager, stateTracker, logCapture);
 
         // 6. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, bridgeManager, apiHandler);
