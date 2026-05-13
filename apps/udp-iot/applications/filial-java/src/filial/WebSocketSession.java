@@ -7,6 +7,9 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -22,6 +25,7 @@ public class WebSocketSession {
     private final OutputStream out;
     private final AtomicBoolean open = new AtomicBoolean(true);
     private final String remoteAddr;
+    private ScheduledExecutorService heartbeatExecutor;
 
     private static final int OPCODE_TEXT  = 0x1;
     private static final int OPCODE_CLOSE = 0x8;
@@ -165,8 +169,32 @@ public class WebSocketSession {
         }
     }
 
+    /** Start a 30-second heartbeat sending WebSocket PING frames. */
+    public void startHeartbeat() {
+        heartbeatExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "ws-ping-" + remoteAddr);
+            t.setDaemon(true);
+            return t;
+        });
+        heartbeatExecutor.scheduleAtFixedRate(() -> {
+            try { sendPing(); } catch (Exception ignored) {}
+        }, 30, 30, TimeUnit.SECONDS);
+    }
+
+    private void sendPing() throws IOException {
+        synchronized (this) {
+            if (!isOpen()) return;
+            out.write(0x89); // FIN + Ping opcode
+            out.write(0);    // empty payload
+            out.flush();
+        }
+    }
+
     public void close() {
         if (!open.compareAndSet(true, false)) return;
+        if (heartbeatExecutor != null) {
+            heartbeatExecutor.shutdownNow();
+        }
         try {
             synchronized (this) {
                 if (!socket.isClosed()) {

@@ -114,7 +114,7 @@ public class DeviceBridge {
                 session.sendText(buildDevicesUpdatedJson());
             }
         } catch (IOException e) {
-            System.err.println("DeviceBridge: Error sending to " + session.remoteAddress());
+            // race: session closed between isOpen() check and sendText()
         }
     }
 
@@ -145,8 +145,9 @@ public class DeviceBridge {
                     session.sendText(json);
                 }
             } catch (IOException e) {
-                System.err.println("DeviceBridge: Broadcast error to "
-                    + session.remoteAddress() + ": " + e.getMessage());
+                // Race: connection closed between isOpen() check and sendText().
+                // Cleanup is handled by the read-loop thread; our removal is
+                // idempotent on CopyOnWriteArrayList.
                 onSessionClosed(session);
                 session.close();
             }

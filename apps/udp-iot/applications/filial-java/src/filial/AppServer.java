@@ -128,7 +128,9 @@ public class AppServer {
                                          int totalRead, String headers) throws IOException {
         if (WebSocketSession.performHandshake(
                 new ByteArrayInputStream(buf, 0, totalRead), out)) {
+            client.setSoTimeout(0); // no read timeout for WebSocket — idle is normal
             WebSocketSession session = new WebSocketSession(client, in, out);
+            session.startHeartbeat();
             deviceBridge.onSessionOpened(session);
             deviceBridge.sessionReadLoop(session);
         } else {
