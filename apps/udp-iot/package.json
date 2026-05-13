@@ -1,25 +1,13 @@
 {
 	"name": "udp-iot",
-	"version": "1.0.0",
 	"private": true,
+	"version": "1.0.0",
+	"workspaces": [
+		"applications/*",
+		"packages/*"
+	],
+	"packageManager": "npm@10.9.2",
 	"scripts": {
-		"biome:fix": "biome check --write",
-		"build:docs": "cd docusaurus && npm run build",
-		"build:matriz-gui": "cd matriz-gui && npm run build",
-		"build:filial-gui": "cd filial-gui && npm run build",
-		"build:matriz": "cd matriz-esp32 && pio run",
-		"build:filial": "cd filial-esp32 && pio run",
-		"build:java": "cd java && npm run build",
-		"build:all": "npm run build:docs & npm run build:matriz-gui & npm run build:filial-gui & npm run build:matriz & npm run build:filial & npm run build:java",
-		"dev:matriz-java": "cd java && java -cp dist matriz.MatrizMain",
-		"dev:filial-java": "cd java && java -cp dist filial.FilialMain",
-		"dev:matriz-gui": "cd matriz-gui && npm run dev",
-		"dev:filial-gui": "cd filial-gui && npm run dev",
-		"upload:matriz": "cd matriz-esp32 && pio run --target upload",
-		"upload:filial": "cd filial-esp32 && pio run --target upload",
-		"uploadfs:matriz": "cd matriz-esp32 && pio run --target buildfs && pio run --target uploadfs",
-		"uploadfs:filial": "cd filial-esp32 && pio run --target buildfs && pio run --target uploadfs",
-		"monitor:matriz": "cd matriz-esp32 && pio device monitor",
-		"monitor:filial": "cd filial-esp32 && pio device monitor"
+		"biome:fix": "biome check --write"
 	}
 }

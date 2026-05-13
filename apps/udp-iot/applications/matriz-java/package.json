@@ -1,0 +1,11 @@
+{
+  "name": "@udp-iot/matriz-java",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UDP-IoT Matriz - Java implementation",
+  "scripts": {
+    "build": "javac -d dist -cp ../../packages/udp-shared/src:dist src/shared/*.java src/matriz/*.java",
+    "dev": "java -cp dist:../../packages/udp-shared/src matriz.MatrizMain",
+    "clean": "rm -rf dist"
+  }
+}
