@@ -1,0 +1,11 @@
+{
+  "port": 51000,
+  "admin_user": "admin",
+  "admin_pass": "admin",
+  "id": [
+    "actuator_light_sala",
+    "sensor_light_sala",
+    "actuator_ac_escritorio",
+    "sensor_ac_escritorio"
+  ]
+}
