@@ -19,6 +19,7 @@ public:
 	void begin(AsyncWebServer& server);
 	void loop();
 	void sendUdpCommand(const String& ip, uint16_t port, const String& payload);
+	void broadcast(const char* json);
 };
 
 #endif

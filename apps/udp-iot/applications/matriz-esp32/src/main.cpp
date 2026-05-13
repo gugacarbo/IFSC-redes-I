@@ -3,6 +3,7 @@
 #include "ConfigManager.h"
 #include "ApiServer.h"
 #include "BridgeManager.h"
+#include "LogCapture.h"
 
 const char* WIFI_SSID = "WOKWI-GUEST";
 const char* WIFI_PASS = "";
@@ -15,15 +16,19 @@ void connectWiFi() {
 	while (WiFi.status() != WL_CONNECTED) {
 		delay(500);
 	}
-	Serial.print("Matriz IP: ");
-	Serial.println(WiFi.localIP());
+	LogCapture::printf("Matriz IP: %s", WiFi.localIP().toString().c_str());
 }
 
 void setup() {
 	Serial.begin(115200);
+	LogCapture::begin(500);
+	LogCapture::println("Matriz IoT (ESP32) starting...");
 	if (ConfigManager::begin()) {
 		connectWiFi();
 		bridge.begin(apiServer.getServer());
+		LogCapture::setBroadcastCallback([](const char* json) {
+			bridge.broadcast(json);
+		});
 		apiServer.begin();
 	}
 }

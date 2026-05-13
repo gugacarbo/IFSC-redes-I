@@ -105,3 +105,7 @@ void BridgeManager::sendUdpCommand(const String& ip, uint16_t port, const String
 		udp.writeTo((const uint8_t*)payload.c_str(), payload.length(), addr, port);
 	}
 }
+
+void BridgeManager::broadcast(const char* json) {
+	ws.textAll(json);
+}

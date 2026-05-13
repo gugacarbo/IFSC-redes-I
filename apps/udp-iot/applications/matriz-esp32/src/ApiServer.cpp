@@ -1,5 +1,6 @@
 #include "ApiServer.h"
 #include "ConfigManager.h"
+#include "LogCapture.h"
 #include <LittleFS.h>
 
 void ApiServer::setupRoutes() {
@@ -35,6 +36,28 @@ void ApiServer::setupRoutes() {
 			request->send(resp);
 		}
 	);
+
+	// ── GET /api/logs ──
+	server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request) {
+		int limit = 200;
+		if (request->hasParam("limit")) {
+			limit = request->getParam("limit")->value().toInt();
+			if (limit < 1) limit = 1;
+			if (limit > 500) limit = 500;
+		}
+		String json = LogCapture::getEntries(limit);
+		AsyncWebServerResponse *resp = request->beginResponse(200, "application/json", json);
+		resp->addHeader("Access-Control-Allow-Origin", "*");
+		request->send(resp);
+	});
+
+	server.on("/api/logs", HTTP_OPTIONS, [](AsyncWebServerRequest *request) {
+		AsyncWebServerResponse *resp = request->beginResponse(200);
+		resp->addHeader("Access-Control-Allow-Origin", "*");
+		resp->addHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+		resp->addHeader("Access-Control-Allow-Headers", "Content-Type");
+		request->send(resp);
+	});
 
 	server.serveStatic("/", LittleFS, "/www/").setDefaultFile("index.html");
 }
