@@ -38,6 +38,7 @@
 		"prettier": "^3.8.3",
 		"test-staged": "^1.1.11",
 		"turbo": "^2.9.9",
-		"typescript": "^6.0.3"
+		"typescript": "^6.0.3",
+		"vite": "^8.0.12"
 	}
 }
