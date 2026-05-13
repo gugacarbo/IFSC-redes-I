@@ -6,6 +6,7 @@
 
 struct FilialConfig {
     uint16_t port;
+    uint16_t http_port;
     String admin_user;
     String admin_pass;
     std::vector<String> devices;

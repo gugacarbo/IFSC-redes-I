@@ -20,6 +20,9 @@ public:
     bool set(const String& id, bool val);
     bool set(const String& id, int val);
     std::vector<String> list();
+    bool addDevice(const String& id);
+    bool removeDevice(const String& id);
+    String getAllJson();
 };
 
 #endif

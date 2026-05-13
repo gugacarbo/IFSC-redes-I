@@ -44,3 +44,36 @@ std::vector<String> DeviceManager::list() {
     }
     return keys;
 }
+
+bool DeviceManager::addDevice(const String& id) {
+    if (devices.find(id) != devices.end()) return false;
+    DeviceState state;
+    state.is_light = id.indexOf("_light_") != -1;
+    state.bool_val = false;
+    state.int_val = 0;
+    devices[id] = state;
+    return true;
+}
+
+bool DeviceManager::removeDevice(const String& id) {
+    return devices.erase(id) > 0;
+}
+
+String DeviceManager::getAllJson() {
+    String json = "[";
+    bool first = true;
+    for (auto const& pair : devices) {
+        if (!first) json += ",";
+        first = false;
+        json += "{";
+        json += "\"id\":\"" + pair.first + "\",";
+        json += "\"isLight\":" + String(pair.second.is_light ? "true" : "false") + ",";
+        bool isSensor = pair.first.indexOf("sensor_") == 0;
+        json += "\"isSensor\":" + String(isSensor ? "true" : "false") + ",";
+        json += "\"boolValue\":" + String(pair.second.bool_val ? "true" : "false") + ",";
+        json += "\"intValue\":" + String(pair.second.int_val);
+        json += "}";
+    }
+    json += "]";
+    return json;
+}

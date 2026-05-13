@@ -3,6 +3,8 @@
 #include "ConfigManager.h"
 #include "DeviceManager.h"
 #include "UdpServer.h"
+#include "DeviceBridge.h"
+#include "ApiServer.h"
 
 const char* WIFI_SSID = "WOKWI-GUEST";
 const char* WIFI_PASS = "";
@@ -10,6 +12,8 @@ const char* WIFI_PASS = "";
 FilialConfig globalConfig;
 DeviceManager deviceManager;
 UdpServerWrapper udpServer;
+DeviceBridge deviceBridge;
+ApiServer* apiServer = nullptr;
 
 void connectWiFi() {
   Serial.printf("Connecting to %s ", WIFI_SSID);
@@ -34,11 +38,22 @@ void setup() {
   
   connectWiFi();
   
-  // Start UDP after WiFi
+  // UDP server (Matriz communication)
   udpServer.begin(&globalConfig, &deviceManager);
+
+  // HTTP + WebSocket server (GUI communication)
+  uint16_t httpPort = globalConfig.http_port > 0 ? globalConfig.http_port : 80;
+  apiServer = new ApiServer(httpPort);
+  deviceBridge.begin(apiServer->getServer(), &deviceManager);
+  apiServer->begin(&deviceManager);
+
+  Serial.print("Filial ready. UDP port: ");
+  Serial.print(globalConfig.port);
+  Serial.print(", HTTP/WS port: ");
+  Serial.println(httpPort);
 }
 
 void loop() {
-    // AsyncUDP handles everything in background via interrupts/callbacks
+    // AsyncUDP + AsyncWebServer handle everything via callbacks
     delay(1000);
 }

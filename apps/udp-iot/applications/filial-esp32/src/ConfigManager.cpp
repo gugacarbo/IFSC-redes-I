@@ -25,6 +25,7 @@ bool ConfigManager::loadConfig(FilialConfig& config) {
     }
 
     config.port = doc["port"] | 51000;
+    config.http_port = doc["http_port"] | 80;
     config.admin_user = doc["admin_user"] | "test";
     config.admin_pass = doc["admin_pass"] | "test";
     

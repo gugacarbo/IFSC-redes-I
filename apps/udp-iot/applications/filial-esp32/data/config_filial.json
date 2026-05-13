@@ -1,5 +1,6 @@
 {
   "port": 51000,
+  "http_port": 80,
   "admin_user": "test",
   "admin_pass": "test",
   "id": [
