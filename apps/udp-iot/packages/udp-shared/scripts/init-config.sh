@@ -19,8 +19,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-CONFIG_DIR="$PROJECT_DIR/packages/config"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+CONFIG_DIR="$PROJECT_DIR/config"
 
 FORCE=false
 GENERATE_MATRIZ=true
