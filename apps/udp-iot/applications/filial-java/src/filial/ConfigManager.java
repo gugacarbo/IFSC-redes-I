@@ -39,6 +39,7 @@ public class ConfigManager {
             int port = obj.getInt("port", Protocol.DEFAULT_PORT);
             String user = obj.getString("admin_user", Protocol.DEFAULT_USER);
             String pass = obj.getString("admin_pass", Protocol.DEFAULT_PASS);
+            int httpPort = obj.getInt("http_port", 8082);
 
             List<String> deviceIds = new ArrayList<>();
             if (obj.has("id")) {
@@ -48,7 +49,7 @@ public class ConfigManager {
                 }
             }
 
-            this.config = new FilialConfig(port, user, pass, deviceIds);
+            this.config = new FilialConfig(port, httpPort, user, pass, deviceIds);
             return true;
         } catch (IOException e) {
             System.err.println("ConfigManager: IO error reading " + path + ": " + e.getMessage());
