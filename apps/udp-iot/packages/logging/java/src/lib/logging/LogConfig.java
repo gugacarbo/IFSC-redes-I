@@ -1,8 +1,9 @@
 package lib.logging;
 
-import java.io.File;
-
 public class LogConfig {
+    private static final long DEFAULT_MAX_FILE_SIZE = 10L * 1024 * 1024; // 10 MB
+    private static final int DEFAULT_MAX_BACKUPS = 5;
+
     private final LogLevel level;
     private final String filePath;
     private final long maxFileSize;
@@ -24,8 +25,8 @@ public class LogConfig {
     public static LogConfig load() {
         LogLevel level = LogLevel.fromString(System.getenv("LOG_LEVEL"));
         String filePath = System.getenv("LOG_FILE");
-        long maxFileSize = parseSize(System.getenv("LOG_FILE_MAX_SIZE"), 10 * 1024 * 1024);
-        int maxBackups = parseInt(System.getenv("LOG_FILE_MAX_BACKUPS"), 5);
+        long maxFileSize = parseSize(System.getenv("LOG_FILE_MAX_SIZE"), DEFAULT_MAX_FILE_SIZE);
+        int maxBackups = parseInt(System.getenv("LOG_FILE_MAX_BACKUPS"), DEFAULT_MAX_BACKUPS);
         return new LogConfig(level, filePath, maxFileSize, maxBackups);
     }
 
