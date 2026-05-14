@@ -1,0 +1,15 @@
+{
+	"name": "@ifsc/tools-java",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./checkstyle-runner.cjs"
+	},
+	"scripts": {
+		"test": "npx jest"
+	},
+	"devDependencies": {
+		"jest": "^29.7.0"
+	}
+}

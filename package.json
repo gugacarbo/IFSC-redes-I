@@ -5,6 +5,7 @@
 	"type": "module",
 	"packageManager": "^npm@10.9.2",
 	"workspaces": [
+		"tools/*",
 		"launcher",
 		"apps/*",
 		"apps/udp-iot/packages/*",
@@ -26,7 +27,6 @@
 		"lint-staged": "lint-staged",
 		"download-checkstyle": "bash tools/java/download-checkstyle.sh",
 		"prepare": "husky",
-		"postinstall": "npm run download-checkstyle",
 		"knip": "knip"
 	},
 	"devDependencies": {
