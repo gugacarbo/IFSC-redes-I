@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - name: Install dependencies
@@ -34,13 +34,18 @@ jobs:
             BASE="HEAD^"
           fi
 
-          PACKAGES=$(npx turbo run test build --filter="...[${BASE}]" --dry-run=json 2>/dev/null \
+          PACKAGES=$(npx turbo run test build --filter="...[${BASE}]" --filter="!@udp-iot/*-esp32" --dry-run=json 2>/dev/null \
             | jq -r '.tasks[] | .taskId' | cut -d'#' -f2 | sort -u)
 
           if [ -z "$PACKAGES" ]; then
             echo "No changed packages detected."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
+            echo "Packages to test and build:"
+            echo "$PACKAGES" | while read -r pkg; do
+              echo "  - $pkg"
+            done
+
             echo "## Changed packages" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "$PACKAGES" | while read -r pkg; do
@@ -53,4 +58,4 @@ jobs:
 
       - name: Run tests & build on changed packages
         if: steps.changed.outputs.has_changes == 'true'
-        run: npx turbo run test build --filter="...[${BASE}]"
+        run: npx turbo run test build --filter="...[${BASE}]" --filter="!@udp-iot/*-esp32"

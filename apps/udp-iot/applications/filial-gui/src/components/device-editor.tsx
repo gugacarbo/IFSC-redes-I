@@ -65,9 +65,9 @@ export function DeviceEditor({
 				</CardHeader>
 				<CardContent className="flex flex-col gap-4">
 					<div>
-						<label className="mb-1 block text-sm text-muted-foreground">
+						<span className="mb-1 block text-sm text-muted-foreground">
 							Tipo
-						</label>
+						</span>
 						<div className="flex gap-2">
 							<Button
 								variant={deviceType === "light" ? "default" : "outline"}
@@ -91,9 +91,9 @@ export function DeviceEditor({
 					</div>
 
 					<div>
-						<label className="mb-1 block text-sm text-muted-foreground">
+						<span className="mb-1 block text-sm text-muted-foreground">
 							Acesso
-						</label>
+						</span>
 						<div className="flex gap-2">
 							<Button
 								variant={accessType === "actuator" ? "default" : "outline"}
@@ -115,13 +115,17 @@ export function DeviceEditor({
 					</div>
 
 					<div>
-						<label className="mb-1 block text-sm text-muted-foreground">
+						<label
+							htmlFor="device-place"
+							className="mb-1 block text-sm text-muted-foreground"
+						>
 							Local (ex: sala, escritorio)
 						</label>
 						<Input
 							value={place}
 							onChange={(e) => setPlace(e.target.value)}
 							placeholder="sala"
+							id="device-place"
 						/>
 					</div>
 

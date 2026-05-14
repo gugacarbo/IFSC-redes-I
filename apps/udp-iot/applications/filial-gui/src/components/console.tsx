@@ -40,9 +40,9 @@ export function Console({ logs, onClear }: ConsoleProps) {
 				{logs.length === 0 && (
 					<span className="text-zinc-500">Aguardando logs...</span>
 				)}
-				{logs.map((entry, i) => (
+				{logs.map((entry, _i) => (
 					<div
-						key={i}
+						key={entry.ts}
 						className={
 							entry.level === "error" ? "text-red-400" : "text-green-400"
 						}

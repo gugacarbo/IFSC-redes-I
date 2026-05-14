@@ -42,33 +42,45 @@ export function Config({ config, onSave }: ConfigProps) {
 				</CardHeader>
 				<CardContent className="flex flex-col gap-4">
 					<div>
-						<label className="mb-1 block text-sm text-muted-foreground">
+						<label
+							htmlFor="config-port"
+							className="mb-1 block text-sm text-muted-foreground"
+						>
 							Porta UDP
 						</label>
 						<Input
 							type="number"
 							value={port}
 							onChange={(e) => setPort(e.target.value)}
+							id="config-port"
 						/>
 					</div>
 					<div>
-						<label className="mb-1 block text-sm text-muted-foreground">
+						<label
+							htmlFor="config-admin-user"
+							className="mb-1 block text-sm text-muted-foreground"
+						>
 							Usuario Admin
 						</label>
 						<Input
 							type="text"
 							value={adminUser}
 							onChange={(e) => setAdminUser(e.target.value)}
+							id="config-admin-user"
 						/>
 					</div>
 					<div>
-						<label className="mb-1 block text-sm text-muted-foreground">
+						<label
+							htmlFor="config-admin-pass"
+							className="mb-1 block text-sm text-muted-foreground"
+						>
 							Senha Admin
 						</label>
 						<Input
 							type="password"
 							value={adminPass}
 							onChange={(e) => setAdminPass(e.target.value)}
+							id="config-admin-pass"
 						/>
 					</div>
 					<Button

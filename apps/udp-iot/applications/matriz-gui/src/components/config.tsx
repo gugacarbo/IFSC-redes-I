@@ -96,23 +96,38 @@ export function ConfigView() {
 			<CardContent className="flex flex-col gap-6">
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<div>
-						<label className="block text-sm font-semibold mb-1">Usuario</label>
+						<label
+							htmlFor="config-user"
+							className="block text-sm font-semibold mb-1"
+						>
+							Usuario
+						</label>
 						<Input
 							type="text"
 							value={config.user}
 							onChange={(e) => setConfig({ ...config, user: e.target.value })}
+							id="config-user"
 						/>
 					</div>
 					<div>
-						<label className="block text-sm font-semibold mb-1">Senha</label>
+						<label
+							htmlFor="config-pass"
+							className="block text-sm font-semibold mb-1"
+						>
+							Senha
+						</label>
 						<Input
 							type="password"
 							value={config.pass}
 							onChange={(e) => setConfig({ ...config, pass: e.target.value })}
+							id="config-pass"
 						/>
 					</div>
 					<div>
-						<label className="block text-sm font-semibold mb-1">
+						<label
+							htmlFor="config-polling"
+							className="block text-sm font-semibold mb-1"
+						>
 							Polling (ms)
 						</label>
 						<Input
@@ -124,6 +139,7 @@ export function ConfigView() {
 									pollingMs: parseInt(e.target.value, 10) || 0,
 								})
 							}
+							id="config-polling"
 						/>
 					</div>
 				</div>
@@ -133,21 +149,33 @@ export function ConfigView() {
 						Filiais Cadastradas
 					</h3>
 					<div className="flex flex-col gap-3 mb-6">
-						{config.filiais.map((f, idx) => (
+						{config.filiais.map((f) => (
 							<div
-								key={idx}
+								key={f.ip + f.port}
 								className="flex flex-wrap gap-2 items-center bg-muted p-3 rounded"
 							>
 								<Input
 									className="flex-1 min-w-[120px]"
 									value={f.name}
-									onChange={(e) => updateFilial(idx, "name", e.target.value)}
+									onChange={(e) =>
+										updateFilial(
+											config.filiais.indexOf(f),
+											"name",
+											e.target.value,
+										)
+									}
 									placeholder="Nome"
 								/>
 								<Input
 									className="flex-1 min-w-[120px] font-mono"
 									value={f.ip}
-									onChange={(e) => updateFilial(idx, "ip", e.target.value)}
+									onChange={(e) =>
+										updateFilial(
+											config.filiais.indexOf(f),
+											"ip",
+											e.target.value,
+										)
+									}
 									placeholder="IP"
 								/>
 								<Input
@@ -155,14 +183,18 @@ export function ConfigView() {
 									className="w-24 font-mono"
 									value={f.port}
 									onChange={(e) =>
-										updateFilial(idx, "port", parseInt(e.target.value, 10) || 0)
+										updateFilial(
+											config.filiais.indexOf(f),
+											"port",
+											parseInt(e.target.value, 10) || 0,
+										)
 									}
 									placeholder="Porta"
 								/>
 								<Button
 									variant="destructive"
 									size="sm"
-									onClick={() => removeFilial(idx)}
+									onClick={() => removeFilial(config.filiais.indexOf(f))}
 								>
 									Remover
 								</Button>
