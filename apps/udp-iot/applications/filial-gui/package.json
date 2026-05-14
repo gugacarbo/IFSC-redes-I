@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",
-    "clean": "rm -rf dist .turbo",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true});require('node:fs').rmSync('.turbo',{recursive:true,force:true});\"",
     "preview": "vite preview"
   },
   "dependencies": {

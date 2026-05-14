@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@udp-iot/ui/components
 import { Badge } from "@udp-iot/ui/components/badge";
 import { Switch } from "@udp-iot/ui/components/switch";
 import { Slider } from "@udp-iot/ui/components/slider";
+import { Progress } from "@udp-iot/ui/components/progress";
 import { Button } from "@udp-iot/ui/components/button";
 import { Lightbulb, Snowflake } from "lucide-react";
 
@@ -58,9 +59,19 @@ function DeviceCard({
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Estado</span>
             <div className="flex items-center gap-2">
-              <span className={`inline-block size-3 rounded-full ${device.boolValue ? "bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]" : "bg-muted"}`} />
+              <span
+                className={`inline-block size-3 rounded-full ${device.boolValue ? "bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.6)]" : "bg-muted"}`}
+              />
               <span className="text-sm font-medium">{device.boolValue ? "LIGADO" : "DESLIGADO"}</span>
             </div>
+          </div>
+        ) : device.isSensor ? (
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Valor</span>
+              <span className="text-sm font-medium">{device.intValue}</span>
+            </div>
+            <Progress value={(device.intValue / 1023) * 100} />
           </div>
         ) : (
           <div className="flex flex-col gap-1">

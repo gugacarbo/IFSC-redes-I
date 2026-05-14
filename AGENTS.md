@@ -1,17 +1,22 @@
 # PROJECT KNOWLEDGE BASE
 
-**Updated:** 2026-05-05
+**Updated:** 2026-05-13
 **Branch:** main
 
 ## OVERVIEW
 
 npm monorepo for IFSC Estrutura de Dados course. Biome linting for root JS/TS config files, Turbo 2.x orchestration, Husky + lint-staged git hooks. `apps/` contains independent Java course projects (javac-only, no Maven). `packages/` empty scaffold.
 
+Contains `apps/udp-iot/` - UDP-based IoT monitoring system with ESP32, Java backend, and React GUIs.
+
 ## STRUCTURE
 
 ```
 IFSC-redes-I/
 ├── apps/                           # Java TR projects (tr1-playlist, tr2-hash-table)
+│   └── udp-iot/                    # UDP-IoT monitoring (workspace)
+│       ├── applications/           # Desktop apps (matriz-gui, filial-gui, matriz-java, filial-java)
+│       └── packages/               # Shared packages (ui, udp-shared)
 ├── .agents/skills/                 # Skill system (skill-creator toolkit)
 ├── .husky/                         # Git hooks (husky)
 ├── biome.json                       # Biome: tabs, double-quote JS
@@ -55,6 +60,23 @@ npm install                     # Setup workspaces
 npx turbo run dev               # Compile + run all apps
 npx turbo run dev --filter=tr1-playlist  # Run single app
 npm run format:check            # Biome check root JS/TS
+```
+
+## UDP-IOT COMMANDS
+
+```bash
+# Root level (from apps/udp-iot/)
+npm run dev:all                # Run all apps via Turbo
+npm run dev:java               # Run Java backends only
+npm run dev:gui                # Run GUI apps only
+npm run build:all              # Build all apps
+
+# Inside applications/*-gui/
+npm run dev                    # Vite dev server + Express backend
+
+# Inside applications/*-java/
+npm run dev                    # Run Java app via run-java.cjs
+npm run build                  # Compile Java with javac
 ```
 
 ## NOTES

@@ -4,10 +4,10 @@
   "private": true,
   "description": "UDP-IoT Matriz - Java implementation",
   "scripts": {
-    "build": "javac -d dist -cp src src/matriz/*.java",
-    "dev": "java -cp dist matriz.MatrizMain",
-    "typecheck": "javac -Xlint -d dist -cp src src/matriz/*.java",
-    "lint": "javac -Xlint -d dist -cp src src/matriz/*.java",
-    "clean": "rm -rf dist"
+    "build": "node scripts/run-java.cjs build",
+    "dev": "node scripts/run-java.cjs dev",
+    "typecheck": "node scripts/run-java.cjs typecheck",
+    "lint": "node scripts/run-java.cjs lint",
+    "clean": "node scripts/run-java.cjs clean"
   }
 }

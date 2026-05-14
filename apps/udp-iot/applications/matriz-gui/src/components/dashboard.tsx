@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@udp-iot/ui/components
 import { Badge } from "@udp-iot/ui/components/badge";
 import { Switch } from "@udp-iot/ui/components/switch";
 import { Slider } from "@udp-iot/ui/components/slider";
+import { Progress } from "@udp-iot/ui/components/progress";
 
 export function Dashboard({
 	filiais,
@@ -56,6 +57,13 @@ export function Dashboard({
 													onCheckedChange={(v) => onCommand(filial.ip, dev, v)}
 													disabled={isSensor}
 												/>
+											) : isSensor ? (
+												<div className="flex items-center gap-2">
+													<Progress value={((val as number) || 0) / 10.23} className="w-20" />
+													<span className="text-xs font-mono text-muted-foreground w-12 text-right">
+														{val ?? 0}
+													</span>
+												</div>
 											) : (
 												<div className="flex items-center gap-2">
 													<Slider
@@ -63,7 +71,6 @@ export function Dashboard({
 														onValueChange={([v]) => onCommand(filial.ip, dev, v)}
 														min={0}
 														max={1023}
-														disabled={isSensor}
 														className="w-24"
 													/>
 													<span className="text-xs font-mono text-muted-foreground w-10 text-right">

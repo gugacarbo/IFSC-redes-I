@@ -4,10 +4,11 @@
   "private": true,
   "description": "UDP-IoT Filial - Java implementation",
   "scripts": {
-    "build": "javac -d dist -cp src src/filial/*.java",
-    "dev": "java -cp dist filial.FilialMain",
-    "typecheck": "javac -Xlint -d dist -cp src src/filial/*.java",
-    "lint": "javac -Xlint -d dist -cp src src/filial/*.java",
-    "clean": "rm -rf dist"
+    "build": "node scripts/run-java.cjs build",
+    "dev": "node scripts/run-java.cjs dev",
+    "dev:no-gui": "node scripts/run-java.cjs dev:no-gui",
+    "typecheck": "node scripts/run-java.cjs typecheck",
+    "lint": "node scripts/run-java.cjs lint",
+    "clean": "node scripts/run-java.cjs clean"
   }
 }
