@@ -24,7 +24,7 @@ jobs:
           cache: "npm"
 
       - name: Install workspace
-        run: npm install --workspace=@ifsc/tools-java
+        run: npm install --workspace=@ifsc/tools-java --ignore-scripts
 
       - name: Run tests
         run: npm test -w @ifsc/tools-java
