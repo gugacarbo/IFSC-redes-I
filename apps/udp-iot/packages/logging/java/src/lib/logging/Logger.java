@@ -5,9 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Logger {
     private static final Map<String, Logger> instances = new ConcurrentHashMap<>();
-    private static volatile LogConfig config;
-    private static volatile ConsoleHandler console;
-    private static volatile FileHandler fileHandler;
+    private static volatile boolean initialized;
+    private static LogConfig config;
+    private static ConsoleHandler console;
+    private static FileHandler fileHandler;
 
     private final String name;
 
@@ -24,9 +25,9 @@ public class Logger {
     }
 
     private static void ensureInitialized() {
-        if (config == null) {
+        if (!initialized) {
             synchronized (Logger.class) {
-                if (config == null) {
+                if (!initialized) {
                     config = LogConfig.load();
                     console = new ConsoleHandler();
                     if (config.hasFile()) {
@@ -36,6 +37,7 @@ public class Logger {
                             config.getMaxBackups()
                         );
                     }
+                    initialized = true;
                 }
             }
         }
