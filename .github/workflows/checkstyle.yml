@@ -3,8 +3,14 @@ name: Checkstyle CI
 on:
   push:
     branches: [main]
+    paths:
+      - "tools/java/**"
+      - "package.json"
   pull_request:
     branches: [main]
+    paths:
+      - "tools/java/**"
+      - "package.json"
   workflow_dispatch:
 
 jobs:
