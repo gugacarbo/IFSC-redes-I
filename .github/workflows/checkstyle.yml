@@ -29,7 +29,8 @@ jobs:
       - name: Run tests
         run: npm test -w @ifsc/tools-java
 
-      - name: Verify checkstyle.jar was downloaded
+      - name: Verify JAR was downloaded
+        if: matrix.os == 'ubuntu-latest'
         run: |
           if [ -f tools/java/checkstyle.jar ]; then
             echo "checkstyle.jar exists"
@@ -37,3 +38,15 @@ jobs:
           else
             echo "checkstyle.jar NOT found (tests don't download it)"
           fi
+        shell: bash
+
+      - name: Verify JAR was downloaded (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          if (Test-Path "tools/java/checkstyle.jar") {
+            echo "checkstyle.jar exists"
+            ls -lh tools/java/checkstyle.jar
+          } else {
+            echo "checkstyle.jar NOT found (tests don't download it)"
+          }
+        shell: pwsh
