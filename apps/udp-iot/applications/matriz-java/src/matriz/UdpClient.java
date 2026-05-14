@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,6 +13,8 @@ import java.nio.charset.StandardCharsets;
  * Each call creates a temporary socket (lightweight for request-response).
  */
 public class UdpClient {
+
+    private static final Logger logger = Logger.getLogger(UdpClient.class);
 
     private static final int MAX_DATAGRAM_SIZE = 2048;
     private static final int DEFAULT_TIMEOUT_MS = 3000;
@@ -41,10 +44,10 @@ public class UdpClient {
 
             return new String(recvPacket.getData(), 0, recvPacket.getLength(), StandardCharsets.UTF_8);
         } catch (java.net.SocketTimeoutException e) {
-            System.err.println("UdpClient: Timeout waiting for response from " + ip + ":" + port);
+            logger.warn("UdpClient: Timeout waiting for response from {}:{}", ip, port);
             return null;
         } catch (Exception e) {
-            System.err.println("UdpClient: Error communicating with " + ip + ":" + port + " — " + e.getMessage());
+            logger.error("UdpClient: Error communicating with {}:{} — {}", ip, port, e.getMessage());
             return null;
         }
     }
@@ -67,7 +70,7 @@ public class UdpClient {
             DatagramPacket packet = new DatagramPacket(data, data.length, addr, port);
             socket.send(packet);
         } catch (Exception e) {
-            System.err.println("UdpClient: Error sending to " + ip + ":" + port + " — " + e.getMessage());
+            logger.error("UdpClient: Error sending to {}:{} — {}", ip, port, e.getMessage());
         }
     }
 }

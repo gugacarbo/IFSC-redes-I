@@ -1,6 +1,7 @@
 package filial;
 
 import shared.Json;
+import lib.logging.Logger;
 import shared.Json.JsonArray;
 import shared.Json.JsonObject;
 
@@ -18,6 +19,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class DeviceBridge {
 
+    private static final Logger logger = Logger.getLogger(DeviceBridge.class);
+
     private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
     private final DeviceManager deviceManager;
     private final ConfigManager configManager;
@@ -29,16 +32,14 @@ public class DeviceBridge {
 
     public void onSessionOpened(WebSocketSession session) {
         sessions.add(session);
-        System.out.println("DeviceBridge: GUI client connected: " + session.remoteAddress()
-            + " (" + sessions.size() + " total)");
+        logger.info("DeviceBridge: GUI client connected: {} ({} total)", session.remoteAddress(), sessions.size());
         // Send current state immediately
         sendDevicesUpdated(session);
     }
 
     public void onSessionClosed(WebSocketSession session) {
         sessions.remove(session);
-        System.out.println("DeviceBridge: GUI client disconnected: " + session.remoteAddress()
-            + " (" + sessions.size() + " remaining)");
+        logger.info("DeviceBridge: GUI client disconnected: {} ({} remaining)", session.remoteAddress(), sessions.size());
     }
 
     public void sessionReadLoop(WebSocketSession session) {
@@ -50,7 +51,7 @@ public class DeviceBridge {
             }
         } catch (IOException e) {
             if (session.isOpen()) {
-                System.err.println("DeviceBridge: Session read error: " + e.getMessage());
+                logger.error("DeviceBridge: Session read error: {}", e.getMessage());
             }
         } finally {
             onSessionClosed(session);
@@ -67,10 +68,10 @@ public class DeviceBridge {
                 case "set_device" -> handleSetDevice(msg);
                 case "add_device" -> handleAddDevice(msg);
                 case "remove_device" -> handleRemoveDevice(msg);
-                default -> System.err.println("DeviceBridge: Unknown WS message type: " + type);
+                default -> logger.warn("DeviceBridge: Unknown WS message type: {}", type);
             }
         } catch (Exception e) {
-            System.err.println("DeviceBridge: Error handling WS message: " + e.getMessage());
+            logger.error("DeviceBridge: Error handling WS message: {}", e.getMessage());
         }
     }
 

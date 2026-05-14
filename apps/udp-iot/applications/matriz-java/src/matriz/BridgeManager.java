@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import shared.Json;
 import shared.Json.JsonObject;
@@ -22,6 +23,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class BridgeManager {
 
+    private static final Logger logger = Logger.getLogger(BridgeManager.class);
+
+
     private final List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
     private final ConfigManager configManager;
     private final UdpClient udpClient;
@@ -36,8 +40,7 @@ public class BridgeManager {
      */
     public void onSessionOpened(WebSocketSession session) {
         sessions.add(session);
-        System.out.println("Bridge: GUI client connected: " + session.remoteAddress()
-            + " (" + sessions.size() + " total)");
+        logger.info("Bridge: GUI client connected: {} ({} total)", session.remoteAddress(), sessions.size());
     }
 
     /**
@@ -45,8 +48,7 @@ public class BridgeManager {
      */
     public void onSessionClosed(WebSocketSession session) {
         sessions.remove(session);
-        System.out.println("Bridge: GUI client disconnected: " + session.remoteAddress()
-            + " (" + sessions.size() + " remaining)");
+        logger.info("Bridge: GUI client disconnected: {} ({} remaining)", session.remoteAddress(), sessions.size());
     }
 
     /**
@@ -62,7 +64,7 @@ public class BridgeManager {
             }
         } catch (IOException e) {
             if (session.isOpen()) {
-                System.err.println("Bridge: Session read error: " + e.getMessage());
+                logger.error("Bridge: Session read error: {}", e.getMessage());
             }
         } finally {
             onSessionClosed(session);
@@ -85,7 +87,7 @@ public class BridgeManager {
             String type = msg.getString(Protocol.WS_TYPE, "");
 
             if (!Protocol.WS_TX.equals(type)) {
-                System.err.println("Bridge: Unknown WS message type: " + type);
+                logger.warn("Bridge: Unknown WS message type: {}", type);
                 return;
             }
 
@@ -101,8 +103,7 @@ public class BridgeManager {
             int port = configManager.findPortByIp(targetIp);
 
             String payloadStr = payload.toString();
-            System.out.println("Bridge: Forwarding to " + targetIp + ":" + port
-                + " — " + payloadStr);
+            logger.info("Bridge: Forwarding to {}:{} — {}", targetIp, port, payloadStr);
 
             // Send via UDP and wait for response
             String response = udpClient.sendAndReceive(targetIp, port, payloadStr);
@@ -120,10 +121,10 @@ public class BridgeManager {
                 }
                 session.sendText(envelope.toString());
             } else {
-                System.err.println("Bridge: No response from " + targetIp + ":" + port);
+                logger.warn("Bridge: No response from {}:{}", targetIp, port);
             }
         } catch (Exception e) {
-            System.err.println("Bridge: Error handling WS message: " + e.getMessage());
+            logger.error("Bridge: Error handling WS message: {}", e.getMessage());
         }
     }
 
@@ -138,8 +139,7 @@ public class BridgeManager {
                     session.sendText(envelopeJson);
                 }
             } catch (IOException e) {
-                System.err.println("Bridge: Broadcast error to "
-                    + session.remoteAddress() + ": " + e.getMessage());
+                logger.error("Bridge: Broadcast error to {}: {}", session.remoteAddress(), e.getMessage());
                 onSessionClosed(session);
                 session.close();
             }

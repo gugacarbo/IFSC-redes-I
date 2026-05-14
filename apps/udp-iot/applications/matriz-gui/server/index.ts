@@ -64,7 +64,7 @@ udpSocket.on("message", (msg, rinfo) => {
 			if (ws.readyState === WebSocket.OPEN) ws.send(wsMsg);
 		}
 	} catch (e) {
-		console.error("UDP parse error:", e);
+		logger.error("UDP parse error: {}", e);
 	}
 });
 
@@ -156,7 +156,7 @@ wss.on("connection", (ws) => {
 				// Response will arrive via UDP callback → broadcast as ws_rx to all clients
 			}
 		} catch (e) {
-			console.error("WS message error:", e);
+			logger.error("WS message error: {}", e);
 		}
 	});
 
@@ -166,10 +166,15 @@ wss.on("connection", (ws) => {
 // ── Start ───────────────────────────────────────────────────
 currentConfig = loadConfig();
 udpSocket.bind(0, () => {
-	console.log(`UDP socket bound to dynamic port ${udpSocket.address().port}`);
+		logger.info("UDP socket bound to dynamic port {}", udpSocket.address().port);
 	startPolling();
 });
 server.listen(PORT, () => {
-	console.log(`Matriz server listening on http://localhost:${PORT}`);
-	console.log(`WebSocket on ws://localhost:${PORT}/ws`);
+		logger.info("Matriz server listening on http://localhost:{}", PORT);
+		logger.info("WebSocket on ws://localhost:{}/ws", PORT);
 });
+import { Logger } from "@lib/logging";
+
+const logger = Logger.getLogger("MatrizServer");
+
+		if (err) logger.error("UDP send error to {}:{} {}", targetIp, targetPort, err);

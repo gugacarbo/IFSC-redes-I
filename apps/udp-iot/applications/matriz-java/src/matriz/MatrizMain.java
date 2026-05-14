@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import shared.Env;
 import shared.LogCapture;
@@ -32,6 +33,7 @@ import shared.LogCapture;
 public class MatrizMain {
 
     private static final String DEFAULT_CONFIG = "config/config_matriz.json";
+    private static final Logger logger = Logger.getLogger(MatrizMain.class);
 
     public static void main(String[] args) {
         // Load .env before anything else
@@ -40,24 +42,24 @@ public class MatrizMain {
         String configPath = args.length > 0 ? args[0] : DEFAULT_CONFIG;
         int httpPort = Env.getInt("MATRIZ_HTTP_PORT", 8080);
 
-        System.out.println("=== Matriz IoT (Java) ===");
-        System.out.println("Config: " + configPath);
+        logger.info("=== Matriz IoT (Java) ===");
+        logger.info("Config: {}", configPath);
 
         // === Log stdout to GUI console ===
         LogCapture logCapture = new LogCapture(500);
         logCapture.install();
 
-        System.out.println("HTTP/WS port: " + httpPort + " (via .env)");
+        logger.info("HTTP/WS port: {} (via .env)", httpPort);
 
         // 1. Load configuration
         ConfigManager configManager = new ConfigManager();
         if (!configManager.load(configPath)) {
-            System.err.println("FATAL: Could not load config from " + configPath);
+            logger.error("FATAL: Could not load config from {}", configPath);
             System.exit(1);
         }
         ConfigManager.MatrizConfig cfg = configManager.getConfig();
-        System.out.println("Filiais configured: " + cfg.filiais().size());
-        System.out.println("Polling interval: " + cfg.pollingMs() + "ms");
+        logger.info("Filiais configured: {}", cfg.filiais().size());
+        logger.info("Polling interval: {}ms", cfg.pollingMs());
 
         // 2. Create UDP client
         UdpClient udpClient = new UdpClient();
@@ -79,26 +81,26 @@ public class MatrizMain {
         // 7. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, bridgeManager, apiHandler);
         if (!appServer.start()) {
-            System.err.println("FATAL: Could not start HTTP/WS server on port " + httpPort);
+            logger.error("FATAL: Could not start HTTP/WS server on port {}", httpPort);
             System.exit(1);
         }
-        System.out.println("HTTP + WebSocket server on port " + httpPort);
-        System.out.println("  REST API: http://localhost:" + httpPort + "/api/config");
-        System.out.println("  Status:   http://localhost:" + httpPort + "/api/status");
-        System.out.println("  WebSocket: ws://localhost:" + httpPort + "/ws");
-        System.out.println("  Health:   http://localhost:" + httpPort + "/health");
+        logger.info("HTTP + WebSocket server on port {}", httpPort);
+        logger.info("  REST API: http://localhost:{}/api/config", httpPort);
+        logger.info("  Status:   http://localhost:{}/api/status", httpPort);
+        logger.info("  WebSocket: ws://localhost:{}/ws", httpPort);
+        logger.info("  Health:   http://localhost:{}/health", httpPort);
 
         // 8. Start polling (updates FilialStateTracker independently of GUI)
         pollingManager.start();
 
         // 9. Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("\nShutting down...");
+            logger.info("Shutting down...");
             pollingManager.stop();
             appServer.stop();
         }));
 
-        System.out.println("Ready. Press Ctrl+C to stop.");
+        logger.info("Ready. Press Ctrl+C to stop.");
 
         // 8. Keep alive
         try {

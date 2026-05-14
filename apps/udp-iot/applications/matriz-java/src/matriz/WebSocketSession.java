@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * external WebSocket library required.
  */
 public class WebSocketSession {
+
+    private static final Logger logger = Logger.getLogger(WebSocketSession.class);
 
     private final Socket socket;
     private final InputStream  in;
@@ -149,7 +152,7 @@ public class WebSocketSession {
             }
             case OPCODE_PONG -> null; // ignore pong
             default -> {
-                System.err.println("WebSocket: Unknown opcode " + opcode);
+                logger.warn("WebSocket: Unknown opcode {}", opcode);
                 yield null;
             }
         };

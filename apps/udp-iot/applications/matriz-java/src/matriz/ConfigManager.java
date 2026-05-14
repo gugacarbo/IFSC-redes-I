@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import shared.Json;
 import shared.Json.JsonArray;
@@ -18,6 +19,8 @@ import java.util.List;
  * Thread-safe: reads/writes are synchronised on the config object.
  */
 public class ConfigManager {
+
+    private static final Logger logger = Logger.getLogger(ConfigManager.class);
 
     private volatile MatrizConfig config;
     private String configPath;
@@ -52,10 +55,10 @@ public class ConfigManager {
             this.config = new MatrizConfig(user, pass, pollingMs, filiais);
             return true;
         } catch (IOException e) {
-            System.err.println("ConfigManager: IO error: " + e.getMessage());
+            logger.error("ConfigManager: IO error: {}", e.getMessage());
             return false;
         } catch (RuntimeException e) {
-            System.err.println("ConfigManager: Parse error: " + e.getMessage());
+            logger.error("ConfigManager: Parse error: {}", e.getMessage());
             return false;
         }
     }
@@ -70,7 +73,7 @@ public class ConfigManager {
             // Validate that it parses and has required fields
             JsonObject obj = Json.parseObject(jsonContent);
             if (!obj.has("user") || !obj.has("pass")) {
-                System.err.println("ConfigManager: Refusing to save — missing user/pass");
+                logger.warn("ConfigManager: Refusing to save — missing user/pass");
                 return false;
             }
 
@@ -96,13 +99,13 @@ public class ConfigManager {
 
             // Write to file
             Files.writeString(Path.of(configPath), jsonContent);
-            System.out.println("ConfigManager: Configuration saved (" + filiais.size() + " filiais)");
+            logger.info("ConfigManager: Configuration saved ({} filiais)", filiais.size());
             return true;
         } catch (IOException e) {
-            System.err.println("ConfigManager: IO error on save: " + e.getMessage());
+            logger.error("ConfigManager: IO error on save: {}", e.getMessage());
             return false;
         } catch (RuntimeException e) {
-            System.err.println("ConfigManager: Invalid JSON on save: " + e.getMessage());
+            logger.error("ConfigManager: Invalid JSON on save: {}", e.getMessage());
             return false;
         }
     }

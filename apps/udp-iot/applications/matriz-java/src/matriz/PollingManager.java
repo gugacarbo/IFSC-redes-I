@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import shared.Json;
 import shared.Json.JsonArray;
@@ -22,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * {@code ws_rx} envelopes, and broadcasts them.
  */
 public class PollingManager {
+
+    private static final Logger logger = Logger.getLogger(PollingManager.class);
 
     private final ConfigManager configManager;
     private final UdpClient udpClient;
@@ -60,7 +63,7 @@ public class PollingManager {
 
         ConfigManager.MatrizConfig cfg = configManager.getConfig();
         if (cfg.pollingMs() <= 0) {
-            System.out.println("Polling: Disabled (polling_ms = 0)");
+            logger.info("Polling: Disabled (polling_ms = 0)");
             running.set(false);
             return;
         }
@@ -78,8 +81,7 @@ public class PollingManager {
             TimeUnit.MILLISECONDS
         );
 
-        System.out.println("Polling: Started (interval=" + cfg.pollingMs() + "ms, "
-            + cfg.filiais().size() + " filiais)");
+        logger.info("Polling: Started (interval={}ms, {} filiais)", cfg.pollingMs(), cfg.filiais().size());
     }
 
     /** Stop the polling loop. */
@@ -175,8 +177,8 @@ public class PollingManager {
             }
 
         } catch (Exception e) {
-            System.err.println("Polling: Error polling " + filial.displayString()
-                + ": " + e.getMessage());
+            logger.error("Polling: Error polling {}", filial.displayString()
+                , e.getMessage());
         }
     }
 }

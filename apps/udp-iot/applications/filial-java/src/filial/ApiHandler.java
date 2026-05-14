@@ -1,6 +1,7 @@
 package filial;
 
 import shared.Json;
+import lib.logging.Logger;
 import shared.Json.JsonArray;
 import shared.Json.JsonObject;
 import shared.LogCapture;
@@ -22,6 +23,8 @@ import java.util.Map;
  * </ul>
  */
 public class ApiHandler {
+
+    private static final Logger logger = Logger.getLogger(ApiHandler.class);
 
     private final DeviceManager deviceManager;
     private final DeviceBridge deviceBridge;
@@ -81,7 +84,7 @@ public class ApiHandler {
 
             return jsonError(404, "Not found");
         } catch (Exception e) {
-            System.err.println("ApiHandler: Error: " + e.getMessage());
+            logger.error("ApiHandler: Error: {}", e.getMessage());
             return jsonError(500, "Internal server error");
         }
     }

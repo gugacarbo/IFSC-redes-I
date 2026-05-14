@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Mirrors the ESP32's single-port architecture (AsyncWebServer on port 80).
  */
 public class AppServer {
+
+    private static final Logger logger = Logger.getLogger(AppServer.class);
 
     private final int port;
     private final BridgeManager bridgeManager;
@@ -57,7 +60,7 @@ public class AppServer {
             serverSocket.setReuseAddress(true);
             running.set(true);
         } catch (IOException e) {
-            System.err.println("AppServer: Failed to bind port " + port + ": " + e.getMessage());
+            logger.error("AppServer: Failed to bind port {}: {}", port, e.getMessage());
             return false;
         }
 
@@ -65,8 +68,7 @@ public class AppServer {
         acceptThread.setDaemon(true);
         acceptThread.start();
 
-        System.out.println("AppServer: Listening on port " + port
-            + " (REST + WebSocket)");
+        logger.info("AppServer: Listening on port {} (REST + WebSocket)", port);
         return true;
     }
 
@@ -88,10 +90,10 @@ public class AppServer {
                 connectionPool.submit(() -> handleConnection(client));
             } catch (java.net.SocketException e) {
                 if (!running.get()) break; // normal shutdown
-                System.err.println("AppServer: Accept error: " + e.getMessage());
+                logger.error("AppServer: Accept error: {}", e.getMessage());
             } catch (IOException e) {
                 if (running.get()) {
-                    System.err.println("AppServer: Accept error: " + e.getMessage());
+                    logger.error("AppServer: Accept error: {}", e.getMessage());
                 }
             }
         }

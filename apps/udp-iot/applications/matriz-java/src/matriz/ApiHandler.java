@@ -1,4 +1,5 @@
 package matriz;
+import lib.logging.Logger;
 
 import shared.LogCapture;
 import shared.Json;
@@ -18,6 +19,8 @@ import shared.Json;
  * <p>All other paths return 404. Unsupported methods return 405.
  */
 public class ApiHandler {
+
+    private static final Logger logger = Logger.getLogger(ApiHandler.class);
 
     private final ConfigManager configManager;
     private final FilialStateTracker stateTracker;
@@ -56,7 +59,7 @@ public class ApiHandler {
                 default -> jsonError(404, "Not found");
             };
         } catch (Exception e) {
-            System.err.println("ApiHandler: Error: " + e.getMessage());
+            logger.error("ApiHandler: Error: {}", e.getMessage());
             return jsonError(500, "Internal server error");
         }
     }

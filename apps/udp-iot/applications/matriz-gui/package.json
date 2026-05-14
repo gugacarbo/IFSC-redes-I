@@ -48,3 +48,5 @@
     "vitest": "^4.1.6"
   }
 }
+"@lib/logging": "*",
+"@lib/logging": "*",

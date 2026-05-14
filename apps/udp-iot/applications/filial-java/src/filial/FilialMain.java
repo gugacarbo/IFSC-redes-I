@@ -1,5 +1,6 @@
 package filial;
 
+import lib.logging.Logger;
 import javax.swing.*;
 import java.util.function.Consumer;
 import shared.Env;
@@ -22,6 +23,8 @@ import shared.LogCapture;
  */
 public class FilialMain {
 
+    private static final Logger logger = Logger.getLogger(FilialMain.class);
+
     private static final String DEFAULT_CONFIG = "config/config_filial.json";
     private static final String NO_GUI_FLAG = "--no-gui";
 
@@ -37,12 +40,12 @@ public class FilialMain {
             }
         }
 
-        System.out.println("=== Filial IoT (Java) ===");
+        logger.info("=== Filial IoT (Java) ===");
 
         // 1. Load config
         ConfigManager cfgMgr = new ConfigManager();
         if (!cfgMgr.load(DEFAULT_CONFIG)) {
-            System.err.println("FATAL: Could not load config from " + DEFAULT_CONFIG);
+            logger.error("FATAL: Could not load config from {}", DEFAULT_CONFIG);
             System.exit(1);
         }
         FilialConfig cfg = cfgMgr.getConfig();
@@ -50,14 +53,14 @@ public class FilialMain {
         int udpPort = Env.getInt("FILIAL_UDP_PORT", cfg.port());
         int httpPort = Env.getInt("FILIAL_HTTP_PORT", cfg.httpPort());
 
-        System.out.println("UDP port: " + udpPort);
-        System.out.println("HTTP/WS port: " + httpPort);
-        System.out.println("Devices: " + cfg.deviceIds().size());
+        logger.info("UDP port: {}", udpPort);
+        logger.info("HTTP/WS port: {}", httpPort);
+        logger.info("Devices: {}", cfg.deviceIds().size());
 
         // 2. Initialise device manager
         DeviceManager devMgr = new DeviceManager();
         devMgr.init(cfg.deviceIds());
-        System.out.println("Initialised " + devMgr.count() + " devices");
+        logger.info("Initialised {} devices", devMgr.count());
 
         // 3. Create bridge (needed by GUI callback and API handler)
         DeviceBridge deviceBridge = new DeviceBridge(devMgr, cfgMgr);
@@ -76,12 +79,12 @@ public class FilialMain {
         // 6. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, deviceBridge, apiHandler);
         if (!appServer.start()) {
-            System.err.println("FATAL: Could not start HTTP/WS server on port " + httpPort);
+            logger.error("FATAL: Could not start HTTP/WS server on port {}", httpPort);
             System.exit(1);
         }
-        System.out.println("  REST API: http://localhost:" + httpPort + "/api/devices");
-        System.out.println("  WebSocket: ws://localhost:" + httpPort + "/ws");
-        System.out.println("  Health:   http://localhost:" + httpPort + "/health");
+        logger.info("  REST API: http://localhost:{}/api/devices", httpPort);
+        logger.info("  WebSocket: ws://localhost:{}/ws", httpPort);
+        logger.info("  Health:   http://localhost:{}/health", httpPort);
 
         // 7. Start UDP server for Matriz
         CommandProcessor processor = new CommandProcessor(
@@ -93,16 +96,16 @@ public class FilialMain {
         UdpServer udpServer = new UdpServer(udpPort, processor);
 
         if (!udpServer.start()) {
-            System.err.println("FATAL: Could not bind UDP port " + udpPort);
+            logger.error("FATAL: Could not bind UDP port {}", udpPort);
             System.exit(1);
         }
 
-        System.out.println("Listening on UDP port " + udpPort);
-        System.out.println("Ready. Press Ctrl+C to stop.");
+        logger.info("Listening on UDP port {}", udpPort);
+        logger.info("Ready. Press Ctrl+C to stop.");
 
         // 8. Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("\nShutting down...");
+            logger.info("\nShutting down...");
             appServer.stop();
             udpServer.stop();
         }));
@@ -119,7 +122,7 @@ public class FilialMain {
      * Launch the desktop GUI simulation in a separate thread.
      */
     private static void launchGui(DeviceManager devMgr, Consumer<String> onSensorChanged) {
-        System.out.println("Starting desktop GUI...");
+        logger.info("Starting desktop GUI...");
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

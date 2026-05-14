@@ -7,6 +7,7 @@
 	"workspaces": [
 		"tools/*",
 		"launcher",
+		"packages/*",
 		"apps/*",
 		"apps/udp-iot/packages/*",
 		"apps/udp-iot/applications/*"

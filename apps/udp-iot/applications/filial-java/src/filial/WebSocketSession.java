@@ -1,6 +1,7 @@
 package filial;
 
 import java.io.IOException;
+import lib.logging.Logger;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -19,6 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * and graceful close. No external WebSocket library required.
  */
 public class WebSocketSession {
+
+    private static final Logger logger = Logger.getLogger(WebSocketSession.class);
 
     private final Socket socket;
     private final InputStream  in;
@@ -112,7 +115,7 @@ public class WebSocketSession {
             }
             case OPCODE_PONG -> null;
             default -> {
-                System.err.println("WebSocket: Unknown opcode " + opcode);
+                logger.warn("WebSocket: Unknown opcode {}", opcode);
                 yield null;
             }
         };

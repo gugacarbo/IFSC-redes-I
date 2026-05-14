@@ -1,6 +1,7 @@
 package filial;
 
 import java.net.DatagramPacket;
+import lib.logging.Logger;
 import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,6 +14,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * to {@link CommandProcessor} via a thread pool.
  */
 public class UdpServer {
+
+    private static final Logger logger = Logger.getLogger(UdpServer.class);
 
     private final int port;
     private final CommandProcessor processor;
@@ -41,7 +44,7 @@ public class UdpServer {
             socket.setSoTimeout(0); // blocking mode (no timeout)
             running.set(true);
         } catch (Exception e) {
-            System.err.println("UdpServer: Failed to bind port " + port + ": " + e.getMessage());
+            logger.error("UdpServer: Failed to bind port {}: {}", port, e.getMessage());
             return false;
         }
 
@@ -98,9 +101,9 @@ public class UdpServer {
             } catch (java.net.SocketException e) {
                 // Socket closed during stop()
                 if (!running.get()) break;
-                System.err.println("UdpServer: Socket error: " + e.getMessage());
+                logger.error("UdpServer: Socket error: {}", e.getMessage());
             } catch (Exception e) {
-                System.err.println("UdpServer: Error processing packet: " + e.getMessage());
+                logger.error("UdpServer: Error processing packet: {}", e.getMessage());
             }
         }
     }

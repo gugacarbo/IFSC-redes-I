@@ -1,6 +1,7 @@
 package filial;
 
 import java.io.ByteArrayInputStream;
+import lib.logging.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +23,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>Same pattern as {@code matriz-java/src/matriz/AppServer.java}.
  */
 public class AppServer {
+
+    private static final Logger logger = Logger.getLogger(AppServer.class);
 
     private final int port;
     private final DeviceBridge deviceBridge;
@@ -49,13 +52,13 @@ public class AppServer {
             serverSocket.setReuseAddress(true);
             running.set(true);
         } catch (IOException e) {
-            System.err.println("AppServer: Failed to bind port " + port + ": " + e.getMessage());
+            logger.error("AppServer: Failed to bind port {}: {}", port, e.getMessage());
             return false;
         }
         acceptThread = new Thread(this::acceptLoop, "app-server-accept");
         acceptThread.setDaemon(true);
         acceptThread.start();
-        System.out.println("AppServer: Listening on port " + port + " (REST + WebSocket)");
+        logger.info("AppServer: Listening on port {} (REST + WebSocket)", port);
         return true;
     }
 
@@ -74,10 +77,10 @@ public class AppServer {
                 connectionPool.submit(() -> handleConnection(client));
             } catch (java.net.SocketException e) {
                 if (!running.get()) break;
-                System.err.println("AppServer: Accept error: " + e.getMessage());
+                logger.error("AppServer: Accept error: {}", e.getMessage());
             } catch (IOException e) {
                 if (running.get()) {
-                    System.err.println("AppServer: Accept error: " + e.getMessage());
+                    logger.error("AppServer: Accept error: {}", e.getMessage());
                 }
             }
         }

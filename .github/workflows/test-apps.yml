@@ -1,0 +1,56 @@
+name: Test Changed Packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Detect changed packages
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="HEAD^"
+          fi
+
+          PACKAGES=$(npx turbo run test build --filter="...[${BASE}]" --dry-run=json 2>/dev/null \
+            | jq -r '.tasks[] | .taskId' | cut -d'#' -f2 | sort -u)
+
+          if [ -z "$PACKAGES" ]; then
+            echo "No changed packages detected."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "## Changed packages" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "$PACKAGES" | while read -r pkg; do
+              echo "- \`$pkg\`" >> "$GITHUB_STEP_SUMMARY"
+            done
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "BASE=$BASE" >> "$GITHUB_ENV"
+
+      - name: Run tests & build on changed packages
+        if: steps.changed.outputs.has_changes == 'true'
+        run: npx turbo run test build --filter="...[${BASE}]"

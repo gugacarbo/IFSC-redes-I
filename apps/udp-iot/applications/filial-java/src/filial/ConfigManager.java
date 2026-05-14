@@ -1,6 +1,7 @@
 package filial;
 
 import shared.Json;
+import lib.logging.Logger;
 import shared.Json.JsonArray;
 import shared.Json.JsonObject;
 import shared.Protocol;
@@ -29,6 +30,8 @@ import java.util.List;
  */
 public class ConfigManager {
 
+    private static final Logger logger = Logger.getLogger(ConfigManager.class);
+
     private FilialConfig config;
 
     /** Load configuration from a JSON file. Returns true on success. */
@@ -53,10 +56,10 @@ public class ConfigManager {
             this.config = new FilialConfig(port, httpPort, user, pass, deviceIds);
             return true;
         } catch (IOException e) {
-            System.err.println("ConfigManager: IO error reading " + path + ": " + e.getMessage());
+            logger.error("ConfigManager: IO error reading {}: {}", path, e.getMessage());
             return false;
         } catch (RuntimeException e) {
-            System.err.println("ConfigManager: Parse error: " + e.getMessage());
+            logger.error("ConfigManager: Parse error: {}", e.getMessage());
             return false;
         }
     }
