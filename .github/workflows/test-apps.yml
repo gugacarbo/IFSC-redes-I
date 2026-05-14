@@ -22,8 +22,8 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install root dependencies
+        run: npm install --ignore-scripts --no-workspaces
 
       - name: Detect changed packages
         id: changed
@@ -52,9 +52,21 @@ jobs:
               echo "- \`$pkg\`" >> "$GITHUB_STEP_SUMMARY"
             done
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "packages<<EOF" >> "$GITHUB_OUTPUT"
+            echo "$PACKAGES" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
           fi
 
           echo "BASE=$BASE" >> "$GITHUB_ENV"
+
+      - name: Install changed packages dependencies
+        if: steps.changed.outputs.has_changes == 'true'
+        run: |
+          ARGS=""
+          while IFS= read -r pkg; do
+            ARGS="$ARGS -w $pkg"
+          done <<< "${{ steps.changed.outputs.packages }}"
+          npm install $ARGS --ignore-scripts
 
       - name: Run tests & build on changed packages
         if: steps.changed.outputs.has_changes == 'true'

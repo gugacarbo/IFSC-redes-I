@@ -53,3 +53,4 @@ nbdist/
 .Trashes
 ehthumbs.db
 Thumbs.db
+.temp
