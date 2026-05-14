@@ -16,9 +16,9 @@
 	},
 	"scripts": {
 		"start": "node launcher/prepare-and-start.js",
+		"build": "turbo run build --filter=launcher",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
-		"build": "turbo run build",
 		"typecheck": "turbo run typecheck",
 		"format:packages": "turbo run format",
 		"format": "biome check --write",

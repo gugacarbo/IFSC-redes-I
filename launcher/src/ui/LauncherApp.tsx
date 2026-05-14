@@ -2,12 +2,16 @@ import { Box, Spacer, Text } from "ink";
 import type { AppInfo } from "../types.js";
 import {
 	LauncherProvider,
+	type RunViewState,
 	useLauncherContext,
 } from "./context/LauncherContext.js";
 import { useNavigation } from "./hooks/useNavigation.js";
 
 interface LauncherAppProps {
 	apps: AppInfo[];
+	repoRoot: string;
+	initialRunViews: RunViewState[];
+	initialStatusMessage: string;
 }
 
 function LauncherAppContent() {
@@ -164,9 +168,19 @@ function LauncherAppContent() {
 	);
 }
 
-export function LauncherApp({ apps }: LauncherAppProps) {
+export function LauncherApp({
+	apps,
+	repoRoot,
+	initialRunViews,
+	initialStatusMessage,
+}: LauncherAppProps) {
 	return (
-		<LauncherProvider apps={apps}>
+		<LauncherProvider
+			apps={apps}
+			repoRoot={repoRoot}
+			initialRunViews={initialRunViews}
+			initialStatusMessage={initialStatusMessage}
+		>
 			<LauncherAppContent />
 		</LauncherProvider>
 	);

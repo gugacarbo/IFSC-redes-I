@@ -1,6 +1,7 @@
 import readline from "node:readline";
 import { render } from "ink";
 import { getApps, getRepoRoot } from "./data/apps.js";
+import { loadPersistedRunState } from "./services/state/runStateStore.js";
 import { LauncherApp } from "./ui/LauncherApp.js";
 
 let restoreTerminalState: (() => void) | null = null;
@@ -29,8 +30,16 @@ function enterFullscreenTerminal(): void {
 function main(): void {
 	const repoRoot = getRepoRoot();
 	const apps = getApps(repoRoot);
+	const restored = loadPersistedRunState(repoRoot);
 	enterFullscreenTerminal();
-	const instance = render(<LauncherApp apps={apps} />);
+	const instance = render(
+		<LauncherApp
+			apps={apps}
+			repoRoot={repoRoot}
+			initialRunViews={restored.runs}
+			initialStatusMessage={restored.message}
+		/>,
+	);
 	instance.waitUntilExit().finally(() => {
 		restoreTerminalState?.();
 	});

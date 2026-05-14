@@ -1,6 +1,7 @@
 package filial;
 
 import javax.swing.*;
+import java.util.function.Consumer;
 import shared.Env;
 import shared.LogCapture;
 
@@ -10,6 +11,7 @@ import shared.LogCapture;
  * <p>Initialises all components:
  * <ol>
  *   <li>Loads configuration</li>
+ *   <li>Creates DeviceBridge (needed by GUI callback)</li>
  *   <li>Launches desktop GUI for sensor simulation</li>
  *   <li>Starts the UDP server for Matriz communication</li>
  *   <li>Starts the HTTP + WebSocket server (REST API + GUI connections)</li>
@@ -57,21 +59,21 @@ public class FilialMain {
         devMgr.init(cfg.deviceIds());
         System.out.println("Initialised " + devMgr.count() + " devices");
 
-        // 3. Launch GUI (if not disabled)
+        // 3. Create bridge (needed by GUI callback and API handler)
+        DeviceBridge deviceBridge = new DeviceBridge(devMgr, cfgMgr);
+
+        // 4. Launch GUI (if not disabled)
         if (!noGui) {
-            launchGui(devMgr);
+            launchGui(devMgr, sensorId -> deviceBridge.broadcastDevicesUpdated());
         }
 
-        // === Log stdout to GUI console ===
+        // 5. Log stdout to GUI console
         LogCapture logCapture = new LogCapture(500);
         logCapture.install();
-
-        // 4. Create bridge and API handler
-        DeviceBridge deviceBridge = new DeviceBridge(devMgr, cfgMgr);
         logCapture.setBroadcastListener(json -> deviceBridge.broadcast(json));
         ApiHandler apiHandler = new ApiHandler(devMgr, deviceBridge, logCapture);
 
-        // 5. Start HTTP + WebSocket server
+        // 6. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, deviceBridge, apiHandler);
         if (!appServer.start()) {
             System.err.println("FATAL: Could not start HTTP/WS server on port " + httpPort);
@@ -81,7 +83,7 @@ public class FilialMain {
         System.out.println("  WebSocket: ws://localhost:" + httpPort + "/ws");
         System.out.println("  Health:   http://localhost:" + httpPort + "/health");
 
-        // 6. Start UDP server for Matriz
+        // 7. Start UDP server for Matriz
         CommandProcessor processor = new CommandProcessor(devMgr, cfg.adminUser(), cfg.adminPass());
         UdpServer udpServer = new UdpServer(udpPort, processor);
 
@@ -93,14 +95,14 @@ public class FilialMain {
         System.out.println("Listening on UDP port " + udpPort);
         System.out.println("Ready. Press Ctrl+C to stop.");
 
-        // 7. Shutdown hook
+        // 8. Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\nShutting down...");
             appServer.stop();
             udpServer.stop();
         }));
 
-        // 8. Keep alive
+        // 9. Keep alive
         try {
             Thread.sleep(Long.MAX_VALUE);
         } catch (InterruptedException e) {
@@ -111,7 +113,7 @@ public class FilialMain {
     /**
      * Launch the desktop GUI simulation in a separate thread.
      */
-    private static void launchGui(DeviceManager devMgr) {
+    private static void launchGui(DeviceManager devMgr, Consumer<String> onSensorChanged) {
         System.out.println("Starting desktop GUI...");
         SwingUtilities.invokeLater(() -> {
             try {
@@ -119,7 +121,7 @@ public class FilialMain {
             } catch (Exception e) {
                 // Use default look and feel
             }
-            DeviceGui gui = new DeviceGui(devMgr);
+            DeviceGui gui = new DeviceGui(devMgr, onSensorChanged);
             gui.setVisible(true);
         });
     }

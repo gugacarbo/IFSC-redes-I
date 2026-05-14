@@ -19,6 +19,9 @@ export default defineConfig(({ mode }) => {
 		},
 		server: {
 			port: parseInt(env.VITE_MATRIZ_PORT || "5173", 10),
+			fs: {
+				allow: [path.resolve(__dirname, "../../..")],
+			},
 		},
 	};
 });

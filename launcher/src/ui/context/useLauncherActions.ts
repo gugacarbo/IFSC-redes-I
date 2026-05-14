@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { getApps, getRepoRoot } from "../../data/apps.js";
 import { createApp } from "../../services/appCreator/createApp.js";
 import type { LanguageTemplate } from "../../services/appCreator/types.js";
+import { stopProcessTree } from "../../services/process/stopProcessTree.js";
 import { executeScriptOptionInBackground } from "../../services/runner.js";
 import type { AppInfo, ScriptOption } from "../../types.js";
 import { readAppDocs } from "../docs/readAppDocs.js";
@@ -140,6 +141,13 @@ export function useLauncherActions(
 		}
 		const handle = runningHandlesRef.current.get(selectedRun.id);
 		if (!handle) {
+			if (selectedRun.pid && selectedRun.pid > 0) {
+				setStatusMessage(
+					`Encerrando terminal restaurado (PID ${selectedRun.pid})...`,
+				);
+				stopProcessTree(selectedRun.pid);
+				return;
+			}
 			setStatusMessage("Handle do terminal nao encontrado.");
 			return;
 		}
@@ -151,9 +159,15 @@ export function useLauncherActions(
 		for (const run of runViews) {
 			if (!run.isRunning) continue;
 			const handle = runningHandlesRef.current.get(run.id);
-			if (!handle) continue;
-			handle.stop();
-			stopped += 1;
+			if (handle) {
+				handle.stop();
+				stopped += 1;
+				continue;
+			}
+			if (run.pid && run.pid > 0) {
+				stopProcessTree(run.pid);
+				stopped += 1;
+			}
 		}
 		setStatusMessage(
 			stopped > 0
@@ -187,12 +201,21 @@ export function useLauncherActions(
 				handle.stop();
 			}
 		}
+		for (const run of runViews) {
+			if (!run.isRunning || !run.pid || run.pid <= 0) {
+				continue;
+			}
+			if (runningHandlesRef.current.has(run.id)) {
+				continue;
+			}
+			stopProcessTree(run.pid);
+		}
 		try {
 			process.exit(0);
 		} catch {
 			// If exit is not available in some environments, ignore.
 		}
-	}, [runningHandlesRef]);
+	}, [runViews, runningHandlesRef]);
 
 	const createNewApp = useCallback((): void => {
 		const template: LanguageTemplate | undefined =

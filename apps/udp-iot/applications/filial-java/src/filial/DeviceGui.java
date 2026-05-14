@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Desktop GUI for simulating IoT sensors and viewing actuator states.
@@ -21,6 +22,7 @@ import java.util.Map;
 public class DeviceGui extends JFrame {
 
     private final DeviceManager deviceManager;
+    private final Consumer<String> onSensorChanged;
     private final Map<String, JSlider> acSensorSliders = new HashMap<>();
     private final Map<String, JToggleButton> lightSensorSwitches = new HashMap<>();
     private final Map<String, JLabel> actuatorLabels = new HashMap<>();
@@ -37,6 +39,14 @@ public class DeviceGui extends JFrame {
 
     public DeviceGui(DeviceManager deviceManager) {
         this.deviceManager = deviceManager;
+        this.onSensorChanged = null;
+        initUI();
+        startRefreshTimer();
+    }
+
+    public DeviceGui(DeviceManager deviceManager, Consumer<String> onSensorChanged) {
+        this.deviceManager = deviceManager;
+        this.onSensorChanged = onSensorChanged;
         initUI();
         startRefreshTimer();
     }
@@ -257,7 +267,7 @@ public class DeviceGui extends JFrame {
         toggle.setMargin(new Insets(5, 15, 5, 15));
 
         // Initial state
-        boolean isOn = state.intValue() > 512;
+        boolean isOn = state.boolValue();
         toggle.setSelected(isOn);
         updateSwitchAppearance(toggle, isOn);
 
@@ -266,8 +276,8 @@ public class DeviceGui extends JFrame {
             boolean selected = toggle.isSelected();
             updateSwitchAppearance(toggle, selected);
             try {
-                // Light sensor: 1023 = light detected, 0 = dark
-                deviceManager.set(sensorId, selected ? 1023 : 0);
+                deviceManager.set(sensorId, selected);
+                if (onSensorChanged != null) onSensorChanged.accept(sensorId);
             } catch (IllegalArgumentException ex) {
                 // Ignore
             }
@@ -310,6 +320,7 @@ public class DeviceGui extends JFrame {
             if (!slider.getValueIsAdjusting()) {
                 try {
                     deviceManager.set(sensorId, slider.getValue());
+                    if (onSensorChanged != null) onSensorChanged.accept(sensorId);
                 } catch (IllegalArgumentException ex) {
                     // Ignore
                 }
@@ -399,7 +410,7 @@ public class DeviceGui extends JFrame {
             DeviceState state = deviceManager.get(deviceId);
             if (state != null) {
                 JToggleButton toggle = lightSensorSwitches.get(deviceId);
-                boolean isOn = state.intValue() > 512;
+                boolean isOn = state.boolValue();
                 if (toggle.isSelected() != isOn) {
                     toggle.setSelected(isOn);
                     updateSwitchAppearance(toggle, isOn);

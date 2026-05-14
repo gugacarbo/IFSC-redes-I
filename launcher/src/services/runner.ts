@@ -15,15 +15,12 @@ export interface BackgroundRunHandle {
 
 const MONITOR_INTERVAL_MS = 1200;
 
-export function executeScriptOptionInBackground(
-	app: AppInfo,
-	option: ScriptOption,
+function monitorTerminalProcess(
+	pid: number,
 	hooks: RunHooks = {},
 ): BackgroundRunHandle {
-	let pid: number | null = null;
 	let finished = false;
 	let stopRequested = false;
-	let monitorTimer: NodeJS.Timeout | null = null;
 
 	const finish = (success: boolean, message: string): void => {
 		if (finished) {
@@ -38,6 +35,48 @@ export function executeScriptOptionInBackground(
 		hooks.onFinish?.(success, message);
 	};
 
+	let monitorTimer: NodeJS.Timeout | null = setInterval(() => {
+		if (finished) {
+			return;
+		}
+		if (!isProcessAlive(pid)) {
+			if (stopRequested) {
+				finish(true, "Terminal encerrado pelo launcher.");
+				return;
+			}
+			finish(true, "Terminal foi fechado.");
+		}
+	}, MONITOR_INTERVAL_MS);
+
+	return {
+		stop: () => {
+			if (finished) {
+				return;
+			}
+			stopRequested = true;
+			hooks.onStatus?.(`Encerrando terminal (PID ${pid})...`);
+			stopProcessTree(pid);
+		},
+	};
+}
+
+export function attachToExistingTerminalRun(
+	pid: number,
+	hooks: RunHooks = {},
+): BackgroundRunHandle {
+	if (!Number.isInteger(pid) || pid <= 0) {
+		throw new Error("PID invalido para restauracao.");
+	}
+	return monitorTerminalProcess(pid, hooks);
+}
+
+export function executeScriptOptionInBackground(
+	app: AppInfo,
+	option: ScriptOption,
+	hooks: RunHooks = {},
+): BackgroundRunHandle {
+	let pid: number | null = null;
+
 	try {
 		hooks.onStatus?.(
 			`Abrindo novo terminal para ${app.name} -> ${option.label}...`,
@@ -45,34 +84,15 @@ export function executeScriptOptionInBackground(
 		pid = launchInNewCmdTerminal(app, option);
 		hooks.onPid?.(pid);
 		hooks.onStatus?.(`Terminal aberto (PID ${pid}).`);
-
-		monitorTimer = setInterval(() => {
-			if (!pid || finished) {
-				return;
-			}
-
-			if (!isProcessAlive(pid)) {
-				if (stopRequested) {
-					finish(true, "Terminal encerrado pelo launcher.");
-					return;
-				}
-				finish(true, "Terminal foi fechado.");
-			}
-		}, MONITOR_INTERVAL_MS);
+		return monitorTerminalProcess(pid, hooks);
 	} catch (error) {
 		const message =
 			error instanceof Error ? error.message : "Falha ao iniciar execucao.";
-		finish(false, message);
+		hooks.onStatus?.(message);
+		hooks.onFinish?.(false, message);
 	}
 
 	return {
-		stop: () => {
-			if (finished || !pid) {
-				return;
-			}
-			stopRequested = true;
-			hooks.onStatus?.(`Encerrando terminal (PID ${pid})...`);
-			stopProcessTree(pid);
-		},
+		stop: () => {},
 	};
 }

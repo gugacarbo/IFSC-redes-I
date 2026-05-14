@@ -3,6 +3,7 @@ import {
 	createContext,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -10,7 +11,15 @@ import {
 import { getScriptOptions } from "../../data/apps.js";
 import { LANGUAGE_TEMPLATES } from "../../services/appCreator/languages.js";
 import type { LanguageTemplate } from "../../services/appCreator/types.js";
-import type { BackgroundRunHandle } from "../../services/runner.js";
+import { isProcessAlive } from "../../services/process/isProcessAlive.js";
+import {
+	attachToExistingTerminalRun,
+	type BackgroundRunHandle,
+} from "../../services/runner.js";
+import {
+	savePersistedRunState,
+	type PersistedRunView,
+} from "../../services/state/runStateStore.js";
 import type { AppInfo, ScriptOption } from "../../types.js";
 import { renderMarkdownLine } from "../markdown/renderMarkdownLine.js";
 import { useLauncherActions } from "./useLauncherActions.js";
@@ -81,20 +90,30 @@ const LauncherContext = createContext<LauncherContextValue | null>(null);
 
 interface LauncherProviderProps {
 	apps: AppInfo[];
+	repoRoot: string;
+	initialRunViews: PersistedRunView[];
+	initialStatusMessage: string;
 	children: React.ReactNode;
 }
 
-export function LauncherProvider({ apps, children }: LauncherProviderProps) {
+export function LauncherProvider({
+	apps,
+	repoRoot,
+	initialRunViews,
+	initialStatusMessage,
+	children,
+}: LauncherProviderProps) {
 	const [appsState, setApps] = useState<AppInfo[]>(apps);
 	const [screen, setScreen] = useState<Screen>("apps");
 	const [previousScreen, setPreviousScreen] = useState<Screen>("apps");
 	const [runReturnScreen, setRunReturnScreen] = useState<Screen>("scripts");
 	const [selectedAppIndex, setSelectedAppIndex] = useState<number>(0);
 	const [selectedScriptIndex, setSelectedScriptIndex] = useState<number>(0);
-	const [statusMessage, setStatusMessage] = useState<string>("");
+	const [statusMessage, setStatusMessage] =
+		useState<string>(initialStatusMessage);
 	const [docsContent, setDocsContent] = useState<string>("");
 	const [docsScrollOffset, setDocsScrollOffset] = useState<number>(0);
-	const [runViews, setRunViews] = useState<RunViewState[]>([]);
+	const [runViews, setRunViews] = useState<RunViewState[]>(initialRunViews);
 	const [selectedRunIndex, setSelectedRunIndex] = useState<number>(0);
 	const [isExitConfirmOpen, setIsExitConfirmOpen] = useState<boolean>(false);
 	const [createAppName, setCreateAppName] = useState<string>("");
@@ -112,6 +131,64 @@ export function LauncherProvider({ apps, children }: LauncherProviderProps) {
 
 	const runningCount = runViews.filter((run) => run.isRunning).length;
 	const finishedCount = runViews.length - runningCount;
+
+	useEffect(() => {
+		for (const run of initialRunViews) {
+			if (!run.isRunning || !run.pid || run.pid <= 0) {
+				continue;
+			}
+			if (runningHandlesRef.current.has(run.id)) {
+				continue;
+			}
+			if (!isProcessAlive(run.pid)) {
+				setRunViews((prev) =>
+					prev.map((entry) =>
+						entry.id === run.id
+							? {
+									...entry,
+									isRunning: false,
+									status: "Terminal nao estava mais em execucao.",
+								}
+							: entry,
+					),
+				);
+				continue;
+			}
+
+			const pid = run.pid;
+			const handle = attachToExistingTerminalRun(pid, {
+				onStatus: (status) => {
+					setRunViews((prev) =>
+						prev.map((entry) =>
+							entry.id === run.id ? { ...entry, status } : entry,
+						),
+					);
+				},
+				onFinish: (_success, message) => {
+					runningHandlesRef.current.delete(run.id);
+					setRunViews((prev) =>
+						prev.map((entry) =>
+							entry.id === run.id
+								? { ...entry, isRunning: false, status: message }
+								: entry,
+						),
+					);
+				},
+			});
+			runningHandlesRef.current.set(run.id, handle);
+			setRunViews((prev) =>
+				prev.map((entry) =>
+					entry.id === run.id
+						? { ...entry, status: `Terminal restaurado (PID ${pid}).` }
+						: entry,
+				),
+			);
+		}
+	}, [initialRunViews]);
+
+	useEffect(() => {
+		savePersistedRunState(repoRoot, runViews);
+	}, [repoRoot, runViews]);
 
 	const visibleDocsNodes = useMemo(() => {
 		const visibleLines = docsLines.slice(

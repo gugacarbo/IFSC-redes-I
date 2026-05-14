@@ -3,10 +3,10 @@ import type { AppConfig, FilialData, LogEntry } from "../types";
 
 const WS_URL =
 	import.meta.env.VITE_MATRIZ_WS_URL ||
-	`ws://localhost:${import.meta.env.VITE_MATRIZ_PORT || 8080}/ws`;
+	"ws://localhost:3001/ws";
 const API_URL =
 	import.meta.env.VITE_MATRIZ_API_URL ||
-	`http://localhost:${import.meta.env.VITE_MATRIZ_PORT || 8080}`;
+	"http://localhost:3001";
 
 export function useIoT() {
 	const [filiais, setFiliais] = useState<Record<string, FilialData>>({});

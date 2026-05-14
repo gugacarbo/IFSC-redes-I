@@ -149,3 +149,5 @@ vite.config.ts.timestamp-*
 tools/java/*.jar
 
 .weave/runtime
+
+,launcher
