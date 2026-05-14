@@ -24,7 +24,7 @@ Crie uma aplicação de bate papo (chat) contemplando os seguintes requisitos t�
 "message":"message_value"
 }
 
-onde:
+**onde:**
 date_value é a data (dd/mm/aaaa) de envio da mensagem (obtida no nó origem);
 time_value é a hora (hh:mm:ss) de envio da mensagem (obtida no nó origem);
 username_value é o nome do usuário que enviou a mensagem;
