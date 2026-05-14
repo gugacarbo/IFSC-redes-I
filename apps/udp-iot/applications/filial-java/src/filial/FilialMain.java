@@ -84,7 +84,12 @@ public class FilialMain {
         System.out.println("  Health:   http://localhost:" + httpPort + "/health");
 
         // 7. Start UDP server for Matriz
-        CommandProcessor processor = new CommandProcessor(devMgr, cfg.adminUser(), cfg.adminPass());
+        CommandProcessor processor = new CommandProcessor(
+            devMgr,
+            cfg.adminUser(),
+            cfg.adminPass(),
+            deviceBridge::broadcastDevicesUpdated
+        );
         UdpServer udpServer = new UdpServer(udpPort, processor);
 
         if (!udpServer.start()) {

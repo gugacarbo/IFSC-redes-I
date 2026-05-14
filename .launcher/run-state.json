@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"runs": [
+		{
+			"id": "1778726245988-f80tli",
+			"appName": "udp-iot",
+			"scriptLabel": "start",
+			"pid": 430671,
+			"isRunning": true,
+			"status": "Terminal aberto (PID 430671)."
+		}
+	]
+}

@@ -9,6 +9,8 @@ export interface AppConfig {
   pass: string;
   pollingMs: number;
   filiais: FilialConfig[];
+  deviceAliases?: Record<string, string>;
+  deviceAliasesByIp?: Record<string, Record<string, string>>;
 }
 
 export interface FilialData {

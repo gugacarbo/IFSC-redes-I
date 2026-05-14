@@ -25,11 +25,22 @@ public class CommandProcessor {
     private final DeviceManager deviceManager;
     private final String adminUser;
     private final String adminPass;
+    private final Runnable onDevicesChanged;
 
     public CommandProcessor(DeviceManager deviceManager, String adminUser, String adminPass) {
+        this(deviceManager, adminUser, adminPass, null);
+    }
+
+    public CommandProcessor(
+        DeviceManager deviceManager,
+        String adminUser,
+        String adminPass,
+        Runnable onDevicesChanged
+    ) {
         this.deviceManager = deviceManager;
         this.adminUser = adminUser;
         this.adminPass = adminPass;
+        this.onDevicesChanged = onDevicesChanged;
     }
 
     /**
@@ -118,17 +129,21 @@ public class CommandProcessor {
             return Protocol.errorResponse(Protocol.ERR_READ_ONLY).toString();
         }
 
-        // Determine value type from device type
-        try {
-            if (state.isLight()) {
-                boolean value = req.getBoolean(Protocol.FIELD_VALUE);
-                deviceManager.set(deviceId, value);
-            } else {
-                int value = req.getInt(Protocol.FIELD_VALUE);
-                deviceManager.set(deviceId, value);
-            }
+		// Determine value type from device type
+		try {
+			if (state.isLight()) {
+				boolean value = parseLightBoolean(req);
+				deviceManager.set(deviceId, value);
+			} else {
+				int value = req.getInt(Protocol.FIELD_VALUE);
+				deviceManager.set(deviceId, value);
+			}
         } catch (Exception e) {
             return Protocol.errorResponse("Invalid value: " + e.getMessage()).toString();
+        }
+
+        if (onDevicesChanged != null) {
+            onDevicesChanged.run();
         }
 
         // Build set_resp with the new value
@@ -141,6 +156,39 @@ public class CommandProcessor {
         } else {
             resp.put(Protocol.FIELD_VALUE, updated.intValue());
         }
-        return resp.toString();
-    }
+		return resp.toString();
+	}
+
+	/**
+	 * Parse boolean command values for light devices with tolerant inputs.
+	 *
+	 * Accepts:
+	 * - JSON boolean: true/false
+	 * - JSON number: 0/1
+	 * - JSON string: "true"/"false"/"1"/"0"/"on"/"off"
+	 */
+	private boolean parseLightBoolean(JsonObject req) {
+		try {
+			return req.getBoolean(Protocol.FIELD_VALUE);
+		} catch (Exception ignored) {
+			// Fall through to permissive parsing below
+		}
+
+		try {
+			int numeric = req.getInt(Protocol.FIELD_VALUE);
+			return numeric != 0;
+		} catch (Exception ignored) {
+			// Fall through to string parsing below
+		}
+
+		String raw = req.getString(Protocol.FIELD_VALUE, "").trim().toLowerCase();
+		if (raw.equals("true") || raw.equals("1") || raw.equals("on")) {
+			return true;
+		}
+		if (raw.equals("false") || raw.equals("0") || raw.equals("off")) {
+			return false;
+		}
+
+		throw new IllegalArgumentException("invalid boolean value: '" + raw + "'");
+	}
 }

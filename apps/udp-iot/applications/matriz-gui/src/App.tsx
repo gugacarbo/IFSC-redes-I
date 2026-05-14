@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from "@udp-iot/ui/components/alert";
 
 function App() {
 	const [tab, setTab] = useState("dashboard");
-	const { filiais, connected, logs, sendCommand, clearLogs } = useIoT();
+	const { filiais, config, connected, logs, sendCommand, clearLogs } = useIoT();
 
 	return (
 		<Layout currentTab={tab} setTab={setTab} connected={connected}>
@@ -19,7 +19,7 @@ function App() {
 			)}
 
 			{tab === "dashboard" && (
-				<Dashboard filiais={filiais} onCommand={sendCommand} />
+				<Dashboard filiais={filiais} config={config} onCommand={sendCommand} />
 			)}
 			{tab === "config" && (
 				<ConfigView />
