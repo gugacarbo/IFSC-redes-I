@@ -35,7 +35,7 @@ jobs:
           fi
 
           PACKAGES=$(npx turbo run test build --filter="...[${BASE}]" --filter="!@udp-iot/*-esp32" --dry-run=json 2>/dev/null \
-            | jq -r '.tasks[] | .taskId' | cut -d'#' -f2 | sort -u)
+            | jq -r '.tasks[] | .taskId' | cut -d'#' -f1 | sort -u)
 
           if [ -z "$PACKAGES" ]; then
             echo "No changed packages detected."
