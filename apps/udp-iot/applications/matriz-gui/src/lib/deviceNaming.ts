@@ -65,8 +65,7 @@ export function humanizeDeviceId(id: string): string {
 		const room = roomTokens.map((t) => nameMap[t]).join(" ") || "";
 
 		const sensorTokens = tokens.filter((t) => sensorMap[t]);
-		const sensorType =
-			sensorTokens.map((t) => sensorMap[t]).join(" e ") || "";
+		const sensorType = sensorTokens.map((t) => sensorMap[t]).join(" e ") || "";
 
 		if (room && sensorType) {
 			return `Sensor de ${sensorType} — ${room}`;
@@ -94,9 +93,7 @@ export function humanizeDeviceId(id: string): string {
 	}
 
 	// Fallback: capitalize each token
-	return tokens
-		.map((t) => t.charAt(0).toUpperCase() + t.slice(1))
-		.join(" ");
+	return tokens.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(" ");
 }
 
 /**
@@ -111,10 +108,10 @@ export function resolveDeviceName(
 	uiAlias?: string | null,
 	configAlias?: string | null,
 ): string {
-	if (uiAlias && uiAlias.trim()) {
+	if (uiAlias?.trim()) {
 		return uiAlias.trim();
 	}
-	if (configAlias && configAlias.trim()) {
+	if (configAlias?.trim()) {
 		return configAlias.trim();
 	}
 	const humanized = humanizeDeviceId(deviceId);

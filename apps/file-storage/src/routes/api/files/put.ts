@@ -1,6 +1,9 @@
+import { Logger } from "@lib/logging";
 import { createFileRoute } from "@tanstack/react-router";
 import type { PUT_REQ, PUT_RESP } from "#/@types/command";
 import { putFile, validateFileInput } from "#/services/file-service";
+
+const logger = Logger.getLogger("PutAPI");
 
 export const Route = createFileRoute("/api/files/put")({
 	server: {
@@ -39,7 +42,7 @@ export const Route = createFileRoute("/api/files/put")({
 						headers: { "Content-Type": "application/json" },
 					});
 				} catch (error) {
-					console.error("Error in put API:", error);
+					logger.error("Error in put API: {}", error);
 
 					const response: PUT_RESP = {
 						cmd: "put_resp",

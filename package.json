@@ -10,7 +10,8 @@
 		"packages/*",
 		"apps/*",
 		"apps/udp-iot/packages/*",
-		"apps/udp-iot/applications/*"
+		"apps/udp-iot/applications/*",
+		"packages/logging/*"
 	],
 	"author": {
 		"name": "Gustavo Carbonera",

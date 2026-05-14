@@ -9,9 +9,22 @@ const javaFiles = readdirSync(srcDir)
 	.map((file) => path.join(srcDir, file));
 
 const sharedSrcDir = path.join("..", "..", "packages", "udp-shared", "src");
-const loggingSrcDir = path.join("..", "..", "..", "..", "packages", "logging", "java", "src");
-const sourceClasspath = ["src", sharedSrcDir, loggingSrcDir].join(path.delimiter);
-const runtimeClasspath = ["dist", sharedSrcDir, loggingSrcDir].join(path.delimiter);
+const loggingSrcDir = path.join(
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"logging",
+	"java",
+	"src",
+);
+const sourceClasspath = ["src", sharedSrcDir, loggingSrcDir].join(
+	path.delimiter,
+);
+const runtimeClasspath = ["dist", sharedSrcDir, loggingSrcDir].join(
+	path.delimiter,
+);
 
 function run(command, args) {
 	const result = spawnSync(command, args, { stdio: "inherit" });

@@ -1,6 +1,9 @@
+import { Logger } from "@lib/logging";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { deleteFileById } from "#/services/file-service";
+
+const logger = Logger.getLogger("DeleteFile");
 
 export const deleteFileFn = createServerFn({
 	method: "POST",
@@ -15,7 +18,7 @@ export const deleteFileFn = createServerFn({
 			await deleteFileById(data.id);
 			return { success: true };
 		} catch (error) {
-			console.error("Error deleting file:\n", error);
+			logger.error("Error deleting file: {}", error);
 			return { success: false };
 		}
 	});

@@ -2,11 +2,14 @@ import { createHash, randomBytes } from "node:crypto";
 import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { Logger } from "@lib/logging";
 import { count, eq, inArray, like, or, sql, sum } from "drizzle-orm";
 import type { PUT_REQ } from "#/@types/command";
 import { db } from "#/db";
 import { type FileType, files } from "#/db/schema";
 import { env } from "#/env";
+
+const logger = Logger.getLogger("FileService");
 
 export interface FileData {
 	fileName: string;
@@ -140,7 +143,7 @@ export async function deleteFileById(id: number): Promise<boolean> {
 	try {
 		await unlink(fileRecord.path);
 	} catch (error) {
-		console.error("Error deleting file from disk:\n", error);
+		logger.error("Error deleting file from disk: {}", error);
 	}
 
 	await db.delete(files).where(eq(files.id, id));

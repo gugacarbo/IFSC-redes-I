@@ -9,7 +9,16 @@ const javaFiles = readdirSync(srcDir)
 	.map((file) => path.join(srcDir, file));
 
 const sharedSrcDir = path.join("..", "..", "packages", "udp-shared", "src");
-const loggingSrcDir = path.join("..", "..", "..", "..", "packages", "logging", "java", "src");
+const loggingSrcDir = path.join(
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"logging",
+	"java",
+	"src",
+);
 const sourceClasspath = ["src", sharedSrcDir, loggingSrcDir].join(
 	path.delimiter,
 );

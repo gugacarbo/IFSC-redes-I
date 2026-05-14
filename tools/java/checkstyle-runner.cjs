@@ -2,7 +2,8 @@ const cp = require("node:child_process");
 const path = require("node:path");
 const fs = require("node:fs");
 
-const DEFAULT_URL = "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.18.0/checkstyle-10.18.0-all.jar";
+const DEFAULT_URL =
+	"https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.18.0/checkstyle-10.18.0-all.jar";
 
 function downloadFile(url, destPath) {
 	const destDir = path.dirname(destPath);
@@ -14,7 +15,7 @@ function downloadFile(url, destPath) {
 	try {
 		cp.execSync(`curl -sL -o "${destPath}" "${url}"`, { stdio: "inherit" });
 		console.log("Download completed successfully.");
-	} catch (e) {
+	} catch (_e) {
 		console.error(`Failed to download from ${url}`);
 		process.exit(1);
 	}

@@ -1,14 +1,14 @@
 {
-  "name": "@udp-iot/filial-java",
-  "version": "1.0.0",
-  "private": true,
-  "description": "UDP-IoT Filial - Java implementation",
-  "scripts": {
-    "build": "node scripts/run-java.cjs build",
-    "dev": "node scripts/run-java.cjs dev",
-    "dev:no-gui": "node scripts/run-java.cjs dev:no-gui",
-    "typecheck": "node scripts/run-java.cjs typecheck",
-    "lint": "node scripts/run-java.cjs lint",
-    "clean": "node scripts/run-java.cjs clean"
-  }
+	"name": "@udp-iot/filial-java",
+	"version": "1.0.0",
+	"private": true,
+	"description": "UDP-IoT Filial - Java implementation",
+	"scripts": {
+		"build": "node scripts/run-java.cjs build",
+		"dev": "node scripts/run-java.cjs dev",
+		"dev:no-gui": "node scripts/run-java.cjs dev:no-gui",
+		"typecheck": "node scripts/run-java.cjs typecheck",
+		"lint": "node scripts/run-java.cjs lint",
+		"clean": "node scripts/run-java.cjs clean"
+	}
 }

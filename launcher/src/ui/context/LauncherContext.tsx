@@ -17,8 +17,8 @@ import {
 	type BackgroundRunHandle,
 } from "../../services/runner.js";
 import {
-	savePersistedRunState,
 	type PersistedRunView,
+	savePersistedRunState,
 } from "../../services/state/runStateStore.js";
 import type { AppInfo, ScriptOption } from "../../types.js";
 import { renderMarkdownLine } from "../markdown/renderMarkdownLine.js";

@@ -35,7 +35,8 @@ function sanitizeRun(value: unknown): PersistedRunView | null {
 	const candidate = value as Partial<PersistedRunView>;
 	const pid = candidate.pid ?? null;
 	const pidValid =
-		pid === null || (typeof pid === "number" && Number.isInteger(pid) && pid > 0);
+		pid === null ||
+		(typeof pid === "number" && Number.isInteger(pid) && pid > 0);
 
 	if (
 		typeof candidate.id !== "string" ||

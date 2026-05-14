@@ -1,6 +1,9 @@
+import { Logger } from "@lib/logging";
 import { createFileRoute } from "@tanstack/react-router";
 import type { LIST_REQ, LIST_RESP } from "#/@types/command";
 import { countFiles, listFiles } from "#/services/file-service";
+
+const logger = Logger.getLogger("ListAPI");
 
 export const Route = createFileRoute("/api/files/list")({
 	server: {
@@ -39,7 +42,7 @@ export const Route = createFileRoute("/api/files/list")({
 						headers: { "Content-Type": "application/json" },
 					});
 				} catch (error) {
-					console.error("Error in list API:", error);
+					logger.error("Error in list API: {}", error);
 
 					const response: LIST_RESP = {
 						cmd: "list_resp",

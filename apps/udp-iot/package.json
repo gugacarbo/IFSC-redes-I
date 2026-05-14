@@ -1,17 +1,17 @@
 {
-    "name": "udp-iot",
-    "workspaces": [
-        "packages/*",
-        "applications/*"
-    ],
-    "scripts": {
-        "start": "npm run build:all && npm run dev:all",
-        "dev:all": "turbo run dev --cwd ../.. --filter=@udp-iot/* --ui=tui",
-        "dev:java": "turbo run dev --cwd ../.. --filter=@udp-iot/*-java --ui=tui",
-        "dev:gui": "turbo run dev --cwd ../.. --filter=@udp-iot/*-gui --ui=tui",
-        "build:all": "turbo run build --cwd ../.. --filter=@udp-iot/*",
-        "build:java": "turbo run build --cwd ../.. --filter=@udp-iot/*-java",
-        "build:gui": "turbo run build --cwd ../.. --filter=@udp-iot/*-gui",
-        "build:esp": "turbo run build --cwd ../.. --filter=@udp-iot/*-esp"
-    }
+	"name": "udp-iot",
+	"workspaces": [
+		"packages/*",
+		"applications/*"
+	],
+	"scripts": {
+		"start": "npm run build:all && npm run dev:all",
+		"dev:all": "turbo run dev --cwd ../.. --filter=@udp-iot/* --ui=tui",
+		"dev:java": "turbo run dev --cwd ../.. --filter=@udp-iot/*-java --ui=tui",
+		"dev:gui": "turbo run dev --cwd ../.. --filter=@udp-iot/*-gui --ui=tui",
+		"build:all": "turbo run build --cwd ../.. --filter=@udp-iot/*",
+		"build:java": "turbo run build --cwd ../.. --filter=@udp-iot/*-java",
+		"build:gui": "turbo run build --cwd ../.. --filter=@udp-iot/*-gui",
+		"build:esp": "turbo run build --cwd ../.. --filter=@udp-iot/*-esp"
+	}
 }

@@ -1,3 +1,4 @@
+import { Logger } from "@lib/logging";
 import { createFileRoute } from "@tanstack/react-router";
 import type {
 	GET_REQ,
@@ -14,6 +15,8 @@ import {
 	putFile,
 	validateFileInput,
 } from "#/services/file-service";
+
+const logger = Logger.getLogger("FilesAPI");
 
 export const Route = createFileRoute("/api/files/")({
 	server: {
@@ -56,7 +59,7 @@ export const Route = createFileRoute("/api/files/")({
 									headers: { "Content-Type": "application/json" },
 								});
 							} catch (error) {
-								console.error("Error in list API:", error);
+								logger.error("Error in list API: {}", error);
 								const response: LIST_RESP = {
 									cmd: "list_resp",
 									files: [],
@@ -100,7 +103,7 @@ export const Route = createFileRoute("/api/files/")({
 									headers: { "Content-Type": "application/json" },
 								});
 							} catch (error) {
-								console.error("Error in put API:", error);
+								logger.error("Error in put API: {}", error);
 
 								const response: PUT_RESP = {
 									cmd: "put_resp",
@@ -160,7 +163,7 @@ export const Route = createFileRoute("/api/files/")({
 									headers: { "Content-Type": "application/json" },
 								});
 							} catch (error) {
-								console.error("Error in get API:", error);
+								logger.error("Error in get API: {}", error);
 								const response: GET_RESP = {
 									cmd: "get_resp",
 									file: getBody.file ?? "",
@@ -184,7 +187,7 @@ export const Route = createFileRoute("/api/files/")({
 							);
 					}
 				} catch (error) {
-					console.error("Error parsing request body:", error);
+					logger.error("Error parsing request body: {}", error);
 					return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
 						status: 400,
 						headers: { "Content-Type": "application/json" },

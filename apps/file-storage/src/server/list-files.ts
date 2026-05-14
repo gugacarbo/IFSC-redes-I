@@ -1,7 +1,10 @@
+import { Logger } from "@lib/logging";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { FileType } from "#/db/schema";
 import { countFiles, listFiles } from "#/services/file-service";
+
+const logger = Logger.getLogger("ListFiles");
 
 export interface ListFilesResult {
 	files: FileType[];
@@ -38,7 +41,7 @@ export const listFilesFn = createServerFn({
 				limit,
 			};
 		} catch (error) {
-			console.error("Error listing files:\n", error);
+			logger.error("Error listing files: {}", error);
 
 			return {
 				files: [],

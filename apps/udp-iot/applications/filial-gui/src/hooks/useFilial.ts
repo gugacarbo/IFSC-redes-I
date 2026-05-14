@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DeviceInfo, ServerConfig, LogEntry } from "../types";
+import type { DeviceInfo, LogEntry, ServerConfig } from "../types";
 
 const FILIAL_GUI_PORT = import.meta.env.VITE_FILIAL_GUI_PORT || "8082";
 const API_BASE =
@@ -61,7 +61,10 @@ export function useFilial() {
 						setDevices(msg.devices);
 					} else if (msg.type === "log") {
 						setLogs((prev) => {
-							const next = [...prev, { level: msg.level, message: msg.message, ts: msg.ts }];
+							const next = [
+								...prev,
+								{ level: msg.level, message: msg.message, ts: msg.ts },
+							];
 							return next.length > 500 ? next.slice(next.length - 500) : next;
 						});
 					}

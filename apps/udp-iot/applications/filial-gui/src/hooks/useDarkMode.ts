@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function getInitialDark(): boolean {
 	if (typeof window === "undefined") return false;

@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppConfig, FilialData, LogEntry } from "../types";
 
-const WS_URL =
-	import.meta.env.VITE_MATRIZ_WS_URL ||
-	"ws://localhost:3001/ws";
-const API_URL =
-	import.meta.env.VITE_MATRIZ_API_URL ||
-	"http://localhost:3001";
+const WS_URL = import.meta.env.VITE_MATRIZ_WS_URL || "ws://localhost:3001/ws";
+const API_URL = import.meta.env.VITE_MATRIZ_API_URL || "http://localhost:3001";
 
 export function useIoT() {
 	const [filiais, setFiliais] = useState<Record<string, FilialData>>({});
@@ -87,7 +83,10 @@ export function useIoT() {
 					});
 				} else if (msg.type === "log") {
 					setLogs((prev) => {
-						const next = [...prev, { level: msg.level, message: msg.message, ts: msg.ts }];
+						const next = [
+							...prev,
+							{ level: msg.level, message: msg.message, ts: msg.ts },
+						];
 						return next.length > 500 ? next.slice(next.length - 500) : next;
 					});
 				}
@@ -164,5 +163,13 @@ export function useIoT() {
 		[],
 	);
 
-	return { filiais, connected, config, logs, updateConfig, sendCommand, clearLogs: () => setLogs([]) };
+	return {
+		filiais,
+		connected,
+		config,
+		logs,
+		updateConfig,
+		sendCommand,
+		clearLogs: () => setLogs([]),
+	};
 }

@@ -1,6 +1,9 @@
+import { Logger } from "@lib/logging";
 import { createFileRoute } from "@tanstack/react-router";
 import type { GET_REQ, GET_RESP } from "#/@types/command";
 import { getFileByName } from "#/services/file-service";
+
+const logger = Logger.getLogger("GetAPI");
 
 export const Route = createFileRoute("/api/files/get")({
 	server: {
@@ -49,7 +52,7 @@ export const Route = createFileRoute("/api/files/get")({
 						headers: { "Content-Type": "application/json" },
 					});
 				} catch (error) {
-					console.error("Error in get API:", error);
+					logger.error("Error in get API: {}", error);
 
 					let fileName = "";
 					try {

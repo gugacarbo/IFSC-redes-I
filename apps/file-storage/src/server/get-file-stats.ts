@@ -1,7 +1,10 @@
+import { Logger } from "@lib/logging";
 import { createServerFn } from "@tanstack/react-start";
 
 import type { FileStats } from "#/services/file-service";
 import { filesStats } from "#/services/file-service";
+
+const logger = Logger.getLogger("GetFileStats");
 
 export const getFileStatsFn = createServerFn({
 	method: "GET",
@@ -11,7 +14,7 @@ export const getFileStatsFn = createServerFn({
 
 		return stats;
 	} catch (error) {
-		console.error("Error getting file stats:\n", error);
+		logger.error("Error getting file stats: {}", error);
 
 		return {
 			count: 0,

@@ -2,8 +2,8 @@ import { spawnSync } from "node:child_process";
 import type { AppInfo, ScriptOption } from "../../types.js";
 import { buildCommandForOption } from "./buildCommandForOption.js";
 import { escapePowerShellSingleQuoted } from "./escapePowerShellSingleQuoted.js";
-import { sanitizeWindowTitle } from "./sanitizeWindowTitle.js";
 import { launchInNewCmdTerminalLinux } from "./launchInNewCmdTerminalLinux.js";
+import { sanitizeWindowTitle } from "./sanitizeWindowTitle.js";
 
 export function launchInNewCmdTerminal(
 	app: AppInfo,

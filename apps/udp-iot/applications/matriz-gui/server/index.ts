@@ -1,11 +1,14 @@
+import dgram from "node:dgram";
+import fs from "node:fs";
+import http from "node:http";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { Logger } from "@lib/logging";
 import cors from "cors";
-import dgram from "dgram";
 import express from "express";
-import fs from "fs";
-import http from "http";
-import path from "path";
-import { fileURLToPath } from "url";
 import { WebSocket, WebSocketServer } from "ws";
+
+const logger = Logger.getLogger("MatrizServer");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.MATRIZ_PORT || "3001", 10);
@@ -72,7 +75,8 @@ udpSocket.on("message", (msg, rinfo) => {
 function sendUdp(targetIp: string, targetPort: number, payload: object) {
 	const buf = Buffer.from(JSON.stringify(payload));
 	udpSocket.send(buf, targetPort, targetIp, (err) => {
-		if (err) console.error(`UDP send error to ${targetIp}:${targetPort}`, err);
+		if (err)
+			logger.error("UDP send error to {}:{} {}", targetIp, targetPort, err);
 	});
 }
 
@@ -166,15 +170,10 @@ wss.on("connection", (ws) => {
 // ── Start ───────────────────────────────────────────────────
 currentConfig = loadConfig();
 udpSocket.bind(0, () => {
-		logger.info("UDP socket bound to dynamic port {}", udpSocket.address().port);
+	logger.info("UDP socket bound to dynamic port {}", udpSocket.address().port);
 	startPolling();
 });
 server.listen(PORT, () => {
-		logger.info("Matriz server listening on http://localhost:{}", PORT);
-		logger.info("WebSocket on ws://localhost:{}/ws", PORT);
+	logger.info("Matriz server listening on http://localhost:{}", PORT);
+	logger.info("WebSocket on ws://localhost:{}/ws", PORT);
 });
-import { Logger } from "@lib/logging";
-
-const logger = Logger.getLogger("MatrizServer");
-
-		if (err) logger.error("UDP send error to {}:{} {}", targetIp, targetPort, err);

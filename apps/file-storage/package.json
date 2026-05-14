@@ -21,8 +21,9 @@
     "db:studio": "drizzle-kit studio",
     "postinstall": "npm run db:migrate"
   },
-  "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
+	"dependencies": {
+		"@lib/logging": "*",
+		"@hookform/resolvers": "^5.2.2",
     "@t3-oss/env-core": "^0.13.11",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/react-devtools": "^0.10.3",

@@ -1,16 +1,16 @@
 {
-  "name": "@udp-iot/filial-esp32",
-  "version": "1.0.0",
-  "private": true,
-  "description": "UDP-IoT Filial - ESP32 implementation",
-  "scripts": {
-    "build": "pio run",
-    "build:release": "pio run -e release",
-    "upload": "pio run --target upload",
-    "uploadfs": "pio run --target buildfs && pio run --target uploadfs",
-    "monitor": "pio device monitor",
-    "clean": "pio run --target clean",
-    "typecheck": "pio run",
-    "lint": "pio run"
-  }
+	"name": "@udp-iot/filial-esp32",
+	"version": "1.0.0",
+	"private": true,
+	"description": "UDP-IoT Filial - ESP32 implementation",
+	"scripts": {
+		"build": "pio run",
+		"build:release": "pio run -e release",
+		"upload": "pio run --target upload",
+		"uploadfs": "pio run --target buildfs && pio run --target uploadfs",
+		"monitor": "pio device monitor",
+		"clean": "pio run --target clean",
+		"typecheck": "pio run",
+		"lint": "pio run"
+	}
 }

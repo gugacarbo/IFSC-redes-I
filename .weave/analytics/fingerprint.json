@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-05-12T22:10:57.757Z",
-  "stack": [
-    {
-      "name": "node",
-      "confidence": "high",
-      "evidence": "package.json exists"
-    },
-    {
-      "name": "npm",
-      "confidence": "high",
-      "evidence": "package-lock.json exists"
-    }
-  ],
-  "isMonorepo": true,
-  "packageManager": "npm",
-  "primaryLanguage": "javascript",
-  "os": "linux",
-  "arch": "x64",
-  "weaveVersion": "0.8.0"
+	"generatedAt": "2026-05-12T22:10:57.757Z",
+	"stack": [
+		{
+			"name": "node",
+			"confidence": "high",
+			"evidence": "package.json exists"
+		},
+		{
+			"name": "npm",
+			"confidence": "high",
+			"evidence": "package-lock.json exists"
+		}
+	],
+	"isMonorepo": true,
+	"packageManager": "npm",
+	"primaryLanguage": "javascript",
+	"os": "linux",
+	"arch": "x64",
+	"weaveVersion": "0.8.0"
 }

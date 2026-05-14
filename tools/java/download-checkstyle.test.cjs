@@ -1,8 +1,9 @@
-const { execSync } = require("child_process");
-const { existsSync, unlinkSync, statSync, readFileSync } = require("fs");
-const { resolve } = require("path");
+const { execSync } = require("node:child_process");
+const { existsSync, unlinkSync, statSync, readFileSync } = require("node:fs");
+const { resolve } = require("node:path");
 
-const TEST_URL = "https://raw.githubusercontent.com/facebook/react/main/README.md";
+const TEST_URL =
+	"https://raw.githubusercontent.com/facebook/react/main/README.md";
 
 describe("download-checkstyle", () => {
 	const outputDir = __dirname;

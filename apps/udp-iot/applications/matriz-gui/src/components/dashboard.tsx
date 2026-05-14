@@ -1,15 +1,25 @@
-import { useState } from "react";
-import type { AppConfig, FilialData } from "../types";
-import { Card, CardHeader, CardTitle, CardContent } from "@udp-iot/ui/components/card";
 import { Badge } from "@udp-iot/ui/components/badge";
-import { Switch } from "@udp-iot/ui/components/switch";
-import { Slider } from "@udp-iot/ui/components/slider";
-import { Progress } from "@udp-iot/ui/components/progress";
 import { Button } from "@udp-iot/ui/components/button";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+} from "@udp-iot/ui/components/card";
 import { Input } from "@udp-iot/ui/components/input";
-import { Pencil, RotateCcw, Check, X, Power, PowerOff } from "lucide-react";
+import { Progress } from "@udp-iot/ui/components/progress";
+import { Slider } from "@udp-iot/ui/components/slider";
+import { Switch } from "@udp-iot/ui/components/switch";
+import { Check, Pencil, Power, PowerOff, RotateCcw, X } from "lucide-react";
+import { useState } from "react";
 import { useDeviceAliases } from "../hooks/useDeviceAliases";
-import { isLightDevice, isSensorDevice, resolveConfigAlias, resolveDeviceName } from "../lib/deviceNaming";
+import {
+	isLightDevice,
+	isSensorDevice,
+	resolveConfigAlias,
+	resolveDeviceName,
+} from "../lib/deviceNaming";
+import type { AppConfig, FilialData } from "../types";
 
 export function Dashboard({
 	filiais,
@@ -64,7 +74,9 @@ export function Dashboard({
 							<div className="flex justify-between items-start gap-3">
 								<div>
 									<CardTitle className="text-xl">{filial.name}</CardTitle>
-									<span className="text-xs text-muted-foreground font-mono tracking-wide">{filial.ip}</span>
+									<span className="text-xs text-muted-foreground font-mono tracking-wide">
+										{filial.ip}
+									</span>
 								</div>
 								<Badge variant={isOffline ? "destructive" : "outline"}>
 									{isOffline ? "Offline" : "Online"}
@@ -93,7 +105,11 @@ export function Dashboard({
 										config?.deviceAliasesByIp,
 										config?.deviceAliases,
 									);
-									const displayName = resolveDeviceName(dev, uiAlias, configAlias);
+									const displayName = resolveDeviceName(
+										dev,
+										uiAlias,
+										configAlias,
+									);
 									const editing = editingKey === editKey;
 
 									return (
@@ -111,18 +127,30 @@ export function Dashboard({
 															autoFocus
 														/>
 													) : (
-														<p className="text-sm font-semibold truncate">{displayName}</p>
+														<p className="text-sm font-semibold truncate">
+															{displayName}
+														</p>
 													)}
-													<p className="text-[11px] font-mono text-muted-foreground truncate">{dev}</p>
+													<p className="text-[11px] font-mono text-muted-foreground truncate">
+														{dev}
+													</p>
 												</div>
 
 												<div className="flex items-center gap-1">
 													{editing ? (
 														<>
-															<Button size="icon" variant="ghost" onClick={() => saveEdit(filial.ip, dev)}>
+															<Button
+																size="icon"
+																variant="ghost"
+																onClick={() => saveEdit(filial.ip, dev)}
+															>
 																<Check className="h-4 w-4" />
 															</Button>
-															<Button size="icon" variant="ghost" onClick={cancelEdit}>
+															<Button
+																size="icon"
+																variant="ghost"
+																onClick={cancelEdit}
+															>
 																<X className="h-4 w-4" />
 															</Button>
 														</>
@@ -131,7 +159,9 @@ export function Dashboard({
 															<Button
 																size="icon"
 																variant="ghost"
-																onClick={() => beginEdit(filial.ip, dev, displayName)}
+																onClick={() =>
+																	beginEdit(filial.ip, dev, displayName)
+																}
 															>
 																<Pencil className="h-4 w-4" />
 															</Button>
@@ -152,7 +182,9 @@ export function Dashboard({
 													<div className="flex items-center gap-2">
 														<div
 															className={`h-2.5 w-2.5 rounded-full ${
-																sensorValue > 0 ? "bg-emerald-500" : "bg-zinc-400"
+																sensorValue > 0
+																	? "bg-emerald-500"
+																	: "bg-zinc-400"
 															}`}
 														/>
 														<span
@@ -162,11 +194,17 @@ export function Dashboard({
 																	: "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
 															}`}
 														>
-															{sensorValue > 0 ? <Power className="h-3 w-3" /> : <PowerOff className="h-3 w-3" />}
+															{sensorValue > 0 ? (
+																<Power className="h-3 w-3" />
+															) : (
+																<PowerOff className="h-3 w-3" />
+															)}
 															{sensorValue > 0 ? "Ligado" : "Desligado"}
 														</span>
 													</div>
-													<span className="text-xs font-mono text-muted-foreground tabular-nums">{sensorValue}</span>
+													<span className="text-xs font-mono text-muted-foreground tabular-nums">
+														{sensorValue}
+													</span>
 												</div>
 											) : isLight ? (
 												<Switch
@@ -175,7 +213,10 @@ export function Dashboard({
 												/>
 											) : isSensor ? (
 												<div className="flex items-center gap-3">
-													<Progress value={((val as number) || 0) / 10.23} className="h-2.5 flex-1" />
+													<Progress
+														value={((val as number) || 0) / 10.23}
+														className="h-2.5 flex-1"
+													/>
 													<span className="text-xs font-mono text-muted-foreground w-12 text-right tabular-nums">
 														{val ?? 0}
 													</span>
@@ -184,7 +225,9 @@ export function Dashboard({
 												<div className="flex items-center gap-3">
 													<Slider
 														value={[(val as number) || 0]}
-														onValueChange={([v]) => onCommand(filial.ip, dev, v)}
+														onValueChange={([v]) =>
+															onCommand(filial.ip, dev, v)
+														}
 														min={0}
 														max={1023}
 														className="flex-1"

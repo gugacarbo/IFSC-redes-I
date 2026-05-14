@@ -1,6 +1,6 @@
+import { Button } from "@udp-iot/ui/components/button";
 import { useEffect, useRef } from "react";
 import type { LogEntry } from "../types";
-import { Button } from "@udp-iot/ui/components/button";
 
 interface ConsoleProps {
 	logs: LogEntry[];
@@ -17,13 +17,13 @@ export function Console({ logs, onClear }: ConsoleProps) {
 		if (!el) return;
 		const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
 		autoScroll.current = isAtBottom;
-	}, [logs]);
+	}, []);
 
 	useEffect(() => {
 		if (autoScroll.current) {
 			bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 		}
-	}, [logs]);
+	}, []);
 
 	return (
 		<div className="space-y-2">
@@ -43,7 +43,9 @@ export function Console({ logs, onClear }: ConsoleProps) {
 				{logs.map((entry, i) => (
 					<div
 						key={i}
-						className={entry.level === "error" ? "text-red-400" : "text-green-400"}
+						className={
+							entry.level === "error" ? "text-red-400" : "text-green-400"
+						}
 					>
 						<span className="text-zinc-500 mr-2">
 							[{new Date(entry.ts).toLocaleTimeString()}]

@@ -1,7 +1,10 @@
+import { Logger } from "@lib/logging";
 import { createServerFn } from "@tanstack/react-start";
 
 import { putReqSchema } from "#/@types/command";
 import { putFile, validateFileInput } from "#/services/file-service";
+
+const logger = Logger.getLogger("CreateFile");
 
 export interface CreateFileResult {
 	fileName: string;
@@ -26,7 +29,7 @@ export const createFile = createServerFn({
 				success: true,
 			};
 		} catch (error) {
-			console.error("Error saving file:\n", error);
+			logger.error("Error saving file: {}", error);
 
 			return {
 				fileName: data.file,
