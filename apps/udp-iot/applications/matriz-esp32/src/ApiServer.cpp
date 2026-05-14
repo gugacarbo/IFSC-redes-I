@@ -1,7 +1,10 @@
 #include "ApiServer.h"
 #include "ConfigManager.h"
 #include "LogCapture.h"
+#include "BridgeManager.h"
 #include <LittleFS.h>
+
+extern BridgeManager* g_bridgeManager;  // Set in main.cpp
 
 void ApiServer::setupRoutes() {
 	server.on("/api/config", HTTP_OPTIONS, [](AsyncWebServerRequest *request){
@@ -28,6 +31,8 @@ void ApiServer::setupRoutes() {
 
 			AsyncWebServerResponse *resp;
 			if (ConfigManager::saveConfig(body)) {
+				// Reset poll timer so new polling_ms takes effect immediately
+				if (g_bridgeManager) g_bridgeManager->resetPollTimer();
 				resp = request->beginResponse(200, "application/json", "{\"status\":\"ok\"}");
 			} else {
 				resp = request->beginResponse(400, "application/json", "{\"error\":\"Invalid format\"}");

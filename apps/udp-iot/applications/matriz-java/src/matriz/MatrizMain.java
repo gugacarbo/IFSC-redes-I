@@ -69,10 +69,14 @@ public class MatrizMain {
         // 4. Create FilialStateTracker (internal state, independent of GUI)
         FilialStateTracker stateTracker = new FilialStateTracker();
 
-        // 5. Create API handler
-        ApiHandler apiHandler = new ApiHandler(configManager, stateTracker, logCapture);
+        // 5. Create PollingManager (before ApiHandler so we can inject it)
+        PollingManager pollingManager = new PollingManager(configManager, udpClient,
+            bridgeManager, stateTracker);
 
-        // 6. Start HTTP + WebSocket server
+        // 6. Create API handler (needs pollingManager to restart on config changes)
+        ApiHandler apiHandler = new ApiHandler(configManager, stateTracker, logCapture, pollingManager);
+
+        // 7. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, bridgeManager, apiHandler);
         if (!appServer.start()) {
             System.err.println("FATAL: Could not start HTTP/WS server on port " + httpPort);
@@ -84,12 +88,10 @@ public class MatrizMain {
         System.out.println("  WebSocket: ws://localhost:" + httpPort + "/ws");
         System.out.println("  Health:   http://localhost:" + httpPort + "/health");
 
-        // 7. Start polling (updates FilialStateTracker independently of GUI)
-        PollingManager pollingManager = new PollingManager(configManager, udpClient,
-            bridgeManager, stateTracker);
+        // 8. Start polling (updates FilialStateTracker independently of GUI)
         pollingManager.start();
 
-        // 7. Shutdown hook
+        // 9. Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\nShutting down...");
             pollingManager.stop();

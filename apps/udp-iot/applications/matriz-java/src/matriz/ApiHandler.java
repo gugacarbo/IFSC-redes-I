@@ -24,10 +24,14 @@ public class ApiHandler {
     private final LogCapture logCapture;
     private int lastStatusCode = 200;
 
-    public ApiHandler(ConfigManager configManager, FilialStateTracker stateTracker, LogCapture logCapture) {
+    private final PollingManager pollingManager;
+
+    public ApiHandler(ConfigManager configManager, FilialStateTracker stateTracker,
+                      LogCapture logCapture, PollingManager pollingManager) {
         this.configManager = configManager;
         this.stateTracker = stateTracker;
         this.logCapture = logCapture;
+        this.pollingManager = pollingManager;
     }
 
     /**
@@ -77,6 +81,8 @@ public class ApiHandler {
                 }
                 boolean ok = configManager.save(body);
                 if (ok) {
+                    // Restart polling with new config
+                    pollingManager.restart();
                     lastStatusCode = 200;
                     return "{\"status\":\"ok\"}";
                 } else {

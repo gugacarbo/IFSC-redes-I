@@ -10,22 +10,31 @@ export function launchInNewCmdTerminalLinux(
 	const scriptCommand = buildCommandForOption(app, option);
 	const terminal = detectTerminal();
 
-	const shellCommand = `cd "${app.path}" && ${scriptCommand}; echo ""; echo "Pressione ENTER para fechar..."; read`;
+	const shellCommand = `cd "${app.path}" && ${scriptCommand}; command_status=$?; echo ""; if [ $command_status -ne 0 ]; then echo "Comando finalizado com erro (exit $command_status)."; fi; printf "Pressione ENTER para fechar... "; read -r _; exit $command_status`;
+	const shellArgs = ["sh", "-c", shellCommand];
 
 	let args: string[];
 
 	switch (terminal) {
+		case "foot":
+			args = [
+				"-T",
+				`IFSC Launcher | ${app.name} | ${option.label}`,
+				"-D",
+				app.path,
+				"-H",
+				...shellArgs,
+			];
+			break;
+
 		case "gnome-terminal":
 			args = [
-				"--disable-factory",
 				"--title",
 				`IFSC Launcher | ${app.name} | ${option.label}`,
 				"--working-directory",
 				app.path,
 				"--",
-				"sh",
-				"-c",
-				shellCommand,
+				...shellArgs,
 			];
 			break;
 
@@ -35,7 +44,7 @@ export function launchInNewCmdTerminalLinux(
 				"-title",
 				`IFSC Launcher | ${app.name}`,
 				"-e",
-				shellCommand,
+				...shellArgs,
 			];
 			break;
 
@@ -47,7 +56,7 @@ export function launchInNewCmdTerminalLinux(
 				"--workdir",
 				app.path,
 				"-e",
-				shellCommand,
+				...shellArgs,
 			];
 			break;
 
@@ -60,12 +69,12 @@ export function launchInNewCmdTerminalLinux(
 				"--working-directory",
 				app.path,
 				"-e",
-				shellCommand,
+				...shellArgs,
 			];
 			break;
 
 		case "x-terminal-emulator":
-			args = ["-e", shellCommand];
+			args = ["-e", ...shellArgs];
 			break;
 
 		default:

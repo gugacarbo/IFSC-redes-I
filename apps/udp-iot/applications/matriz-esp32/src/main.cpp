@@ -11,6 +11,9 @@ const char* WIFI_PASS = "";
 ApiServer apiServer;
 BridgeManager bridge;
 
+// Global pointer so ApiServer can reset poll timer on config change
+BridgeManager* g_bridgeManager = nullptr;
+
 void connectWiFi() {
 	WiFi.begin(WIFI_SSID, WIFI_PASS);
 	while (WiFi.status() != WL_CONNECTED) {
@@ -29,6 +32,8 @@ void setup() {
 		LogCapture::setBroadcastCallback([](const char* json) {
 			bridge.broadcast(json);
 		});
+		g_bridgeManager = &bridge;
+		apiServer.setBridgeManager(g_bridgeManager);
 		apiServer.begin();
 	}
 }

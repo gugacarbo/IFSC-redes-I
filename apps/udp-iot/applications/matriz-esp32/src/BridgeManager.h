@@ -20,6 +20,8 @@ public:
 	void loop();
 	void sendUdpCommand(const String& ip, uint16_t port, const String& payload);
 	void broadcast(const char* json);
+	// Reset poll timer so changes take effect immediately
+	void resetPollTimer() { lastPollTime = 0; }
 };
 
 #endif

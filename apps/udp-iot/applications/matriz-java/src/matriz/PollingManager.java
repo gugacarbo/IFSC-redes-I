@@ -42,10 +42,16 @@ public class PollingManager {
     public PollingManager(ConfigManager configManager, UdpClient udpClient,
                           BridgeManager bridgeManager,
                           FilialStateTracker stateTracker) {
-        this.configManager = configManager;
-        this.udpClient = udpClient;
-        this.bridgeManager = bridgeManager;
-        this.stateTracker = stateTracker;
+       this.configManager = configManager;
+       this.udpClient = udpClient;
+       this.bridgeManager = bridgeManager;
+       this.stateTracker = stateTracker;
+   }
+
+    /** Restart polling with current config (call after config changes). */
+    public synchronized void restart() {
+        stop();
+        start();
     }
 
     /** Start the polling loop. */

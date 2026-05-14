@@ -1,5 +1,6 @@
 package filial;
 
+import javax.swing.*;
 import shared.Env;
 import shared.LogCapture;
 
@@ -9,43 +10,46 @@ import shared.LogCapture;
  * <p>Initialises all components:
  * <ol>
  *   <li>Loads configuration</li>
+ *   <li>Launches desktop GUI for sensor simulation</li>
  *   <li>Starts the UDP server for Matriz communication</li>
- *   <li>Creates DeviceBridge + ApiHandler for GUI WebSocket</li>
  *   <li>Starts the HTTP + WebSocket server (REST API + GUI connections)</li>
  *   <li>Blocks indefinitely</li>
  * </ol>
+ *
+ * <p>Use {@code --no-gui} to run without the desktop GUI.
  */
 public class FilialMain {
 
     private static final String DEFAULT_CONFIG = "config/config_filial.json";
+    private static final String NO_GUI_FLAG = "--no-gui";
 
     public static void main(String[] args) {
         Env.load();
 
-        String configPath = args.length > 0 ? args[0] : DEFAULT_CONFIG;
-        int envPort = Env.getInt("FILIAL_UDP_PORT", -1);
-        int envHttpPort = Env.getInt("FILIAL_HTTP_PORT", -1);
+        // Check for no-gui mode
+        boolean noGui = false;
+        for (String arg : args) {
+            if (NO_GUI_FLAG.equals(arg)) {
+                noGui = true;
+                break;
+            }
+        }
 
         System.out.println("=== Filial IoT (Java) ===");
-        System.out.println("Config: " + configPath);
-
-        // === Log stdout to GUI console ===
-        LogCapture logCapture = new LogCapture(500);
-        logCapture.install();
 
         // 1. Load config
         ConfigManager cfgMgr = new ConfigManager();
-        if (!cfgMgr.load(configPath)) {
-            System.err.println("FATAL: Could not load config from " + configPath);
+        if (!cfgMgr.load(DEFAULT_CONFIG)) {
+            System.err.println("FATAL: Could not load config from " + DEFAULT_CONFIG);
             System.exit(1);
         }
         FilialConfig cfg = cfgMgr.getConfig();
 
-        int udpPort = (envPort > 0) ? envPort : cfg.port();
-        int httpPort = (envHttpPort > 0) ? envHttpPort : cfg.httpPort();
+        int udpPort = Env.getInt("FILIAL_UDP_PORT", cfg.port());
+        int httpPort = Env.getInt("FILIAL_HTTP_PORT", cfg.httpPort());
 
-        System.out.println("UDP port: " + udpPort + (envPort > 0 ? " (via .env)" : ""));
-        System.out.println("HTTP/WS port: " + httpPort + (envHttpPort > 0 ? " (via .env)" : ""));
+        System.out.println("UDP port: " + udpPort);
+        System.out.println("HTTP/WS port: " + httpPort);
         System.out.println("Devices: " + cfg.deviceIds().size());
 
         // 2. Initialise device manager
@@ -53,12 +57,21 @@ public class FilialMain {
         devMgr.init(cfg.deviceIds());
         System.out.println("Initialised " + devMgr.count() + " devices");
 
-        // 3. Create bridge and API handler
+        // 3. Launch GUI (if not disabled)
+        if (!noGui) {
+            launchGui(devMgr);
+        }
+
+        // === Log stdout to GUI console ===
+        LogCapture logCapture = new LogCapture(500);
+        logCapture.install();
+
+        // 4. Create bridge and API handler
         DeviceBridge deviceBridge = new DeviceBridge(devMgr, cfgMgr);
         logCapture.setBroadcastListener(json -> deviceBridge.broadcast(json));
         ApiHandler apiHandler = new ApiHandler(devMgr, deviceBridge, logCapture);
 
-        // 4. Start HTTP + WebSocket server
+        // 5. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, deviceBridge, apiHandler);
         if (!appServer.start()) {
             System.err.println("FATAL: Could not start HTTP/WS server on port " + httpPort);
@@ -68,7 +81,7 @@ public class FilialMain {
         System.out.println("  WebSocket: ws://localhost:" + httpPort + "/ws");
         System.out.println("  Health:   http://localhost:" + httpPort + "/health");
 
-        // 5. Start UDP server for Matriz
+        // 6. Start UDP server for Matriz
         CommandProcessor processor = new CommandProcessor(devMgr, cfg.adminUser(), cfg.adminPass());
         UdpServer udpServer = new UdpServer(udpPort, processor);
 
@@ -80,18 +93,34 @@ public class FilialMain {
         System.out.println("Listening on UDP port " + udpPort);
         System.out.println("Ready. Press Ctrl+C to stop.");
 
-        // 6. Shutdown hook
+        // 7. Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\nShutting down...");
             appServer.stop();
             udpServer.stop();
         }));
 
-        // 7. Keep alive
+        // 8. Keep alive
         try {
             Thread.sleep(Long.MAX_VALUE);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /**
+     * Launch the desktop GUI simulation in a separate thread.
+     */
+    private static void launchGui(DeviceManager devMgr) {
+        System.out.println("Starting desktop GUI...");
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                // Use default look and feel
+            }
+            DeviceGui gui = new DeviceGui(devMgr);
+            gui.setVisible(true);
+        });
     }
 }
