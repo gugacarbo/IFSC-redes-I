@@ -43,11 +43,18 @@ export class Logger {
   }
 
   private format(template: string, args: unknown[]): string {
-    let i = 0;
-    return template.replace(/%[sdfoO]/g, () => {
-      const val = i < args.length ? args[i++] : "%";
-      return String(val ?? "");
-    });
+    const parts: string[] = [];
+    let argIdx = 0;
+    let start = 0;
+    while (true) {
+      const brace = template.indexOf("{}", start);
+      if (brace === -1) break;
+      parts.push(template.slice(start, brace));
+      parts.push(argIdx < args.length ? String(args[argIdx++] ?? "") : "{}");
+      start = brace + 2;
+    }
+    parts.push(template.slice(start));
+    return parts.join("");
   }
 
   debug(message: string, ...args: unknown[]): void {
