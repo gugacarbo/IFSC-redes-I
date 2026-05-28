@@ -20,7 +20,7 @@ export function AppsScreen({ apps, selectedIndex }: AppsScreenProps) {
       </Text>
       <Box marginTop={1} flexDirection="column">
         <List
-          items={apps.map((app) => ({ label: app.name }))}
+          items={apps.map((app, index) => ({ label: app.name, isSelected: index === selectedIndex }))}
           getItemKey={(app) => app.label}
         />
       </Box>

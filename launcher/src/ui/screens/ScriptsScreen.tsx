@@ -19,7 +19,7 @@ export function ScriptsScreen({ appName, scriptOptions, selectedIndex }: Scripts
 			</Text>
 			<Box marginTop={1} flexDirection="column">
 				<List
-					items={scriptOptions.map((opt) => ({ label: opt.label }))}
+					items={scriptOptions.map((opt, index) => ({ label: opt.label, isSelected: index === selectedIndex }))}
 					getItemKey={(opt) => opt.label}
 				/>
 			</Box>

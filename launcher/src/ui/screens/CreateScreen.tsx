@@ -25,7 +25,7 @@ export function CreateScreen({
       <Text dimColor>Linguagem:</Text>
       <Box marginTop={1} flexDirection="column">
         <List
-          items={languageTemplates.map((t) => ({ label: `${t.label} - ${t.description}` }))}
+          items={languageTemplates.map((t, index) => ({ label: `${t.label} - ${t.description}`, isSelected: index === selectedLanguageIndex }))}
           getItemKey={(t) => t.label}
         />
       </Box>
