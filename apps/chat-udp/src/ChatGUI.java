@@ -3,6 +3,8 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 
+import lib.logging.Logger;
+
 /**
  * Main application window for the UDP Multicast Chat.
  * <p>
@@ -11,6 +13,8 @@ import javax.swing.text.DefaultCaret;
  */
 @SuppressWarnings("serial")
 public class ChatGUI extends JFrame {
+
+    private static final Logger logger = Logger.getLogger(ChatGUI.class);
 
     private final ConnectionPanel connPanel = new ConnectionPanel();
 
@@ -113,23 +117,29 @@ public class ChatGUI extends JFrame {
             return;
         }
 
+        logger.info("Solicitando conexão ao grupo {}:{} como {}", group, port, username);
+
         try {
             chatManager.joinGroup(group, port, username);
             currentGroup = group;
             currentPort = port;
             connPanel.setConnected(true);
             updateSendEnabled(true);
+            logger.info("Conexão estabelecida com sucesso");
             appendMessage(">>> Entrou no grupo " + group + ":" + port
                     + " como " + username);
         } catch (IOException e) {
+            logger.error("Falha ao conectar: {}", e.getMessage());
             showError("Erro ao entrar no grupo: " + e.getMessage());
         }
     }
 
     private void doDisconnect() {
+        logger.info("Solicitando desconexão");
         chatManager.leaveGroup();
         connPanel.setConnected(false);
         updateSendEnabled(false);
+        logger.info("Desconexão concluída");
         appendMessage(">>> Desconectou do grupo " + currentGroup + ":" + currentPort);
     }
 
@@ -142,6 +152,7 @@ public class ChatGUI extends JFrame {
             chatManager.sendMessage(msg);
             txtMessage.setText("");
         } catch (IOException e) {
+            logger.error("Falha ao enviar mensagem: {}", e.getMessage());
             showError("Erro ao enviar: " + e.getMessage());
         }
     }

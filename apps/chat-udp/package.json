@@ -4,11 +4,11 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"build": "javac -d dist src/*.java",
+		"build": "javac -d dist -sourcepath src;../../packages/logging/java/src src/*.java",
 		"dev": "java -cp dist Main",
 		"test": "echo 'Testes: pendentes'",
-		"lint": "javac -Xlint -d dist src/*.java",
-		"typecheck": "javac -Xlint -d dist src/*.java",
+		"lint": "javac -Xlint -d dist -sourcepath src;../../packages/logging/java/src src/*.java",
+		"typecheck": "javac -Xlint -d dist -sourcepath src;../../packages/logging/java/src src/*.java",
 		"format": "node ../../tools/java/checkstyle-runner.cjs src/*.java",
 		"clean": "if exist dist rmdir /s /q dist"
 	}

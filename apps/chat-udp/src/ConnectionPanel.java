@@ -103,7 +103,7 @@ public class ConnectionPanel extends JPanel {
                 btnToggle.setBackground(ROSE_500);
                 btnToggle.setForeground(Color.WHITE);
             } else {
-                btnToggle.setText("Conectar");
+                btnToggle.setText("Conectado");
                 btnToggle.setBackground(EMERALD_500);
                 btnToggle.setForeground(Color.BLACK);
             }

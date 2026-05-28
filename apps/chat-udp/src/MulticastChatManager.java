@@ -8,11 +8,15 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
+import lib.logging.Logger;
+
 /**
  * Manages a multicast UDP chat session: join/leave group,
  * send/receive messages.
  */
 public class MulticastChatManager {
+
+    private static final Logger logger = Logger.getLogger(MulticastChatManager.class);
 
     private MulticastSocket socket;
     private InetAddress groupAddress;
@@ -34,18 +38,27 @@ public class MulticastChatManager {
         this.port = port;
         this.username = username;
 
-        socket = new MulticastSocket(port);
-        socket.setReuseAddress(true);
-        groupAddress = InetAddress.getByName(groupIp);
+        logger.info("Tentando conectar ao grupo {}:{}", groupIp, port);
 
-        NetworkInterface netIf = findMulticastInterface();
-        InetSocketAddress groupSockAddr = new InetSocketAddress(groupAddress, port);
-        socket.joinGroup(groupSockAddr, netIf);
+        try {
+            socket = new MulticastSocket(port);
+            socket.setReuseAddress(true);
+            groupAddress = InetAddress.getByName(groupIp);
 
-        running = true;
-        receiverThread = new Thread(this::receiveLoop, "udp-receiver");
-        receiverThread.setDaemon(true);
-        receiverThread.start();
+            NetworkInterface netIf = findMulticastInterface();
+            InetSocketAddress groupSockAddr = new InetSocketAddress(groupAddress, port);
+            socket.joinGroup(groupSockAddr, netIf);
+
+            logger.info("Conectado com sucesso ao grupo {}:{} como {}", groupIp, port, username);
+
+            running = true;
+            receiverThread = new Thread(this::receiveLoop, "udp-receiver");
+            receiverThread.setDaemon(true);
+            receiverThread.start();
+        } catch (IOException e) {
+            logger.error("Falha ao conectar ao grupo {}:{}: {}", groupIp, port, e.getMessage());
+            throw e;
+        }
     }
 
     /** Leave the current multicast group and close the socket. */
@@ -53,13 +66,16 @@ public class MulticastChatManager {
         running = false;
 
         if (socket != null) {
+            logger.info("Desconectando do grupo {}:{}", groupAddress, port);
             try {
                 if (groupAddress != null) {
                     NetworkInterface netIf = findMulticastInterface();
                     InetSocketAddress groupSockAddr = new InetSocketAddress(groupAddress, port);
                     socket.leaveGroup(groupSockAddr, netIf);
                 }
-            } catch (IOException ignored) {
+                logger.info("Desconectado com sucesso do grupo {}:{}", groupAddress, port);
+            } catch (IOException e) {
+                logger.warn("Erro ao sair do grupo (ignorado): {}", e.getMessage());
             }
             socket.close();
             socket = null;
@@ -85,6 +101,8 @@ public class MulticastChatManager {
         DatagramPacket packet = new DatagramPacket(buf, buf.length, groupAddress, port);
         socket.send(packet);
 
+        logger.info("Mensagem enviada para {}:{}", groupAddress, port);
+
         // display own message immediately
         gui.appendMessage(jsonToDisplay(json));
     }
@@ -101,6 +119,8 @@ public class MulticastChatManager {
     private void receiveLoop() {
         byte[] buffer = new byte[65535];
 
+        logger.info("Loop de recebimento iniciado");
+
         while (running && socket != null && !socket.isClosed()) {
             try {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -115,18 +135,24 @@ public class MulticastChatManager {
                     continue;
                 }
 
+                logger.debug("Mensagem recebida de {}", sender);
+
                 gui.appendMessage(jsonToDisplay(json));
 
             } catch (SocketException e) {
                 if (!running)
                     break; // socket closed on purpose
+                logger.error("Erro de rede: {}", e.getMessage());
                 gui.appendMessage("*** Erro de rede: " + e.getMessage());
             } catch (IOException e) {
                 if (running) {
+                    logger.error("Erro ao receber mensagem: {}", e.getMessage());
                     gui.appendMessage("*** Erro ao receber: " + e.getMessage());
                 }
             }
         }
+
+        logger.info("Loop de recebimento encerrado");
     }
 
     /** Parse a JSON payload and return the formatted display string. */

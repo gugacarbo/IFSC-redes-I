@@ -150,4 +150,4 @@ tools/java/*.jar
 
 .weave/runtime
 
-,launcher
+.launcher
