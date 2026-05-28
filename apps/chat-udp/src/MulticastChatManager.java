@@ -132,10 +132,14 @@ public class MulticastChatManager {
                 String sender = JsonHelper.extractValue(json, "username");
                 // skip messages sent by ourselves
                 if (sender.isEmpty() || sender.equals(username)) {
+                    logger.debug("Mensagem ignorada (própria ou remetente vazio)");
                     continue;
                 }
 
-                logger.debug("Mensagem recebida de {}", sender);
+                String message = JsonHelper.extractValue(json, "message");
+                String date = JsonHelper.extractValue(json, "date");
+                String time = JsonHelper.extractValue(json, "time");
+                logger.info("Mensagem recebida de {} em {} {}: {}", sender, date, time, message);
 
                 gui.appendMessage(jsonToDisplay(json));
 

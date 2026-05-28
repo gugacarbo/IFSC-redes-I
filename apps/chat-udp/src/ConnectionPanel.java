@@ -17,7 +17,7 @@ public class ConnectionPanel extends JPanel {
     private static final int   ARC         = 16;
 
     private final JTextField txtUsername = new JTextField(12);
-    private final JTextField txtGroup    = new JTextField("230.0.0.0", 12);
+    private final JTextField txtGroup    = new JTextField("230.0.0.12", 12);
     private final JTextField txtPort     = new JTextField("4446", 6);
 
     private final JButton btnToggle;

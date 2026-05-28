@@ -1,9 +1,9 @@
 // launcher/src/ui/screens/AppsScreen.tsx
-import { Box, Spacer, Text } from "ink";
+import { Text } from "ink";
 import type { AppInfo } from "../../types.js";
-import { Header } from "../components/Header.js";
-import { Footer } from "../components/Footer.js";
+import { Layout } from "../components/Layout.js";
 import { List } from "../components/List.js";
+import { useLauncherContext } from "../context/LauncherContext.js";
 
 interface AppsScreenProps {
   apps: AppInfo[];
@@ -11,22 +11,24 @@ interface AppsScreenProps {
 }
 
 export function AppsScreen({ apps, selectedIndex }: AppsScreenProps) {
+  const { repoDisplayName } = useLauncherContext();
   return (
-    <Box flexDirection="column" padding={1} width="100%" height="100%">
-      <Header title="IFSC Estrutura de Dados - Launcher" />
-      <Spacer />
-      <Text dimColor>
-        Selecione um app (Enter), n para novo app, d para docs, t para terminais, q/Esc/Ctrl+C para sair.
-      </Text>
-      <Box marginTop={1} flexDirection="column">
-        <List
-          items={apps.map((app, index) => ({ label: app.name, isSelected: index === selectedIndex }))}
-          getItemKey={(app) => app.label}
-        />
-      </Box>
-      <Spacer />
-      <Text dimColor>{apps[selectedIndex]?.description ?? "Sem descricao"}</Text>
-      <Footer instructions="Cada script abre em uma nova janela de terminal com monitoramento." />
-    </Box>
+    <Layout
+      title={repoDisplayName}
+      activeMenus={{ Enter: true, n: true, d: true, t: true, "q/Esc": true }}
+      footer={
+        <Text dimColor>
+          {apps[selectedIndex]?.description ?? "Sem descricao"}
+        </Text>
+      }
+    >
+      <List
+        items={apps.map((app, index) => ({
+          label: app.name,
+          isSelected: index === selectedIndex,
+        }))}
+        getItemKey={(app) => app.label}
+      />
+    </Layout>
   );
 }

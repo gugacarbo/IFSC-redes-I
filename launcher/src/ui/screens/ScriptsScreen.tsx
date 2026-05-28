@@ -1,6 +1,5 @@
-import { Box, Spacer, Text } from "ink";
 import type { ScriptOption } from "../../types.js";
-import { Header } from "../components/Header.js";
+import { Layout } from "../components/Layout.js";
 import { List } from "../components/List.js";
 
 interface ScriptsScreenProps {
@@ -11,18 +10,17 @@ interface ScriptsScreenProps {
 
 export function ScriptsScreen({ appName, scriptOptions, selectedIndex }: ScriptsScreenProps) {
 	return (
-		<Box flexDirection="column" padding={1} width="100%" height="100%">
-			<Header title={appName} subtitle="selecione um script" />
-			<Spacer />
-			<Text dimColor>
-				{appName}: selecione um script (Enter), d para docs, Esc para voltar, t para terminais, n para novo app.
-			</Text>
-			<Box marginTop={1} flexDirection="column">
-				<List
-					items={scriptOptions.map((opt, index) => ({ label: opt.label, isSelected: index === selectedIndex }))}
-					getItemKey={(opt) => opt.label}
-				/>
-			</Box>
-		</Box>
+		<Layout
+			title={appName}
+			activeMenus={{ Enter: true, d: true, n: true, t: true, Esc: true }}
+		>
+			<List
+				items={scriptOptions.map((opt, index) => ({
+					label: opt.label,
+					isSelected: index === selectedIndex,
+				}))}
+				getItemKey={(opt) => opt.label}
+			/>
+		</Layout>
 	);
 }

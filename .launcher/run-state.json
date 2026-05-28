@@ -1,21 +1,4 @@
 {
 	"version": 1,
-	"runs": [
-		{
-			"id": "1779977186105-8amscz",
-			"appName": "chat-udp",
-			"scriptLabel": "start (build + run no terminal atual)",
-			"pid": 18340,
-			"isRunning": true,
-			"status": "Terminal aberto (PID 18340)."
-		},
-		{
-			"id": "1779977193994-aijb6n",
-			"appName": "chat-udp",
-			"scriptLabel": "dev",
-			"pid": 8356,
-			"isRunning": true,
-			"status": "Terminal aberto (PID 8356)."
-		}
-	]
+	"runs": []
 }

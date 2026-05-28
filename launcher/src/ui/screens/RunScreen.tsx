@@ -1,6 +1,6 @@
-import { Box, Spacer, Text } from "ink";
+import { Box, Text } from "ink";
 import type { RunViewState } from "../context/LauncherContext.js";
-import { Header } from "../components/Header.js";
+import { Layout } from "../components/Layout.js";
 import { List } from "../components/List.js";
 
 interface RunScreenProps {
@@ -17,17 +17,23 @@ export function RunScreen({
 	finishedCount,
 }: RunScreenProps) {
 	return (
-		<Box flexDirection="column" padding={1} width="100%" height="100%">
-			<Header title="Terminais Externos" />
-			<Spacer />
-			<Text dimColor>
-				Executando: {runningCount} | Finalizados: {finishedCount} | Total:{" "}
-				{runViews.length}
-			</Text>
-			<Text dimColor>
-				(Setas: selecionar | k: fecha selecionado | x: fecha todos | c: limpa
-				| n: novo app | Esc/b: voltar)
-			</Text>
+		<Layout
+			title="Terminais Externos"
+			activeMenus={{
+				Setas: true,
+				k: true,
+				x: true,
+				c: true,
+				n: true,
+				"Esc/b": true,
+			}}
+			footer={
+				<Text dimColor>
+					Executando: {runningCount} | Finalizados: {finishedCount} | Total:{" "}
+					{runViews.length}
+				</Text>
+			}
+		>
 			{runViews.length === 0 ? (
 				<Text dimColor>Nenhum terminal iniciado ainda.</Text>
 			) : (
@@ -41,6 +47,6 @@ export function RunScreen({
 					/>
 				</Box>
 			)}
-		</Box>
+		</Layout>
 	);
 }

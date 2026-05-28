@@ -2,6 +2,20 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import type { AppInfo, ScriptOption } from "../types.js";
 
+function kebabToTitleCase(str: string): string {
+	return str
+		.split("-")
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+		.join(" ");
+}
+
+export function getMonorepoDisplayName(repoRoot: string): string {
+	const pkgPath = join(repoRoot, "package.json");
+	const raw = readFileSync(pkgPath, "utf-8");
+	const pkg = JSON.parse(raw) as { name?: string };
+	return kebabToTitleCase(pkg.name ?? "ifsc-redes-i");
+}
+
 function findRepoRoot(fromDir: string): string {
 	let current = resolve(fromDir);
 

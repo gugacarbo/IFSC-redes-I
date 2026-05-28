@@ -1,6 +1,6 @@
-import { Box, Spacer, Text } from "ink";
+import { Box, Text } from "ink";
 import type { LanguageTemplate } from "../../services/appCreator/types.js";
-import { Header } from "../components/Header.js";
+import { Layout } from "../components/Layout.js";
 import { List } from "../components/List.js";
 
 interface CreateScreenProps {
@@ -15,20 +15,21 @@ export function CreateScreen({
   selectedLanguageIndex,
 }: CreateScreenProps) {
   return (
-    <Box flexDirection="column" padding={1} width="100%" height="100%">
-      <Header title="Criar App" />
-      <Spacer />
-      <Text dimColor>
-        Criar app: digite o nome, use setas para linguagem e Enter para criar. Esc cancela.
-      </Text>
+    <Layout
+      title="Criar App"
+      activeMenus={{ Setas: true, Enter: true, Esc: true }}
+    >
       <Text color="green">Nome: {appName || "_"}</Text>
       <Text dimColor>Linguagem:</Text>
       <Box marginTop={1} flexDirection="column">
         <List
-          items={languageTemplates.map((t, index) => ({ label: `${t.label} - ${t.description}`, isSelected: index === selectedLanguageIndex }))}
+          items={languageTemplates.map((t, index) => ({
+            label: `${t.label} - ${t.description}`,
+            isSelected: index === selectedLanguageIndex,
+          }))}
           getItemKey={(t) => t.label}
         />
       </Box>
-    </Box>
+    </Layout>
   );
 }

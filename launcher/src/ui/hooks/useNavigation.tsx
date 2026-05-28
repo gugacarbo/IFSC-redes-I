@@ -25,7 +25,9 @@ export function useNavigation() {
 		setSelectedLanguageIndex,
 		languageTemplates,
 		isExitConfirmOpen,
+		setIsExitConfirmOpen,
 		requestExitConfirmation,
+		confirmExit,
 		openDocs,
 		startExternalTerminal,
 		stopSelectedRun,
@@ -40,9 +42,11 @@ export function useNavigation() {
 		(input, key) => {
 			if (isExitConfirmOpen) {
 				if (key.return || input === "y" || input === "s") {
+					confirmExit();
 					return;
 				}
 				if (key.escape || input === "n") {
+					setIsExitConfirmOpen(false);
 					return;
 				}
 				return;

@@ -8,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { getScriptOptions } from "../../data/apps.js";
+import { getMonorepoDisplayName, getScriptOptions } from "../../data/apps.js";
 import { LANGUAGE_TEMPLATES } from "../../services/appCreator/languages.js";
 import type { LanguageTemplate } from "../../services/appCreator/types.js";
 import { isProcessAlive } from "../../services/process/isProcessAlive.js";
@@ -58,6 +58,7 @@ export interface LauncherContextValue {
 	setSelectedRunIndex: React.Dispatch<React.SetStateAction<number>>;
 	isExitConfirmOpen: boolean;
 	setIsExitConfirmOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	repoDisplayName: string;
 	apps: AppInfo[];
 	setApps: React.Dispatch<React.SetStateAction<AppInfo[]>>;
 	runningHandlesRef: React.MutableRefObject<Map<string, BackgroundRunHandle>>;
@@ -120,6 +121,7 @@ export function LauncherProvider({
 	const [selectedLanguageIndex, setSelectedLanguageIndex] = useState<number>(0);
 	const runningHandlesRef = useRef<Map<string, BackgroundRunHandle>>(new Map());
 	const languageTemplates = LANGUAGE_TEMPLATES;
+	const repoDisplayName = getMonorepoDisplayName(repoRoot);
 
 	const selectedApp = appsState[selectedAppIndex];
 	const scriptOptions = getScriptOptions(selectedApp);
@@ -260,6 +262,7 @@ export function LauncherProvider({
 			setSelectedRunIndex,
 			isExitConfirmOpen,
 			setIsExitConfirmOpen,
+			repoDisplayName,
 			apps: appsState,
 			setApps,
 			runningHandlesRef,
@@ -291,6 +294,7 @@ export function LauncherProvider({
 			runViews,
 			selectedRunIndex,
 			isExitConfirmOpen,
+			repoDisplayName,
 			appsState,
 			createAppName,
 			selectedLanguageIndex,
