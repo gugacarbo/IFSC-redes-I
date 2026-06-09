@@ -2,9 +2,8 @@
  * Humanizes a raw ESP32 device ID into a readable name.
  *
  * Strategy:
- * - light: "LED da Sala" for "living_room_light_1"
- * - fan: "Ventilador" for "bedroom_fan"
- * - sensor: "Sensor de Temperatura" for "garage_temp_sensor"
+ * - light: "Light" for "light", "Sensor de Temp" for "temp"
+ * - Room suffix appended when recognized (e.g. "Light — Sala")
  */
 export function humanizeDeviceId(id: string): string {
 	if (!id || typeof id !== "string") return "";
@@ -22,36 +21,19 @@ export function humanizeDeviceId(id: string): string {
 		backyard: "Quintal",
 	};
 
-	const typeMap: Record<string, string> = {
-		light: "LED",
-		fan: "Ventilador",
-		lamp: "Lampada",
-		bulb: "Lampada",
-		motor: "Motor",
-		pump: "Bomba",
-		valve: "Valvula",
-		switch: "Interruptor",
-		relay: "Rele",
-		led: "LED",
-		strip: "Fita",
-	};
+	function toNormalCase(s: string): string {
+		return s.charAt(0).toUpperCase() + s.slice(1);
+	}
 
-	const sensorMap: Record<string, string> = {
-		temp: "Temperatura",
-		temperature: "Temperatura",
-		humidity: "Umidade",
-		hum: "Umidade",
-		motion: "Presenca",
-		pir: "Presenca",
-		gas: "Gas",
-		smoke: "Fumaca",
-		light_sensor: "Luminosidade",
-		lux: "Luminosidade",
-		door: "Porta",
-		window: "Janela",
-		water: "Agua",
-		leak: "Vazamento",
-	};
+	const typeMap: Record<string, string> = {};
+	for (const k of ["light", "fan", "lamp", "bulb", "motor", "pump", "valve", "switch", "relay", "led", "strip"]) {
+		typeMap[k] = toNormalCase(k);
+	}
+
+	const sensorMap: Record<string, string> = {};
+	for (const k of ["temp", "temperature", "humidity", "hum", "motion", "pir", "gas", "smoke", "light_sensor", "lux", "door", "window", "water", "leak"]) {
+		sensorMap[k] = toNormalCase(k);
+	}
 
 	// Split by underscore and remove numeric suffixes at end
 	const tokens = id
@@ -93,7 +75,7 @@ export function humanizeDeviceId(id: string): string {
 	}
 
 	// Fallback: capitalize each token
-	return tokens.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(" ");
+	return tokens.map((t) => toNormalCase(t)).join(" ");
 }
 
 /**

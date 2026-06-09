@@ -23,23 +23,20 @@ import java.util.Map;
 public class CommandProcessor {
 
     private final DeviceManager deviceManager;
-    private final String adminUser;
-    private final String adminPass;
+    private final ConfigManager configManager;
     private final Runnable onDevicesChanged;
 
-    public CommandProcessor(DeviceManager deviceManager, String adminUser, String adminPass) {
-        this(deviceManager, adminUser, adminPass, null);
+    public CommandProcessor(DeviceManager deviceManager, ConfigManager configManager) {
+        this(deviceManager, configManager, null);
     }
 
     public CommandProcessor(
         DeviceManager deviceManager,
-        String adminUser,
-        String adminPass,
+        ConfigManager configManager,
         Runnable onDevicesChanged
     ) {
         this.deviceManager = deviceManager;
-        this.adminUser = adminUser;
-        this.adminPass = adminPass;
+        this.configManager = configManager;
         this.onDevicesChanged = onDevicesChanged;
     }
 
@@ -66,7 +63,8 @@ public class CommandProcessor {
         }
 
         // 3. Authenticate
-        if (!user.equals(adminUser) || !pass.equals(adminPass)) {
+        FilialConfig cfg = configManager.getConfig();
+        if (!user.equals(cfg.adminUser()) || !pass.equals(cfg.adminPass())) {
             return Protocol.errorResponse(Protocol.ERR_UNAUTHORIZED).toString();
         }
 

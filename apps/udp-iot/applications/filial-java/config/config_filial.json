@@ -7,6 +7,8 @@
 		"actuator_light_sala",
 		"sensor_light_sala",
 		"actuator_ac_escritorio",
-		"sensor_ac_escritorio"
+		"sensor_ac_escritorio",
+		"actuator_light_escritorio",
+		"sensor_ac_aaa"
 	]
 }

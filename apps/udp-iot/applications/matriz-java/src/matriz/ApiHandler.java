@@ -108,7 +108,7 @@ public class ApiHandler {
         if ("GET".equals(method) || "OPTIONS".equals(method)) {
             ConfigManager.MatrizConfig cfg = configManager.getConfig();
             String health = "{\"status\":\"ok\",\"filiais\":" + cfg.filiais().size()
-                + ",\"polling_ms\":" + cfg.pollingMs() + "}";
+                + ",\"pollingMs\":" + cfg.pollingMs() + "}";
             lastStatusCode = 200;
             return health;
         }

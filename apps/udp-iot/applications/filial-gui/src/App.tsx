@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import { Config } from "./components/config";
 import { Console } from "./components/console";
 import { Dashboard } from "./components/dashboard";
@@ -7,7 +7,6 @@ import { Layout } from "./components/layout";
 import { useFilial } from "./hooks/useFilial";
 
 function App() {
-	const [activeTab, setActiveTab] = useState("dashboard");
 	const {
 		devices,
 		connected,
@@ -22,27 +21,33 @@ function App() {
 	} = useFilial();
 
 	return (
-		<Layout
-			connected={connected}
-			activeTab={activeTab}
-			onTabChange={setActiveTab}
-		>
-			{activeTab === "dashboard" && (
-				<Dashboard devices={devices} onSetDevice={setDevice} />
-			)}
-			{activeTab === "devices" && (
-				<DeviceEditor
-					devices={devices}
-					onAdd={addDevice}
-					onRemove={removeDevice}
-					onRename={updateDevice}
+		<Routes>
+			<Route element={<Layout connected={connected} />}>
+				<Route
+					index
+					element={<Dashboard devices={devices} onSetDevice={setDevice} />}
 				/>
-			)}
-			{activeTab === "config" && (
-				<Config config={config} onSave={updateConfig} />
-			)}
-			{activeTab === "console" && <Console logs={logs} onClear={clearLogs} />}
-		</Layout>
+				<Route
+					path="devices"
+					element={
+						<DeviceEditor
+							devices={devices}
+							onAdd={addDevice}
+							onRemove={removeDevice}
+							onRename={updateDevice}
+						/>
+					}
+				/>
+				<Route
+					path="config"
+					element={<Config config={config} onSave={updateConfig} />}
+				/>
+				<Route
+					path="console"
+					element={<Console logs={logs} onClear={clearLogs} />}
+				/>
+			</Route>
+		</Routes>
 	);
 }
 

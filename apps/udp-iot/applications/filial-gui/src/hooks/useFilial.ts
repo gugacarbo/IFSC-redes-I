@@ -112,12 +112,14 @@ export function useFilial() {
 	}, []);
 
 	const updateConfig = useCallback(async (newConfig: ServerConfig) => {
-		await fetch(`${API_BASE}/api/config`, {
+		const res = await fetch(`${API_BASE}/api/config`, {
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(newConfig),
 		});
-		setConfig(newConfig);
+		if (res.ok) {
+			setConfig(await res.json());
+		}
 	}, []);
 
 	return {

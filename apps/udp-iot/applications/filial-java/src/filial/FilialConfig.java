@@ -17,4 +17,8 @@ public record FilialConfig(
     String adminUser,
     String adminPass,
     List<String> deviceIds
-) {}
+) {
+    public FilialConfig {
+        deviceIds = List.copyOf(deviceIds);
+    }
+}

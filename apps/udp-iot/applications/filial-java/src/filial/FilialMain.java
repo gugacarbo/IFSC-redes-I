@@ -2,8 +2,9 @@ package filial;
 
 import lib.logging.Logger;
 import javax.swing.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.function.Consumer;
-import shared.Env;
 import shared.LogCapture;
 
 /**
@@ -29,8 +30,6 @@ public class FilialMain {
     private static final String NO_GUI_FLAG = "--no-gui";
 
     public static void main(String[] args) {
-        Env.load();
-
         // Check for no-gui mode
         boolean noGui = false;
         for (String arg : args) {
@@ -50,8 +49,8 @@ public class FilialMain {
         }
         FilialConfig cfg = cfgMgr.getConfig();
 
-        int udpPort = Env.getInt("FILIAL_UDP_PORT", cfg.port());
-        int httpPort = Env.getInt("FILIAL_HTTP_PORT", cfg.httpPort());
+        int udpPort = cfg.port();
+        int httpPort = cfg.httpPort();
 
         logger.info("UDP port: {}", udpPort);
         logger.info("HTTP/WS port: {}", httpPort);
@@ -67,14 +66,14 @@ public class FilialMain {
 
         // 4. Launch GUI (if not disabled)
         if (!noGui) {
-            launchGui(devMgr, sensorId -> deviceBridge.broadcastDevicesUpdated());
+            launchGui(devMgr, sensorId -> deviceBridge.broadcastDevicesUpdated(), udpPort);
         }
 
         // 5. Log stdout to GUI console
         LogCapture logCapture = new LogCapture(500);
         logCapture.install();
         logCapture.setBroadcastListener(json -> deviceBridge.broadcast(json));
-        ApiHandler apiHandler = new ApiHandler(devMgr, deviceBridge, logCapture);
+        ApiHandler apiHandler = new ApiHandler(devMgr, deviceBridge, cfgMgr, logCapture);
 
         // 6. Start HTTP + WebSocket server
         AppServer appServer = new AppServer(httpPort, deviceBridge, apiHandler);
@@ -89,8 +88,7 @@ public class FilialMain {
         // 7. Start UDP server for Matriz
         CommandProcessor processor = new CommandProcessor(
             devMgr,
-            cfg.adminUser(),
-            cfg.adminPass(),
+            cfgMgr,
             deviceBridge::broadcastDevicesUpdated
         );
         UdpServer udpServer = new UdpServer(udpPort, processor);
@@ -121,15 +119,22 @@ public class FilialMain {
     /**
      * Launch the desktop GUI simulation in a separate thread.
      */
-    private static void launchGui(DeviceManager devMgr, Consumer<String> onSensorChanged) {
+    private static void launchGui(DeviceManager devMgr, Consumer<String> onSensorChanged, int udpPort) {
         logger.info("Starting desktop GUI...");
+        String host;
+        try {
+            host = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            host = "localhost";
+        }
+        final String resolvedHost = host;
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 // Use default look and feel
             }
-            DeviceGui gui = new DeviceGui(devMgr, onSensorChanged);
+            DeviceGui gui = new DeviceGui(devMgr, onSensorChanged, resolvedHost, udpPort);
             gui.setVisible(true);
         });
     }

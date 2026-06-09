@@ -1,32 +1,50 @@
 import { Badge } from "@udp-iot/ui/components/badge";
 import { Button } from "@udp-iot/ui/components/button";
-import { Tabs, TabsList, TabsTrigger } from "@udp-iot/ui/components/tabs";
 import { Moon, Sun } from "lucide-react";
-import type { ReactNode } from "react";
+import { NavLink, Outlet } from "react-router-dom";
 import { useDarkMode } from "../hooks/useDarkMode";
+
+const navItems = [
+	{ to: "/", label: "Dashboard" },
+	{ to: "/devices", label: "Dispositivos" },
+	{ to: "/config", label: "Configuracao" },
+	{ to: "/console", label: "Console" },
+];
 
 interface LayoutProps {
 	connected: boolean;
-	activeTab: string;
-	onTabChange: (tab: string) => void;
-	children: ReactNode;
 }
 
-export function Layout({
-	connected,
-	activeTab,
-	onTabChange,
-	children,
-}: LayoutProps) {
+export function Layout({ connected }: LayoutProps) {
 	const { isDark, toggle } = useDarkMode();
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
 			<header className="border-b px-6 py-4">
-				<div className="mx-auto flex max-w-5xl items-center justify-between">
-					<h1 className="text-xl font-heading font-semibold tracking-wider uppercase">
-						Filial IoT
-					</h1>
+				<div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+					<div className="flex items-center gap-6">
+						<h1 className="text-xl font-heading font-semibold tracking-wider uppercase">
+							Filial IoT
+						</h1>
+						<nav className="flex items-center gap-4">
+							{navItems.map((item) => (
+								<NavLink
+									key={item.to}
+									to={item.to}
+									end={item.to === "/"}
+									className={({ isActive }) =>
+										`text-sm font-medium transition-colors ${
+											isActive
+												? "text-foreground"
+												: "text-muted-foreground hover:text-foreground"
+										}`
+									}
+								>
+									{item.label}
+								</NavLink>
+							))}
+						</nav>
+					</div>
 					<div className="flex items-center gap-3">
 						<Button
 							variant="ghost"
@@ -53,21 +71,8 @@ export function Layout({
 				</div>
 			</header>
 
-			<Tabs
-				value={activeTab}
-				onValueChange={onTabChange}
-				className="mx-auto w-full max-w-5xl px-6 pt-4"
-			>
-				<TabsList variant="line">
-					<TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-					<TabsTrigger value="devices">Dispositivos</TabsTrigger>
-					<TabsTrigger value="config">Configuracao</TabsTrigger>
-					<TabsTrigger value="console">Console</TabsTrigger>
-				</TabsList>
-			</Tabs>
-
 			<main className="mx-auto w-full max-w-5xl flex-1 px-6 py-6">
-				{children}
+				<Outlet />
 			</main>
 		</div>
 	);

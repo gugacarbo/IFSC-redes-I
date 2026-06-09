@@ -31,19 +31,6 @@ export function Layout({
 						/>
 					</div>
 					<div className="flex items-center gap-3">
-						<Button
-							variant="ghost"
-							size="icon-sm"
-							onClick={toggle}
-							title={isDark ? "Modo claro" : "Modo escuro"}
-							className="text-primary-foreground hover:text-primary-foreground/80"
-						>
-							{isDark ? (
-								<Sun className="size-4" />
-							) : (
-								<Moon className="size-4" />
-							)}
-						</Button>
 						<Tabs value={currentTab} onValueChange={setTab}>
 							<TabsList
 								variant="line"
@@ -60,6 +47,19 @@ export function Layout({
 								<TabsTrigger value="console">Console</TabsTrigger>
 							</TabsList>
 						</Tabs>
+						<Button
+							variant="ghost"
+							size="icon-sm"
+							onClick={toggle}
+							title={isDark ? "Modo claro" : "Modo escuro"}
+							className="text-primary-foreground hover:text-primary-foreground/80"
+						>
+							{isDark ? (
+								<Sun className="size-4" />
+							) : (
+								<Moon className="size-4" />
+							)}
+						</Button>
 					</div>
 				</div>
 			</header>

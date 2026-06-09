@@ -28,12 +28,19 @@ public class ApiHandler {
 
     private final DeviceManager deviceManager;
     private final DeviceBridge deviceBridge;
+    private final ConfigManager configManager;
     private final LogCapture logCapture;
     private final ThreadLocal<Integer> lastStatusCode = ThreadLocal.withInitial(() -> 200);
 
-    public ApiHandler(DeviceManager deviceManager, DeviceBridge deviceBridge, LogCapture logCapture) {
+    public ApiHandler(
+        DeviceManager deviceManager,
+        DeviceBridge deviceBridge,
+        ConfigManager configManager,
+        LogCapture logCapture
+    ) {
         this.deviceManager = deviceManager;
         this.deviceBridge = deviceBridge;
+        this.configManager = configManager;
         this.logCapture = logCapture;
     }
 
@@ -119,10 +126,14 @@ public class ApiHandler {
         }
         try {
             JsonObject obj = Json.parseObject(body);
-            String id = obj.getString("id", "");
+            String id = obj.getString("id", "").trim();
             if (id.isEmpty()) {
                 lastStatusCode.set(400);
                 return jsonError(400, "Missing id");
+            }
+            if (!configManager.addDevice(id)) {
+                lastStatusCode.set(500);
+                return jsonError(500, "Could not persist device");
             }
             deviceManager.addDevice(id);
             deviceBridge.broadcastDevicesUpdated();
@@ -135,11 +146,15 @@ public class ApiHandler {
     }
 
     private String handleDeleteDevice(String deviceId) {
-        boolean removed = deviceManager.removeDevice(deviceId);
-        if (!removed) {
+        if (deviceManager.get(deviceId) == null) {
             lastStatusCode.set(404);
             return jsonError(404, "Device not found");
         }
+        if (!configManager.removeDevice(deviceId)) {
+            lastStatusCode.set(500);
+            return jsonError(500, "Could not persist device removal");
+        }
+        deviceManager.removeDevice(deviceId);
         deviceBridge.broadcastDevicesUpdated();
         lastStatusCode.set(200);
         return "{\"id\":" + Json.escape(deviceId) + ",\"removed\":true}";
@@ -152,15 +167,27 @@ public class ApiHandler {
         }
         try {
             JsonObject obj = Json.parseObject(body);
-            String newId = obj.getString("newId", "");
+            String newId = obj.getString("newId", "").trim();
             if (newId.isEmpty()) {
                 lastStatusCode.set(400);
                 return jsonError(400, "Missing newId");
             }
-            boolean updated = deviceManager.updateDevice(oldId, newId);
-            if (!updated) {
+            if (deviceManager.get(oldId) == null) {
                 lastStatusCode.set(404);
                 return jsonError(404, "Device not found");
+            }
+            if (deviceManager.get(newId) != null) {
+                lastStatusCode.set(409);
+                return jsonError(409, "Device already exists");
+            }
+            if (!configManager.renameDevice(oldId, newId)) {
+                lastStatusCode.set(500);
+                return jsonError(500, "Could not persist device rename");
+            }
+            boolean updated = deviceManager.updateDevice(oldId, newId);
+            if (!updated) {
+                lastStatusCode.set(500);
+                return jsonError(500, "Could not update runtime device");
             }
             deviceBridge.broadcastDevicesUpdated();
             lastStatusCode.set(200);
@@ -175,17 +202,61 @@ public class ApiHandler {
 
     private String handleGetConfig() {
         lastStatusCode.set(200);
+        FilialConfig current = configManager.getConfig();
         JsonObject cfg = new JsonObject();
-        cfg.put("port", 0);
-        cfg.put("adminUser", "admin");
-        cfg.put("adminPass", "admin");
+        cfg.put("port", current.port());
+        cfg.put("httpPort", current.httpPort());
+        cfg.put("adminUser", current.adminUser());
+        cfg.put("adminPass", current.adminPass());
         cfg.put("deviceCount", deviceManager.count());
         return cfg.toString();
     }
 
     private String handlePutConfig(String body) {
-        lastStatusCode.set(200);
-        return "{\"status\":\"ok\"}";
+        if (body == null || body.isBlank()) {
+            lastStatusCode.set(400);
+            return jsonError(400, "Empty body");
+        }
+        try {
+            FilialConfig current = configManager.getConfig();
+            JsonObject obj = Json.parseObject(body);
+
+            int port = obj.getInt("port", current.port());
+            int httpPort = obj.getInt("httpPort", current.httpPort());
+            String adminUser = obj.getString("adminUser", current.adminUser()).trim();
+            String adminPass = obj.getString("adminPass", current.adminPass()).trim();
+
+            if (port < 1 || port > 65535 || httpPort < 1 || httpPort > 65535) {
+                lastStatusCode.set(400);
+                return jsonError(400, "Ports must be between 1 and 65535");
+            }
+            if (adminUser.isEmpty() || adminPass.isEmpty()) {
+                lastStatusCode.set(400);
+                return jsonError(400, "Admin credentials cannot be empty");
+            }
+            if (!configManager.updateConfig(port, httpPort, adminUser, adminPass)) {
+                lastStatusCode.set(500);
+                return jsonError(500, "Could not persist config");
+            }
+
+            FilialConfig updated = configManager.getConfig();
+            JsonObject response = new JsonObject();
+            response.put("port", updated.port());
+            response.put("httpPort", updated.httpPort());
+            response.put("adminUser", updated.adminUser());
+            response.put("adminPass", updated.adminPass());
+            response.put("deviceCount", deviceManager.count());
+            response.put(
+                "restartRequired",
+                updated.port() != current.port() || updated.httpPort() != current.httpPort()
+            );
+
+            lastStatusCode.set(200);
+            return response.toString();
+        } catch (Exception e) {
+            lastStatusCode.set(400);
+            return jsonError(400, "Invalid JSON");
+        }
     }
 
     // ---- Helpers ----

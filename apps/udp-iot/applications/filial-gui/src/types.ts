@@ -8,6 +8,7 @@ export interface DeviceInfo {
 
 export interface ServerConfig {
 	port: number;
+	httpPort?: number;
 	adminUser: string;
 	adminPass: string;
 }

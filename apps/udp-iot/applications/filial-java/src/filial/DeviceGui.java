@@ -5,7 +5,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -23,9 +25,14 @@ public class DeviceGui extends JFrame {
 
     private final DeviceManager deviceManager;
     private final Consumer<String> onSensorChanged;
+    private final String host;
+    private final int port;
     private final Map<String, JSlider> acSensorSliders = new HashMap<>();
     private final Map<String, JToggleButton> lightSensorSwitches = new HashMap<>();
     private final Map<String, JLabel> actuatorLabels = new HashMap<>();
+    private JPanel actuatorsPanel;
+    private JPanel sensorsPanel;
+    private String renderedDevicesFingerprint = "";
     private Timer refreshTimer;
 
     // UI Colors
@@ -37,15 +44,19 @@ public class DeviceGui extends JFrame {
     private static final Color TEXT_COLOR = new Color(223, 228, 234);
     private static final Color LABEL_COLOR = new Color(178, 190, 195);
 
-    public DeviceGui(DeviceManager deviceManager) {
+    public DeviceGui(DeviceManager deviceManager, String host, int port) {
         this.deviceManager = deviceManager;
+        this.host = host;
+        this.port = port;
         this.onSensorChanged = null;
         initUI();
         startRefreshTimer();
     }
 
-    public DeviceGui(DeviceManager deviceManager, Consumer<String> onSensorChanged) {
+    public DeviceGui(DeviceManager deviceManager, Consumer<String> onSensorChanged, String host, int port) {
         this.deviceManager = deviceManager;
+        this.host = host;
+        this.port = port;
         this.onSensorChanged = onSensorChanged;
         initUI();
         startRefreshTimer();
@@ -54,7 +65,7 @@ public class DeviceGui extends JFrame {
     private void initUI() {
         setTitle("Filial IoT Simulator");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(550, 480);
+        setSize(800, 600);
         setLocationRelativeTo(null);
         setBackground(BG_COLOR);
 
@@ -75,9 +86,15 @@ public class DeviceGui extends JFrame {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(BG_COLOR);
 
-        contentPanel.add(createSectionPanel("Atuadores (Apenas Leitura)", createActuatorsPanel()));
-        contentPanel.add(Box.createVerticalStrut(15));
-        contentPanel.add(createSectionPanel("Sensores (Editavel)", createSensorsPanel()));
+        actuatorsPanel = createDevicesContainer();
+        sensorsPanel = createDevicesContainer();
+        rebuildDevicePanels();
+
+        JPanel sideBySidePanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        sideBySidePanel.setBackground(BG_COLOR);
+        sideBySidePanel.add(createSectionPanel("Atuadores (Apenas Leitura)", actuatorsPanel));
+        sideBySidePanel.add(createSectionPanel("Sensores (Editavel)", sensorsPanel));
+        contentPanel.add(sideBySidePanel);
 
         scrollPane.setViewportView(contentPanel);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -94,18 +111,41 @@ public class DeviceGui extends JFrame {
     }
 
     private JPanel createHeaderPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
+        // Left: icon + title
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        leftPanel.setBackground(BG_COLOR);
+
         JLabel icon = new JLabel("🏢  ");
         icon.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 28));
-        panel.add(icon);
+        icon.setForeground(TEXT_COLOR);
+        leftPanel.add(icon);
 
         JLabel title = new JLabel("Filial IoT Simulator");
         title.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 22));
         title.setForeground(ACCENT_COLOR);
-        panel.add(title);
+        leftPanel.add(title);
+
+        panel.add(leftPanel, BorderLayout.WEST);
+
+        // Right: IP:port, status, refresh
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        rightPanel.setBackground(BG_COLOR);
+
+        JLabel addrLabel = new JLabel(host + ":" + port);
+        addrLabel.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+        addrLabel.setForeground(LABEL_COLOR);
+        rightPanel.add(addrLabel);
+
+        JLabel status = new JLabel("● Conectado");
+        status.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+        status.setForeground(SUCCESS_COLOR);
+        rightPanel.add(status);
+
+        panel.add(rightPanel, BorderLayout.EAST);
 
         return panel;
     }
@@ -129,30 +169,11 @@ public class DeviceGui extends JFrame {
         return panel;
     }
 
-    private JPanel createActuatorsPanel() {
+    private JPanel createDevicesContainer() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(PANEL_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        for (String deviceId : deviceManager.list()) {
-            DeviceState state = deviceManager.get(deviceId);
-            if (state != null && !state.isSensor()) {
-                JPanel devicePanel = createActuatorPanel(state);
-                // Label is at index 2 (icon, name, label)
-                actuatorLabels.put(deviceId, (JLabel) devicePanel.getComponent(2));
-                panel.add(devicePanel);
-                panel.add(Box.createVerticalStrut(8));
-            }
-        }
-
-        if (actuatorLabels.isEmpty()) {
-            JLabel empty = new JLabel("Nenhum atuador configurado");
-            empty.setForeground(LABEL_COLOR);
-            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            panel.add(empty);
-        }
-
         return panel;
     }
 
@@ -162,10 +183,11 @@ public class DeviceGui extends JFrame {
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String icon = state.isLight() ? "💡" : "❄️";
-        JLabel iconLabel = new JLabel(icon + "  ");
-        iconLabel.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
-        panel.add(iconLabel, BorderLayout.WEST);
+	String icon = state.isLight() ? "💡" : "❄️";
+	JLabel iconLabel = new JLabel(icon + "  ");
+	iconLabel.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
+	iconLabel.setForeground(TEXT_COLOR);
+	panel.add(iconLabel, BorderLayout.WEST);
 
         JLabel nameLabel = new JLabel(formatDeviceName(state.deviceId()));
         nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
@@ -196,31 +218,6 @@ public class DeviceGui extends JFrame {
             else color = new Color(255, 71, 87);
             label.setForeground(color);
         }
-    }
-
-    private JPanel createSensorsPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(PANEL_COLOR);
-        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        for (String deviceId : deviceManager.list()) {
-            DeviceState state = deviceManager.get(deviceId);
-            if (state != null && state.isSensor()) {
-                JPanel sensorPanel = createSensorPanel(state);
-                panel.add(sensorPanel);
-                panel.add(Box.createVerticalStrut(8));
-            }
-        }
-
-        if (acSensorSliders.isEmpty() && lightSensorSwitches.isEmpty()) {
-            JLabel empty = new JLabel("Nenhum sensor configurado");
-            empty.setForeground(LABEL_COLOR);
-            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
-            panel.add(empty);
-        }
-
-        return panel;
     }
 
     private JPanel createSensorPanel(DeviceState state) {
@@ -256,27 +253,14 @@ public class DeviceGui extends JFrame {
         return panel;
     }
 
-    private JToggleButton createSwitch(DeviceState state) {
-        JToggleButton toggle = new JToggleButton();
-        toggle.setBackground(PANEL_COLOR);
-        toggle.setForeground(TEXT_COLOR);
-        toggle.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
-        toggle.setFocusPainted(false);
-        toggle.setBorderPainted(false);
-        toggle.setBorder(null);
-        toggle.setMargin(new Insets(5, 15, 5, 15));
-
-        // Initial state
-        boolean isOn = state.boolValue();
-        toggle.setSelected(isOn);
-        updateSwitchAppearance(toggle, isOn);
+    private SwitchToggle createSwitch(DeviceState state) {
+        SwitchToggle toggle = new SwitchToggle();
+        toggle.setSelected(state.boolValue());
 
         final String sensorId = state.deviceId();
         toggle.addItemListener(e -> {
-            boolean selected = toggle.isSelected();
-            updateSwitchAppearance(toggle, selected);
             try {
-                deviceManager.set(sensorId, selected);
+                deviceManager.set(sensorId, toggle.isSelected());
                 if (onSensorChanged != null) onSensorChanged.accept(sensorId);
             } catch (IllegalArgumentException ex) {
                 // Ignore
@@ -284,18 +268,6 @@ public class DeviceGui extends JFrame {
         });
 
         return toggle;
-    }
-
-    private void updateSwitchAppearance(JToggleButton toggle, boolean selected) {
-        if (selected) {
-            toggle.setText("☀ LUMINOSO");
-            toggle.setBackground(SUCCESS_COLOR);
-            toggle.setForeground(Color.BLACK);
-        } else {
-            toggle.setText("🌙 ESCURO");
-            toggle.setBackground(LABEL_COLOR);
-            toggle.setForeground(Color.BLACK);
-        }
     }
 
     private JPanel createAcSliderPanel(DeviceState state) {
@@ -309,6 +281,7 @@ public class DeviceGui extends JFrame {
 
         JSlider slider = new JSlider(0, 1023, state.intValue());
         slider.setBackground(PANEL_COLOR);
+        slider.setForeground(TEXT_COLOR);
         slider.setMajorTickSpacing(256);
         slider.setMinorTickSpacing(64);
         slider.setPaintTicks(true);
@@ -339,26 +312,9 @@ public class DeviceGui extends JFrame {
     }
 
     private JPanel createFooterPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel panel = new JPanel();
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(10, 0, 0, 0));
-
-        JLabel status = new JLabel("● Conectado");
-        status.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
-        status.setForeground(SUCCESS_COLOR);
-        panel.add(status);
-
-        panel.add(Box.createHorizontalStrut(20));
-
-        JButton refreshBtn = new JButton("Atualizar");
-        refreshBtn.setFocusPainted(false);
-        refreshBtn.setBackground(ACCENT_COLOR);
-        refreshBtn.setForeground(Color.WHITE);
-        refreshBtn.setBorderPainted(false);
-        refreshBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        refreshBtn.addActionListener(e -> refreshAll());
-        panel.add(refreshBtn);
-
         return panel;
     }
 
@@ -379,7 +335,7 @@ public class DeviceGui extends JFrame {
     }
 
     private void startRefreshTimer() {
-        refreshTimer = new Timer(500, e -> refreshActuators());
+        refreshTimer = new Timer(500, e -> refreshAll());
         refreshTimer.start();
     }
 
@@ -403,6 +359,10 @@ public class DeviceGui extends JFrame {
     }
 
     private void refreshAll() {
+        if (haveDevicesChanged()) {
+            rebuildDevicePanels();
+        }
+
         refreshActuators();
 
         // Refresh light sensors
@@ -410,10 +370,8 @@ public class DeviceGui extends JFrame {
             DeviceState state = deviceManager.get(deviceId);
             if (state != null) {
                 JToggleButton toggle = lightSensorSwitches.get(deviceId);
-                boolean isOn = state.boolValue();
-                if (toggle.isSelected() != isOn) {
-                    toggle.setSelected(isOn);
-                    updateSwitchAppearance(toggle, isOn);
+                if (toggle.isSelected() != state.boolValue()) {
+                    toggle.setSelected(state.boolValue());
                 }
             }
         }
@@ -428,5 +386,86 @@ public class DeviceGui extends JFrame {
                 }
             }
         }
+    }
+
+    private boolean haveDevicesChanged() {
+        return !buildDeviceFingerprint().equals(renderedDevicesFingerprint);
+    }
+
+    private void rebuildDevicePanels() {
+        if (actuatorsPanel == null || sensorsPanel == null) {
+            return;
+        }
+
+        actuatorLabels.clear();
+        lightSensorSwitches.clear();
+        acSensorSliders.clear();
+
+        actuatorsPanel.removeAll();
+        sensorsPanel.removeAll();
+
+        int actuatorCount = 0;
+        int sensorCount = 0;
+
+        for (String deviceId : getSortedDeviceIds()) {
+            DeviceState state = deviceManager.get(deviceId);
+            if (state == null) {
+                continue;
+            }
+
+            if (state.isSensor()) {
+                JPanel sensorPanel = createSensorPanel(state);
+                sensorsPanel.add(sensorPanel);
+                sensorsPanel.add(Box.createVerticalStrut(2));
+                JSeparator sensorSep = new JSeparator(JSeparator.HORIZONTAL);
+                sensorSep.setForeground(new Color(60, 70, 85));
+                sensorSep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+                sensorsPanel.add(sensorSep);
+                sensorsPanel.add(Box.createVerticalStrut(2));
+                sensorCount++;
+            } else {
+                JPanel devicePanel = createActuatorPanel(state);
+                actuatorLabels.put(deviceId, (JLabel) devicePanel.getComponent(2));
+                actuatorsPanel.add(devicePanel);
+                actuatorsPanel.add(Box.createVerticalStrut(2));
+                JSeparator actuatorSep = new JSeparator(JSeparator.HORIZONTAL);
+                actuatorSep.setForeground(new Color(60, 70, 85));
+                actuatorSep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+                actuatorsPanel.add(actuatorSep);
+                actuatorsPanel.add(Box.createVerticalStrut(2));
+                actuatorCount++;
+            }
+        }
+
+        if (actuatorCount == 0) {
+            actuatorsPanel.add(createEmptyStateLabel("Nenhum atuador configurado"));
+        }
+
+        if (sensorCount == 0) {
+            sensorsPanel.add(createEmptyStateLabel("Nenhum sensor configurado"));
+        }
+
+        renderedDevicesFingerprint = buildDeviceFingerprint();
+        actuatorsPanel.revalidate();
+        actuatorsPanel.repaint();
+        sensorsPanel.revalidate();
+        sensorsPanel.repaint();
+    }
+
+    private JLabel createEmptyStateLabel(String text) {
+        JLabel empty = new JLabel(text);
+        empty.setForeground(LABEL_COLOR);
+        empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return empty;
+    }
+
+    private List<String> getSortedDeviceIds() {
+        List<String> ids = new ArrayList<>(deviceManager.list());
+        ids.sort(String::compareToIgnoreCase);
+        return ids;
+    }
+
+    private String buildDeviceFingerprint() {
+        return String.join("|", getSortedDeviceIds());
     }
 }

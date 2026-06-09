@@ -1,4 +1,21 @@
 {
 	"version": 1,
-	"runs": []
+	"runs": [
+		{
+			"id": "1781013915753-l5ygkt",
+			"appName": "udp-iot",
+			"scriptLabel": "dev:gui",
+			"pid": 13764,
+			"isRunning": true,
+			"status": "Terminal aberto (PID 13764)."
+		},
+		{
+			"id": "1781015050040-c7rusx",
+			"appName": "udp-iot",
+			"scriptLabel": "dev:java",
+			"pid": 9256,
+			"isRunning": true,
+			"status": "Terminal aberto (PID 9256)."
+		}
+	]
 }

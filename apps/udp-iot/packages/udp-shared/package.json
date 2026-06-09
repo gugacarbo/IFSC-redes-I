@@ -5,6 +5,6 @@
 	"description": "Shared Java classes for UDP-IoT",
 	"type": "module",
 	"scripts": {
-		"postinstall": "bash scripts/init-config.sh"
+		"initial-config": "bash scripts/init-config.sh"
 	}
 }

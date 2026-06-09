@@ -6,8 +6,10 @@ import shared.Json.JsonArray;
 import shared.Json.JsonObject;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,26 +35,7 @@ public class ConfigManager {
     public synchronized boolean load(String path) {
         this.configPath = path;
         try {
-            String content = Files.readString(Path.of(path));
-            JsonObject obj = Json.parseObject(content);
-
-            String user = obj.getString("user", "admin");
-            String pass = obj.getString("pass", "admin");
-            int pollingMs = obj.getInt("polling_ms", 0);
-
-            List<FilialInfo> filiais = new ArrayList<>();
-            if (obj.has("filiais")) {
-                JsonArray arr = obj.getArray("filiais");
-                for (int i = 0; i < arr.size(); i++) {
-                    JsonObject f = arr.getObject(i);
-                    String name = f.getString("name", "Filial " + (i + 1));
-                    String ip   = f.getString("ip", "127.0.0.1");
-                    int port    = f.getInt("port", 51000);
-                    filiais.add(new FilialInfo(name, ip, port));
-                }
-            }
-
-            this.config = new MatrizConfig(user, pass, pollingMs, filiais);
+            this.config = readConfigFromDisk();
             return true;
         } catch (IOException e) {
             logger.error("ConfigManager: IO error: {}", e.getMessage());
@@ -77,29 +60,10 @@ public class ConfigManager {
                 return false;
             }
 
-            // Re-parse to update in-memory config
-            // (We could re-call load, but this avoids re-reading the file)
-            String user = obj.getString("user");
-            String pass = obj.getString("pass");
-            int pollingMs = obj.getInt("polling_ms", 0);
-
-            List<FilialInfo> filiais = new ArrayList<>();
-            if (obj.has("filiais")) {
-                JsonArray arr = obj.getArray("filiais");
-                for (int i = 0; i < arr.size(); i++) {
-                    JsonObject f = arr.getObject(i);
-                    String name = f.getString("name", "Filial " + (i + 1));
-                    String ip   = f.getString("ip", "127.0.0.1");
-                    int port    = f.getInt("port", 51000);
-                    filiais.add(new FilialInfo(name, ip, port));
-                }
-            }
-
-            this.config = new MatrizConfig(user, pass, pollingMs, filiais);
-
-            // Write to file
-            Files.writeString(Path.of(configPath), jsonContent);
-            logger.info("ConfigManager: Configuration saved ({} filiais)", filiais.size());
+            MatrizConfig parsed = parseConfig(obj);
+            writeConfigToDisk(jsonContent);
+            this.config = readConfigFromDisk();
+            logger.info("ConfigManager: Configuration saved ({} filiais)", parsed.filiais().size());
             return true;
         } catch (IOException e) {
             logger.error("ConfigManager: IO error on save: {}", e.getMessage());
@@ -112,36 +76,90 @@ public class ConfigManager {
 
     /** Return the current config as a JSON string (for REST API). */
     public synchronized String getConfigJson() {
-        JsonObject obj = new JsonObject();
-        obj.put("user", config.user());
-        obj.put("pass", config.pass());
-        obj.put("polling_ms", config.pollingMs());
-
-        JsonArray arr = new JsonArray();
-        for (FilialInfo f : config.filiais()) {
-            arr.add(Json.object()
-                .put("name", f.name())
-                .put("ip", f.ip())
-                .put("port", f.port()));
+        try {
+            return Files.readString(Path.of(configPath));
+        } catch (IOException e) {
+            throw new RuntimeException("ConfigManager: Could not read config JSON", e);
         }
-        obj.put("filiais", arr);
-        return obj.toString();
     }
 
     /** Return the current parsed config object. */
-    public MatrizConfig getConfig() {
-        return config;
+    public synchronized MatrizConfig getConfig() {
+        try {
+            this.config = readConfigFromDisk();
+            return config;
+        } catch (IOException e) {
+            throw new RuntimeException("ConfigManager: Could not refresh config from disk", e);
+        }
     }
 
     /**
      * Find a filial's port by IP address.
      * @return port number, or 51000 if not found
      */
-    public int findPortByIp(String ip) {
-        for (FilialInfo f : config.filiais()) {
+    public synchronized int findPortByIp(String ip) {
+        for (FilialInfo f : getConfig().filiais()) {
             if (f.ip().equals(ip)) return f.port();
         }
         return 51000;
+    }
+
+    private MatrizConfig readConfigFromDisk() throws IOException {
+        String content = Files.readString(Path.of(configPath));
+        JsonObject obj = Json.parseObject(content);
+        return parseConfig(obj);
+    }
+
+    private MatrizConfig parseConfig(JsonObject obj) {
+        String user = obj.getString("user", "admin");
+        String pass = obj.getString("pass", "admin");
+        int pollingMs = resolvePollingMs(obj);
+
+        List<FilialInfo> filiais = new ArrayList<>();
+        if (obj.has("filiais")) {
+            JsonArray arr = obj.getArray("filiais");
+            for (int i = 0; i < arr.size(); i++) {
+                JsonObject f = arr.getObject(i);
+                String name = f.getString("name", "Filial " + (i + 1));
+                String ip   = f.getString("ip", "127.0.0.1");
+                int port    = f.getInt("port", 51000);
+                filiais.add(new FilialInfo(name, ip, port));
+            }
+        }
+
+        return new MatrizConfig(user, pass, pollingMs, filiais);
+    }
+
+    private int resolvePollingMs(JsonObject obj) {
+        if (obj.has("pollingMs")) {
+            return obj.getInt("pollingMs", 0);
+        }
+        return obj.getInt("polling_ms", 0);
+    }
+
+    private void writeConfigToDisk(String jsonContent) throws IOException {
+        Path target = Path.of(configPath);
+        Path parent = target.toAbsolutePath().getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+
+        Path tempFile = Files.createTempFile(parent, target.getFileName().toString(), ".tmp");
+        try {
+            Files.writeString(tempFile, jsonContent);
+            try {
+                Files.move(
+                    tempFile,
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE
+                );
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tempFile, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
     }
 
     /** Configuration data record. */

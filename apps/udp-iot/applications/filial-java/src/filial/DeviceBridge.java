@@ -76,7 +76,7 @@ public class DeviceBridge {
     }
 
     private void handleSetDevice(JsonObject msg) {
-        String id = msg.getString("id", "");
+        String id = msg.getString("id", "").trim();
         if (id.isEmpty()) return;
         DeviceState state = deviceManager.get(id);
         if (state == null || state.isSensor()) return;
@@ -90,15 +90,24 @@ public class DeviceBridge {
     }
 
     private void handleAddDevice(JsonObject msg) {
-        String id = msg.getString("id", "");
+        String id = msg.getString("id", "").trim();
         if (id.isEmpty()) return;
+        if (!configManager.addDevice(id)) {
+            logger.error("DeviceBridge: Could not persist added device {}", id);
+            return;
+        }
         deviceManager.addDevice(id);
         broadcastDevicesUpdated();
     }
 
     private void handleRemoveDevice(JsonObject msg) {
-        String id = msg.getString("id", "");
+        String id = msg.getString("id", "").trim();
         if (id.isEmpty()) return;
+        if (deviceManager.get(id) == null) return;
+        if (!configManager.removeDevice(id)) {
+            logger.error("DeviceBridge: Could not persist removed device {}", id);
+            return;
+        }
         deviceManager.removeDevice(id);
         broadcastDevicesUpdated();
     }

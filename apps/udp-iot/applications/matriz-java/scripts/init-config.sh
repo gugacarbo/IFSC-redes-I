@@ -64,7 +64,7 @@ generate_matriz() {
 {
   "user": "${ADMIN_USER}",
   "pass": "${ADMIN_PASS}",
-  "polling_ms": ${POLLING_MS},
+  "pollingMs": ${POLLING_MS},
   "filiais": [
     { "name": "Filial A", "ip": "127.0.0.1", "port": ${PORT_FILIAL} },
     { "name": "Filial B", "ip": "127.0.0.2", "port": ${PORT_FILIAL} }
