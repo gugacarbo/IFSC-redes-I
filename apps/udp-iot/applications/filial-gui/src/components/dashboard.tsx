@@ -102,7 +102,7 @@ export function Dashboard({ devices, onSetDevice }: DashboardProps) {
 								new Map<string, DeviceInfo[]>(),
 							).entries()].map(([place, placeDevices]) => (
 								<div key={place}>
-									<h3 className="mb-2 pl-1 text-[11px] font-medium tracking-wider uppercase text-muted-foreground/70">
+									<h3 className="mb-2 flex items-center gap-1 pl-1 text-[11px] font-medium tracking-wider uppercase text-muted-foreground/70">
 										<MapPin className="size-3" />
 										{toNormalCase(place)}
 									</h3>
