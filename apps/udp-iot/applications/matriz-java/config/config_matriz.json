@@ -1,0 +1,9 @@
+{
+	"user": "admin",
+	"pass": "admin",
+	"pollingMs": 5000,
+	"filiais": [
+		{ "name": "Filial A", "ip": "127.0.0.1", "port": 51000 },
+		{ "name": "Filial B", "ip": "127.0.0.2", "port": 51000 }
+	]
+}

@@ -1,0 +1,44 @@
+{
+	"name": "ifsc-redes-i",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"packageManager": "^npm@10.9.2",
+	"workspaces": [
+		"tools/*",
+		"launcher",
+		"packages/*",
+		"apps/*",
+		"apps/udp-iot/packages/*",
+		"apps/udp-iot/applications/*",
+		"packages/logging/*"
+	],
+	"author": {
+		"name": "Gustavo Carbonera",
+		"url": "https://github.com/gugacarbo"
+	},
+	"scripts": {
+		"start": "node launcher/prepare-and-start.js",
+		"build": "turbo run build --filter=launcher",
+		"test": "turbo run test",
+		"lint": "turbo run lint",
+		"typecheck": "turbo run typecheck",
+		"format:packages": "turbo run format",
+		"format": "biome check --write",
+		"format:md": "prettier --write \"**/*.md\"",
+		"lint-staged": "lint-staged",
+		"download-checkstyle": "bash tools/java/download-checkstyle.sh",
+		"knip": "knip"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.14",
+		"@types/node": "^25.6.0",
+		"knip": "^6.11.0",
+		"lint-staged": "^16.4.0",
+		"prettier": "^3.8.3",
+		"test-staged": "^1.1.11",
+		"turbo": "^2.9.9",
+		"typescript": "^6.0.3",
+		"vite": "^8.0.12"
+	}
+}

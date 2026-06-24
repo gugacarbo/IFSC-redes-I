@@ -1,0 +1,27 @@
+{
+	"name": "launcher",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx src/index.tsx",
+		"build": "tsc",
+		"start": "node dist/src/index.js",
+		"format": "biome check --write",
+		"lint": "biome lint"
+	},
+	"dependencies": {
+		"ink": "^7.0.2",
+		"react": "^19.2.5"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.14",
+		"@types/node": "^25.6.0",
+		"@types/react": "^19.2.14",
+		"boxednode": "^3.0.0",
+		"esbuild": "^0.28.0",
+		"nexe": "^5.0.0-beta.4",
+		"pkg": "^5.8.1",
+		"tsx": "^4.21.0",
+		"typescript": "^6.0.3"
+	}
+}

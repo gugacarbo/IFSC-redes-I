@@ -1,0 +1,15 @@
+{
+	"name": "chat-udp",
+	"description": "Chat UDP Multicast com interface Swing",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "node scripts/run-build.cjs build",
+		"dev": "node scripts/run-build.cjs dev",
+		"test": "node scripts/run-build.cjs test",
+		"lint": "node scripts/run-build.cjs lint",
+		"typecheck": "node scripts/run-build.cjs typecheck",
+		"format": "node scripts/run-build.cjs format",
+		"clean": "node scripts/run-build.cjs clean"
+	}
+}

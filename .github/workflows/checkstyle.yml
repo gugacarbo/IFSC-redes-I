@@ -1,0 +1,58 @@
+name: Checkstyle CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/java/**"
+      - "package.json"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/java/**"
+      - "package.json"
+  workflow_dispatch:
+
+jobs:
+  checkstyle-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install workspace
+        run: npm install --workspace=@ifsc/tools-java --ignore-scripts
+
+      - name: Run tests
+        run: npm test -w @ifsc/tools-java
+
+      - name: Verify JAR was downloaded
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          if [ -f tools/java/checkstyle.jar ]; then
+            echo "checkstyle.jar exists"
+            ls -lh tools/java/checkstyle.jar
+          else
+            echo "checkstyle.jar NOT found (tests don't download it)"
+          fi
+        shell: bash
+
+      - name: Verify JAR was downloaded (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          if (Test-Path "tools/java/checkstyle.jar") {
+            echo "checkstyle.jar exists"
+            ls -lh tools/java/checkstyle.jar
+          } else {
+            echo "checkstyle.jar NOT found (tests don't download it)"
+          }
+        shell: pwsh
