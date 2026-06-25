@@ -1,12 +1,17 @@
 {
-	"user": "admin",
-	"pass": "admin",
-	"pollingMs": 500,
-	"filiais": [
-		{
-			"name": "Filial Local",
-			"ip": "127.0.0.1",
-			"port": 51000
-		}
-	]
+  "user": "admin",
+  "pass": "admin",
+  "pollingMs": 500,
+  "filiais": [
+    {
+      "name": "Filial Local",
+      "ip": "127.0.0.1",
+      "port": 51000
+    },
+    {
+      "name": "Nova Filial",
+      "ip": "10.151.35.80",
+      "port": 51000
+    }
+  ]
 }

@@ -17,7 +17,7 @@ export async function scanStorage({
 	const files: StoredFile[] = [];
 
 	for (const entry of entries) {
-		if (!entry.isFile() || entry.name.startsWith(".")) {
+		if (!entry.isFile()) {
 			continue;
 		}
 
